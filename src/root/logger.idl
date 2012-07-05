@@ -1,0 +1,19 @@
+//
+// File:  src/root/logger.idl
+//
+// Description: Interface for logger
+//
+
+/* The logger interface description */
+
+/* our C++ datatypes and IDL4 datatypes  */
+import "sdi/types.h";
+#include <types.idl>
+#include <iflogging.idl>
+
+
+interface logger : IF_LOGGING {
+
+    /* Nothing more needed */
+      
+};

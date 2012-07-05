@@ -1,0 +1,16 @@
+#! /usr/bin/perl
+
+use Socket; 
+use strict; 
+my $name = $ENV{'sdi_qemu_ctl'};
+if($name eq "")
+{
+	print "ERROR: please execute '. config' before starting this script\n";
+	exit 1;
+}
+my $sock = sockaddr_un($name);
+socket(my $qemu, PF_UNIX,SOCK_STREAM,0) || die "Socket error: $!";
+connect($qemu, $sock) || die "Connection error: $!"; 
+
+my $cmd = join(' ', @ARGV);
+print $qemu "$cmd \n";

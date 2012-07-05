@@ -1,0 +1,19 @@
+//
+// File:  src/root/locator.idl
+//
+// Description: Interface for locator
+//
+
+/* The logger interface description */
+
+/* our C++ datatypes and IDL4 datatypes  */
+import "sdi/types.h";
+#include <types.idl>
+#include <iflocator.idl>
+
+
+interface locator : IF_LOCATOR {
+
+    /* Nothing more needed */
+      
+};

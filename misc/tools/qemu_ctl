@@ -1,0 +1,85 @@
+#!/bin/sh
+
+script_dir="`dirname \"$0\"`"
+. "${script_dir}/config"
+
+
+which qemu &> /dev/null
+if [ $? -ne 0 ]
+	then
+	echo "WARNING: qemu not found in path"
+fi
+
+usage()
+{
+	echo "Usage: $0 [-nc] start | stop | pause | reset | reloadcd"
+	echo "  start:   start qemu"
+	echo "            -n: no video output is opened; useful when using ssh"
+	echo "            -c: video output is displayed using curses (-n is ignored); useful when using ssh"
+	echo ""
+	echo "  stop:     stop qemu"
+	echo ""
+	echo "  pause:    pause qemu"
+	echo ""
+	echo "  reset:    restart the virtual machine"
+	echo ""
+	echo "  reloadcd: eject and reload the iso"
+	exit 1
+}
+
+
+cd "${sdi_basedir}"
+
+vga=""
+curses=false
+
+while getopts nc o
+	do
+	case "$o" in
+		n) vga="-nographic";;
+		c) curses="true";;
+		[?]) usage;;
+	esac
+done
+
+shift `expr $OPTIND - 1`
+
+
+if [ "$1" = "start" ]
+	then
+	shift
+	if [ -r "${sdi_qemu_ctl}" ]
+		then
+		# continue
+		"${sdi_tools}/helper_send_cmd_2_qemu" cont &> /dev/null
+		if [ $? -eq 0 ]
+			then
+			echo "resumed previously paused qemu"
+			exit 0;
+		fi
+	fi
+	
+	if [ "$curses" = "false" ]
+		then
+		$sdi_qemu_cmdline $vga &
+	else
+		$sdi_qemu_cmdline -curses
+	fi
+
+	
+elif [ "$1" = "stop" ]
+	then 
+	"${sdi_tools}/helper_send_cmd_2_qemu" q && rm ${sdi_qemu_ctl}
+elif [ "$1" = "pause" ]
+	then
+	"${sdi_tools}/helper_send_cmd_2_qemu" stop || echo "pausing qemu failed"
+elif [ "$1" = "reset" ]
+	then
+	"${sdi_tools}/helper_send_cmd_2_qemu" system_reset || echo "reseting qemu failed"
+elif [ "$1" = "reloadcd" ]
+	then
+	"${sdi_tools}/helper_send_cmd_2_qemu" eject ide1-cd0 || echo "ejecting cd failed"
+	"${sdi_tools}/helper_send_cmd_2_qemu" change ide1-cd0 "$sdi_iso" || echo "loading cd failed"
+else
+	usage
+fi

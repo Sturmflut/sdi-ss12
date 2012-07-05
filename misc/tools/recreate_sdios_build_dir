@@ -1,0 +1,17 @@
+#!/bin/sh
+
+script_dir="`dirname \"$0\"`"
+. "${script_dir}/config"
+
+function err()
+{
+	echo "ERROR: recreating build dir failed" 1>&2
+	exit 1
+}
+
+cd "$sdi_sdios" || err
+autoheader || err
+autoconf || err
+mkdir -p build || err
+cd build || err
+../configure --prefix="${sdi_cd_dir}/sdios/" --with-l4dir="$sdi_l4_user" || err

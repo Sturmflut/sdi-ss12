@@ -1,0 +1,9 @@
+#!/bin/sh
+
+script_dir="`dirname \"$0\"`"
+. "${script_dir}/config"
+
+
+minicom -o -b 115200 -D "unix#${sdi_qemu_com}" -c on
+
+

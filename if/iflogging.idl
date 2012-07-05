@@ -1,0 +1,16 @@
+//
+// File:  if/logging.idl
+//
+// Description: Interface for logging
+//
+
+/* our datatypes & exceptions */
+import "sdi/types.h";
+#include <types.idl>
+
+[uuid(IF_LOGGING_ID)]
+interface IF_LOGGING {
+
+    void LogMessage( in logmessage_t message );
+
+};

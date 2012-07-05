@@ -1,0 +1,15 @@
+serial --unit=0 --speed=57600
+terminal serial console
+color white/blue black/light-gray
+default 0
+#timeout 0
+
+title SdiOS
+
+kernel=(cd)/sdios/kickstart
+module=(cd)/sdios/x86-kernel
+module=(cd)/sdios/sigma0
+module=(cd)/sdios/root
+module=(cd)/sdios/test
+module=(cd)/sdios/simplethread1
+module=(cd)/sdios/simplethread2

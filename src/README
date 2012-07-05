@@ -1,0 +1,5 @@
+
+To add another directory, you need to 
+
+1) Specify the path of the Makefile in configure.ac
+2) Include the subdir in the SUBDIRS variable of the src/Makefile

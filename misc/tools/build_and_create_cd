@@ -1,0 +1,16 @@
+#!/bin/sh
+
+script_dir="`dirname \"$0\"`"
+. "${script_dir}/config"
+
+
+cd "$sdi_sdios/build" && make && make install && mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o "$sdi_iso" "$sdi_cd_dir" 
+
+if [ $? -ne 0 ] 
+	then
+	echo "=========================="
+	echo "ERROR: creating iso failed"
+	echo "=========================="
+	exit 1
+fi
+

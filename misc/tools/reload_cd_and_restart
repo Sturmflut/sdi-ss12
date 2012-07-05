@@ -1,0 +1,17 @@
+#!/bin/sh
+
+script_dir="`dirname \"$0\"`"
+. "${script_dir}/config"
+
+
+"${sdi_tools}/qemu_ctl" reloadcd && "${sdi_tools}/qemu_ctl" reset
+if [ $? -ne 0 ] 
+	then
+	echo "========================================"
+	echo "ERROR: reloading cd an restarting failed"
+	echo "========================================"
+	exit 1
+fi
+
+
+
