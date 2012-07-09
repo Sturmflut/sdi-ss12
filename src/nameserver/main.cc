@@ -53,6 +53,8 @@ void ** nameserver_itable[8] = { nameserver_vtable_0, nameserver_vtable_discard,
 void  nameserver_server(void)
 
 {
+
+
   L4_ThreadId_t  partner;
   L4_MsgTag_t  msgtag;
   idl4_msgbuf_t  msgbuf;
@@ -71,11 +73,13 @@ void  nameserver_server(void)
       while (1)
         {
           idl4_msgbuf_sync(&msgbuf);
+	printf("[NAMESERVER] Got message\n");
 
           idl4_reply_and_wait(&partner, &msgtag, &msgbuf, &cnt);
 
           if (idl4_is_error(&msgtag))
             break;
+
 
           idl4_process_request(&partner, &msgtag, &msgbuf, &cnt, nameserver_itable[idl4_get_interface_id(&msgtag) & NAMESERVER_IID_MASK][idl4_get_function_id(&msgtag) & NAMESERVER_FID_MASK]);
         }
@@ -90,7 +94,7 @@ void  nameserver_discard(void)
 
 int main(void)
 {
-	printf("Starting nameserver...\n");
+	printf("[NAMSERVER] Starting...\n");
 
 	nameserver_server();
 

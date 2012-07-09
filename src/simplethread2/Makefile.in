@@ -21,7 +21,7 @@ SRCS=		$(ARCH)-crt0.S \
 IDLS=           
 
 LIBS+=		-ll4 -lio -lsdi
-LDFLAGS+=	-Ttext=00710000 -T $(top_builddir)/include/$(ARCH)/sdi.ld
+LDFLAGS+=	-Ttext=00680000 -T $(top_builddir)/include/$(ARCH)/sdi.ld
 
 
 include $(top_srcdir)/Mk/prog.mk

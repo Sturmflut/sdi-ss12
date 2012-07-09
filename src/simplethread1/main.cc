@@ -14,8 +14,10 @@
 #include <idl4glue.h>
 #include <if/iflocator.h>
 #include <if/iflogging.h>
+#include <if/ifnameserver.h>
 
 L4_ThreadId_t locatorid; 
+L4_ThreadId_t nameserverid; 
 
 int main () {
     L4_Msg_t msg;
@@ -31,6 +33,15 @@ int main () {
     while (L4_IsNilThread (loggerid)) {
         IF_LOCATOR_Locate ((CORBA_Object)locatorid, IF_LOGGING_ID, &loggerid, &env);
     }
+
+
+    /* Guess nameserverid */
+    nameserverid = L4_GlobalId (5353, 1);
+
+    printf ("Registering with the nameserver ...\n");
+    IF_NAMESERVER_register ((CORBA_Object)locatorid, "/clients/simplethread1", &env);
+
+
 
     /* Printout message through logger */
     IF_LOGGING_LogMessage ((CORBA_Object)loggerid, "Hello World Thread 1", &env);

@@ -217,36 +217,57 @@ int main(void) {
 	panic ("Bootinfo not found");
     list_modules ((L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
 
+
+
     /* Now we search for the third module, 
+       which will (hopefully) be our nameserver */ 
+    L4_BootRec_t* nameserver = find_module (2, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+    L4_Word_t namestartip = load_elfimage (nameserver); 
+
+    /* some ELF loading and staring */
+    L4_ThreadId_t nameid = L4_GlobalId ( 5353, 1);
+    start_task (nameid, namestartip, utcbarea);
+    printf ("nameserver started as %lx\n", nameid.raw);
+
+
+
+
+    /* Now we search for the fourth module, 
        which will (hopefully) be our testclient */ 
-    L4_BootRec_t* module2 = find_module (2, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+    L4_BootRec_t* module2 = find_module (3, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
     L4_Word_t startip = load_elfimage (module2);
 
     /* some ELF loading and staring */
-
-    L4_ThreadId_t testid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 3, 1);
+    L4_ThreadId_t testid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 4, 1);
     start_task (testid, startip, utcbarea);
     printf ("Testclient started as %lx\n", testid.raw);
 
-    /* Now we search for the fourth module, 
-       which will (hopefully) be our simplethread1 */ 
-    L4_BootRec_t* module3 = find_module (3, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+
+
+
+    /* Now we search for the fifth module, 
+       which will (hopefully) be our nameserver */ 
+    L4_BootRec_t* module3 = find_module (4, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
     L4_Word_t simplestartip = load_elfimage (module3); 
 
     /* some ELF loading and staring */
-    L4_ThreadId_t simpleid1 = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 4, 1);
+    L4_ThreadId_t simpleid1 = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 5, 1);
     start_task (simpleid1, simplestartip, utcbarea);
     printf ("SimpleThread1 started as %lx\n", simpleid1.raw);
 
 
-    /* Now we search for the fifth module, 
-       which will (hopefully) be our simplethread1 */ 
-    L4_BootRec_t* module4 = find_module (4, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+
+
+    /* Now we search for the sixth module, 
+       which will (hopefully) be our simplethread2 */ 
+    L4_BootRec_t* module4 = find_module (5, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
     L4_Word_t simplestartip2 = load_elfimage (module4); 
 
-    L4_ThreadId_t simpleid2 = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 5, 1);
+    L4_ThreadId_t simpleid2 = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 6, 1);
     start_task (simpleid2, simplestartip2, utcbarea);
     printf ("SimpleThread2 started as %lx\n", simpleid2.raw);
+
+
 
     /* now it is time to become the pager for all those threads we 
        created recently */

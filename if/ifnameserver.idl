@@ -9,9 +9,11 @@
 /* our C++ datatypes and IDL4 datatypes  */
 import "sdi/types.h";
 #include <types.idl>
-#include <ifnameserver.idl>
+#include <ifnaming.idl>
 
 
-interface nameserver : IF_NAMESERVER {
+interface IF_NAMESERVER : IF_NAMING {
 
+	void register(in path_t path); 
+	void deregister();
 };
