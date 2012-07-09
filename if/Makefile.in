@@ -15,7 +15,6 @@ IDLS=		types.idl \
 		iflogging.idl \
 		iflocator.idl \
 		ifnaming.idl \
-		ifnameserver.idl \
 		iftask.idl
 
 include $(top_srcdir)/Mk/idl.mk

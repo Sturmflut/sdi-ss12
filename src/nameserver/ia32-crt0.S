@@ -1,5 +1,5 @@
 //
-// File:  src/test/ia32-crt0.S
+// File:  src/root/ia32-crt0.S
 //
 // Description: Simple startupcode
 //
@@ -62,7 +62,6 @@ ___return_from_main:
 __stack:   /* this marks the top of the stack */
 
 /* allocate 16*1024 bytes heap space and aditional pointers */
-
 	.data
 	.global __heap_ptr
 __heap_ptr:	
