@@ -12,7 +12,10 @@ top_builddir=	@top_builddir@
 include $(top_srcdir)/Mk/base.mk
 
 IDLS=		types.idl \
-		iflogging.idl iflocator.idl \
+		iflogging.idl \
+		iflocator.idl \
+		ifnaming.idl \
+		ifnameserver.idl \
 		iftask.idl
 
 include $(top_srcdir)/Mk/idl.mk
