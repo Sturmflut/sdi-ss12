@@ -11,7 +11,7 @@ import "sdi/types.h";
 #include <types.idl>
 #include <ifnaming.idl>
 
-
+[uuid(IF_NAMESERVER_ID)]
 interface IF_NAMESERVER : IF_NAMING {
 
 	void register(in path_t path); 

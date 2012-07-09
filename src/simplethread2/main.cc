@@ -27,7 +27,6 @@ int main () {
     CORBA_Environment env (idl4_default_environment);    
     L4_ThreadId_t loggerid = L4_nilthread;
 
-    printf ("Resolve logger ...\n");
     while (L4_IsNilThread (loggerid)) {
         IF_LOCATOR_Locate ((CORBA_Object)locatorid, IF_LOGGING_ID, &loggerid, &env);
     }

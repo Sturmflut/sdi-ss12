@@ -29,17 +29,21 @@ int main () {
     CORBA_Environment env (idl4_default_environment);    
     L4_ThreadId_t loggerid = L4_nilthread;
 
-    printf ("Resolve logger ...\n");
     while (L4_IsNilThread (loggerid)) {
         IF_LOCATOR_Locate ((CORBA_Object)locatorid, IF_LOGGING_ID, &loggerid, &env);
     }
 
+    L4_ThreadId_t nameserverid = L4_GlobalId (5353, 1);
+    
 
     /* Guess nameserverid */
     nameserverid = L4_GlobalId (5353, 1);
 
-    printf ("Registering with the nameserver ...\n");
-    IF_NAMESERVER_register ((CORBA_Object)locatorid, "/clients/simplethread1", &env);
+    IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Registering", &env);
+
+    IF_NAMESERVER_register ((CORBA_Object)loggerid, "/clients/simplethread1", &env);
+
+    IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Registered", &env);
 
 
     /* Spin forever */

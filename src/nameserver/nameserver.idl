@@ -11,7 +11,7 @@ import "sdi/types.h";
 #include <types.idl>
 #include <ifnameserver.idl>
 
-
+[uuid(IF_NAMESERVER_ID)]
 interface nameserver : IF_NAMESERVER {
 
 };
