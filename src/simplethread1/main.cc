@@ -42,30 +42,6 @@ int main () {
     IF_NAMESERVER_register ((CORBA_Object)locatorid, "/clients/simplethread1", &env);
 
 
-
-    /* Printout message through logger */
-    IF_LOGGING_LogMessage ((CORBA_Object)loggerid, "Hello World Thread 1", &env);
-
-
-    /* Send two words to the companion thread */
-    L4_MsgClear(&msg);
-    L4_MsgAppendWord(&msg, 23);
-    L4_MsgAppendWord(&msg, 42);
-    L4_MsgLoad(&msg);
-
-    tag = L4_Send(L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 1, 1));
-
-    IF_LOGGING_LogMessage ((CORBA_Object)loggerid, "Thread 1 finished sending", &env);
-
-    /* Receive result from companion */
-    L4_MsgClear(&msg);
-    tag = L4_Receive(L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 1, 1));
-    L4_Store(tag, &msg);
-
-    IF_LOGGING_LogMessage ((CORBA_Object)loggerid, "Thread 1 finished receiving", &env);
-    printf("Thread 1 got sum: %i\n", L4_Get(&msg, 0));
-
-
     /* Spin forever */
     while (42);
     
