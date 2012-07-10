@@ -21,6 +21,8 @@
 
 #include <idl4glue.h>
 
+#include <sdi/constants.h>
+
 /* local threadids */
 L4_ThreadId_t sigma0id;
 L4_ThreadId_t pagerid;
@@ -225,7 +227,7 @@ int main(void) {
     L4_Word_t namestartip = load_elfimage (nameserver); 
 
     /* some ELF loading and staring */
-    L4_ThreadId_t nameid = L4_GlobalId ( 5353, 1);
+    L4_ThreadId_t nameid = L4_GlobalId ( SDI_NAMESERVER_DEFAULT_THREADID, 1);
     start_task (nameid, namestartip, utcbarea);
     printf ("nameserver started as %lx\n", nameid.raw);
 
