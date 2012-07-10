@@ -13,6 +13,7 @@ include $(top_srcdir)/Mk/base.mk
 
 IDLS=		types.idl \
 		iflogging.idl iflocator.idl \
-		iftask.idl
+		iftask.idl \
+		ifmemory.idl
 
 include $(top_srcdir)/Mk/idl.mk

@@ -261,6 +261,7 @@ src/root/Makefile
 src/test/Makefile
 src/simplethread1/Makefile
 src/simplethread2/Makefile
+src/memory/Makefile
 
 ])
 

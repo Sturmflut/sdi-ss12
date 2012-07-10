@@ -1,0 +1,7 @@
+import "sdi/types.h";
+#include <types.idl>
+#include <ifmemory.idl>
+            
+interface memory : IF_MEMORY {
+  /* Nothing more needed */      
+};

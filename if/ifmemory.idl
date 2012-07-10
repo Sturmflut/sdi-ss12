@@ -1,0 +1,24 @@
+import "sdi/types.h";
+#include <types.idl>
+
+[uuid(IF_MEMORY_ID)] interface IF_MEMORY {
+
+    exception NoMem {};
+    exception InvalidAddress {};
+    exception NoExist {};
+
+    void map_io_pages(in int threadid, in int virt_start_address, in int phys_start_address, in int size) raises (NoMem, InvalidAddress);
+
+    void map_anon_pages(in int threadid, in int type, in int virt_start_address, in int num_pages) raises (NoMem, InvalidAddress);
+
+    void map_file_pages(in int threadid, in int type, in string path, in int offset, in int virt_start_address, in int size) raises ( NoExist, NoMem, InvalidAddress);
+
+    void unmap_pages(in int virt_start_address) raises (InvalidAddress);
+
+    void startup(in int threadid, in int ip, in int sp);
+
+    void destroy(in int threadid);
+
+    void pagefault(in int addr, in int ip, out fpage f);
+};
+

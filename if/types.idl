@@ -23,6 +23,7 @@ typedef sequence<char> buffer_t;
 const interfaceid_t IF_LOGGING_ID = 1;
 const interfaceid_t IF_LOCATOR_ID = 2;
 const interfaceid_t IF_TASK_ID = 3;
+const interfaceid_t IF_MEMORY_ID = 4;
 
 const interfaceid_t MAX_INTERFACEID = 8;
 

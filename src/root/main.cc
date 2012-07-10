@@ -248,6 +248,15 @@ int main(void) {
     start_task (simpleid2, simplestartip2, utcbarea);
     printf ("SimpleThread2 started as %lx\n", simpleid2.raw);
 
+    /* Now we search for the sixth module, 
+       which will (hopefully) be our Memory Manager*/ 
+    L4_BootRec_t* module5 = find_module (5, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+    L4_Word_t memorystartip = load_elfimage (module5); 
+
+    L4_ThreadId_t memoryid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 6, 1);
+    start_task (memoryid, memorystartip, utcbarea);
+    printf ("Memory Manager started as %lx\n", memoryid.raw);
+
     /* now it is time to become the pager for all those threads we 
        created recently */
     pager_loop();

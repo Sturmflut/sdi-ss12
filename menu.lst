@@ -13,3 +13,4 @@ module=(cd)/sdios/root
 module=(cd)/sdios/test
 module=(cd)/sdios/simplethread1
 module=(cd)/sdios/simplethread2
+module=(cd)/sdios/memory
