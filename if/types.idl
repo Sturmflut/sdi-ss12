@@ -16,7 +16,7 @@ import "sdi/types.h";
 
 typedef char interfaceid_t;
 typedef string<256> logmessage_t;
-typedef string<256> path_t;
+typedef string<64> path_t;
 typedef sequence<char> buffer_t;
 
 /* IDL interface consts */

@@ -13,6 +13,6 @@ import "sdi/types.h";
 interface IF_NAMING {
     exception NotFound {};
 
-    void Lookup(in path_t path, out path_t remaining) raises (NotFound);
+    L4_ThreadId_t Lookup(in path_t path, out path_t remaining) raises (NotFound);
 
 };
