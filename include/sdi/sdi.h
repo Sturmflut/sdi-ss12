@@ -21,6 +21,9 @@ extern void LogMessage (const char* message);
 // Panic managment 
 extern void panic (const char* message);
 
+// Sleeping
+extern void sleep (int msec);
+
 #define bailout(S) L4_KDB_Enter( S )
 #define assert(X) if (!(X)) bailout( #X )
 
