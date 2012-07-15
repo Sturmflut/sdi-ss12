@@ -227,7 +227,7 @@ int main(void) {
     /* Now we search for the fifth module, 
        which will (hopefully) be our nameserver */ 
     printf ("Starting simplethread1 ... \n");
-    L4_BootRec_t* module3 = find_module (4, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+    L4_BootRec_t* module3 = find_module (3, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
     L4_Word_t simplestartip = load_elfimage (module3); 
 
     /* some ELF loading and staring */
@@ -241,7 +241,7 @@ int main(void) {
     /* Now we search for the sixth module, 
        which will (hopefully) be our simplethread2 */ 
     printf ("Starting simplethread2 ... \n");
-    L4_BootRec_t* module4 = find_module (5, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+    L4_BootRec_t* module4 = find_module (4, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
     L4_Word_t simplestartip2 = load_elfimage (module4); 
 
     L4_ThreadId_t simpleid2 = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 4, 1);
