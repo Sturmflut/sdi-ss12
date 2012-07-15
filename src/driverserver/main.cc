@@ -30,7 +30,7 @@ int main () {
         loggerid = nameserver_lookup("/server/logger");
     }
 
-    IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD2] Active", &env);
+    IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[DRIVERSERVER] Active", &env);
 
     /* Spin forever */
     while (42);

@@ -14,5 +14,8 @@ import "sdi/types.h";
 
 [uuid(IF_CONSOLESERVER_ID)]
 interface IF_CONSOLESERVER {
+	void setcolor(in char color);
+	void putchar(in char character);
 
+	char getchar();	
 };
