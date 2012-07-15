@@ -191,11 +191,11 @@ L4_Word_t load_elfimage (L4_BootRec_t* mod) {
 
 void start_task_byname(char* path, L4_ThreadId_t taskid, L4_Fpage_t nutcbarea)
 {
+    printf ("Starting %s ... \n", path);
     L4_BootRec_t* taskrec = find_module_byname (path, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
     L4_Word_t startip = load_elfimage (taskrec);
 
     /* some ELF loading and staring */
-    printf ("Starting %s ... \n", path);
     start_task (taskid, startip, utcbarea);
     printf ("%s started with thread id %lx\n", path, taskid.raw);
 }
