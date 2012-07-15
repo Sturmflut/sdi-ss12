@@ -93,13 +93,22 @@ L4_Bool_t request_page (L4_Word_t addr) {
 
 void list_modules (const L4_BootInfo_t* bootinfo) {
     L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
-    for (unsigned int i=0; i < L4_BootInfo_Entries (bootinfo); i++) {
-	printf ("Module: start %lx size %lx type: %d\n", 
-		L4_Module_Start (bootrec),
-		L4_Module_Size (bootrec),
-		(int)L4_Type (bootrec));
+    for (unsigned int i=0; i < L4_BootInfo_Entries (bootinfo); i++){
+	if((int)L4_Type (bootrec) == 1)
+		printf ("Module: start %lx size %lx type: %d cmdline: %s\n", 
+			L4_Module_Start (bootrec),
+			L4_Module_Size (bootrec),
+			(int)L4_Type (bootrec),
+			L4_Module_Cmdline (bootrec));
+		else
+		printf ("Module: start %lx size %lx type: %d\n", 
+			L4_Module_Start (bootrec),
+			L4_Module_Size (bootrec),
+			(int)L4_Type (bootrec));
+
 	bootrec = L4_Next (bootrec);
     }
+    
 }
 
 L4_BootRec_t* find_module (unsigned int index, const L4_BootInfo_t* bootinfo) {
