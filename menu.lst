@@ -12,5 +12,6 @@ module=(cd)/sdios/sigma0
 module=(cd)/sdios/root
 module=(cd)/sdios/nameserver
 module=(cd)/sdios/driverserver
+module=(cd)/sdios/consoleserver
 module=(cd)/sdios/simplethread1
 module=(cd)/sdios/simplethread2
