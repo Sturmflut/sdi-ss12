@@ -42,6 +42,8 @@ int main () {
 
 	printf("a");
 
+    char buf[256];
+
     /* Guess locatorid */
     locatorid = L4_GlobalId (L4_ThreadIdUserBase (L4_KernelInterface ()) + 3, 1);
 
@@ -65,15 +67,25 @@ int main () {
 
 
     /* Lookup existing query */
-    if(nameserver_lookup("/clients/simplethread1") != L4_Myself ())
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Lookup for /clients/simplethread1 failed", &env);
+    L4_ThreadId_t result = L4_nilthread;
+
+    if((result = nameserver_lookup("/clients/simplethread1")) != L4_Myself ())
+    {
+	snprintf(buf, 256, "[SIMPLETHREAD1] Lookup for /clients/simplethread1 failed, got %lx instead od %lx", &env, result.raw, L4_Myself().raw);
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, buf, &env);
+    }
     else
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Lookup for /clients/simplethread1 okay", &env);
+    {
+	snprintf(buf, 256, "[SIMPLETHREAD1] Lookup for /clients/simplethread1 okay, got %lx when expecting %lx", result.raw, L4_Myself().raw);
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, buf, &env);
 
-
+    }
     /* Lookup non-existant query */
-    if(nameserver_lookup("/clients/bernd") != L4_nilthread)
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Lookup for /clients/bernd did not return L4_nilthread", &env);
+    if((result = nameserver_lookup("/clients/bernd")) != L4_nilthread)
+    {
+	snprintf(buf, 256, "[SIMPLETHREAD1] Lookup for /clients/bernd did not return L4_nilthread, but %lx", result);
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, buf, &env);
+    }
     else
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Lookup for /clients/bernd failed as expected", &env);
 
