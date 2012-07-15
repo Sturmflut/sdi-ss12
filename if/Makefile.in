@@ -18,6 +18,7 @@ IDLS=		types.idl \
 		iffile.idl \
 		iffileserver.idl \
 		ifdriverserver.idl \
-		iftask.idl
+		iftask.idl \
+		ifconsoleserver.idl
 
 include $(top_srcdir)/Mk/idl.mk

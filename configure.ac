@@ -260,6 +260,7 @@ src/Makefile
 src/root/Makefile
 src/nameserver/Makefile
 src/driverserver/Makefile
+src/consoleserver/Makefile
 src/simplethread1/Makefile
 src/simplethread2/Makefile
 
