@@ -12,24 +12,25 @@
 #include <sdi/sdi.h>
 
 #include <idl4glue.h>
-#include <if/iflocator.h>
 #include <if/iflogging.h>
 
-L4_ThreadId_t locatorid; 
+#include <nameserver.h>
 
 int main () {
     L4_Msg_t msg;
     L4_MsgTag_t tag;
 
-    /* Guess locatorid */
-    locatorid = L4_GlobalId (L4_ThreadIdUserBase (L4_KernelInterface ()) + 3, 1);
+    CORBA_Environment env (idl4_default_environment);
 
-    CORBA_Environment env (idl4_default_environment);    
     L4_ThreadId_t loggerid = L4_nilthread;
 
+    printf(" ");
+
     while (L4_IsNilThread (loggerid)) {
-        IF_LOCATOR_Locate ((CORBA_Object)locatorid, IF_LOGGING_ID, &loggerid, &env);
+        loggerid = nameserver_lookup("/server/logger");
     }
+
+    IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD2] Active", &env);
 
     /* Spin forever */
     while (42);

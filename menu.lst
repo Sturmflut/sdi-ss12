@@ -11,6 +11,5 @@ module=(cd)/sdios/x86-kernel
 module=(cd)/sdios/sigma0
 module=(cd)/sdios/root
 module=(cd)/sdios/nameserver
-module=(cd)/sdios/test
 module=(cd)/sdios/simplethread1
 module=(cd)/sdios/simplethread2

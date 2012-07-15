@@ -24,7 +24,6 @@
 
 #include <sdi/constants.h>
 
-#include <if/iflocator.h>
 #include <if/iflogging.h>
 #include <if/ifnameserver.h>
 
@@ -33,8 +32,6 @@
 
 //extern "C" int printf(const char * format, ...);
 
-L4_ThreadId_t locatorid; 
-L4_ThreadId_t nameserverid; 
 
 int main () {
     L4_Msg_t msg;
@@ -42,24 +39,17 @@ int main () {
 
 	printf("a");
 
-    /* Guess locatorid */
-    locatorid = L4_GlobalId (L4_ThreadIdUserBase (L4_KernelInterface ()) + 3, 1);
+    CORBA_Environment env (idl4_default_environment);
 
-    CORBA_Environment env (idl4_default_environment);    
     L4_ThreadId_t loggerid = L4_nilthread;
 
     while (L4_IsNilThread (loggerid)) {
-        IF_LOCATOR_Locate ((CORBA_Object)locatorid, IF_LOGGING_ID, &loggerid, &env);
+        loggerid = nameserver_lookup("/server/logger");
     }
-
-
-    /* Guess nameserverid */
-    L4_ThreadId_t nameserverid = L4_GlobalId (SDI_NAMESERVER_DEFAULT_THREADID, 1);
 
     IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Registering", &env);
 
-    /* Register */
-    IF_NAMESERVER_register ((CORBA_Object)nameserverid, "/clients/simplethread1", &env);
+    nameserver_register("/clients/simplethread1");
 
     IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Registered", &env);
 

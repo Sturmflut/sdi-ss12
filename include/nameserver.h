@@ -1,6 +1,31 @@
 #ifndef _NAMESERVER_H
 #define _NAMESERVER_H 1
 
+#include <sdi/constants.h>
+
+#include <if/ifnameserver.h>
+
+/**
+ Register the calling thread for the given path at the default nameserver
+*/
+void nameserver_register(path_t path)
+{
+        CORBA_Environment env (idl4_default_environment);
+        L4_ThreadId_t nameserverid = L4_GlobalId (SDI_NAMESERVER_DEFAULT_THREADID, 1);
+	IF_NAMESERVER_register((CORBA_Object) nameserverid, path, &env);
+}
+
+
+/**
+ Deregister the calling thread from the given path at the default nameserver
+*/
+void nameserver_deregister()
+{
+        CORBA_Environment env (idl4_default_environment);
+        L4_ThreadId_t nameserverid = L4_GlobalId (SDI_NAMESERVER_DEFAULT_THREADID, 1);
+	IF_NAMESERVER_deregister((CORBA_Object) nameserverid, &env);
+}
+
 /**
  Recursive lookup of path path on the default nameserver (port 5353)
 */

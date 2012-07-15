@@ -15,7 +15,6 @@
 #include <sdi/constants.h>
 #include <stdlib.h>
 
-#include <if/iflocator.h>
 #include <if/iflogging.h>
 
 /* Interface IF_NAMESERVER */
@@ -27,7 +26,6 @@ typedef struct {
 
 name_entry_t names[SDI_NAMESERVER_MAX_ENTRIES];
 
-L4_ThreadId_t locatorid;
 L4_ThreadId_t loggerid;
 CORBA_Environment env (idl4_default_environment);
 
@@ -83,8 +81,6 @@ IDL4_PUBLISH_IF_NAMESERVER_DEREGISTER(IF_NAMESERVER_deregister_implementation);
 IDL4_INLINE L4_ThreadId_t  IF_NAMESERVER_Lookup_implementation(CORBA_Object  _caller, const path_t  path, path_t * remaining, idl4_server_environment * _env)
 
 {
-	printf("IF_NAMESERVER_Lookup_implementation %s %p\n", path, remaining);
-
         /* Find the first database entry matching the query */
         for(int i = 0; i < SDI_NAMESERVER_MAX_ENTRIES; i++)
                 if(strncmp(path, names[i].path, strlen(names[i].path)) == 0)
