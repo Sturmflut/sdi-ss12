@@ -120,6 +120,24 @@ L4_BootRec_t* find_module (unsigned int index, const L4_BootInfo_t* bootinfo) {
     return bootrec;
 }
 
+L4_BootRec_t* find_module_byname (char* name, const L4_BootInfo_t* bootinfo) {
+    L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
+    int i = 0;
+
+   do
+   {
+	if((int)L4_Type (bootrec) == 1 && 
+		strncmp(L4_Module_Cmdline (bootrec), name, strlen(name)) == 0)
+		return bootrec;
+
+	if(i < L4_BootInfo_Entries (bootinfo))
+		bootrec = L4_Next (bootrec);
+	i++;
+   } while(i < L4_BootInfo_Entries (bootinfo));
+
+  panic ("Modules not found");
+}
+
 L4_Word_t load_elfimage (L4_BootRec_t* mod) {
     /* Check type of module */
     if (L4_Type (mod) != L4_BootInfo_Module)
@@ -209,7 +227,7 @@ int main(void) {
 
     /* Now we search for the third module, 
        which will (hopefully) be our nameserver */ 
-    L4_BootRec_t* nameserver = find_module (2, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+    L4_BootRec_t* nameserver = find_module_byname ("(cd)/sdios/nameserver", (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
     L4_Word_t namestartip = load_elfimage (nameserver); 
 
     /* some ELF loading and staring */
@@ -236,7 +254,7 @@ int main(void) {
     /* Now we search for the fifth module, 
        which will (hopefully) be our nameserver */ 
     printf ("Starting simplethread1 ... \n");
-    L4_BootRec_t* module3 = find_module (3, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+    L4_BootRec_t* module3 = find_module_byname ("(cd)/sdios/simplethread1", (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
     L4_Word_t simplestartip = load_elfimage (module3); 
 
     /* some ELF loading and staring */
@@ -250,7 +268,7 @@ int main(void) {
     /* Now we search for the sixth module, 
        which will (hopefully) be our simplethread2 */ 
     printf ("Starting simplethread2 ... \n");
-    L4_BootRec_t* module4 = find_module (4, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+    L4_BootRec_t* module4 = find_module_byname ("(cd)/sdios/simplethread2", (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
     L4_Word_t simplestartip2 = load_elfimage (module4); 
 
     L4_ThreadId_t simpleid2 = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 4, 1);
