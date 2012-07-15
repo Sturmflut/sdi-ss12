@@ -12,6 +12,6 @@ import "sdi/types.h";
 #include <ifconsoleserver.idl>
 
 [uuid(IF_CONSOLESERVER_ID)]
-interface nameserver : IF_CONSOLESERVER {
+interface consoleserver : IF_CONSOLESERVER {
 
 };

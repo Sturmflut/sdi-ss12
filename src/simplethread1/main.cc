@@ -25,12 +25,12 @@
 #include <sdi/constants.h>
 
 #include <if/iflogging.h>
-#include <if/ifnameserver.h>
+#include <if/ifnaming.h>
+#include <if/ifconsoleserver.h>
 
 #include <nameserver.h>
+#include <sdi/console_attributes.h>
 
-
-//extern "C" int printf(const char * format, ...);
 
 
 int main () {
@@ -79,6 +79,18 @@ int main () {
     else
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Lookup for /clients/bernd failed as expected", &env);
 
+
+
+	/* Print some stuff on the console */
+    L4_ThreadId_t consoleid = L4_nilthread;
+
+    while (L4_IsNilThread (consoleid)) {
+        consoleid = nameserver_lookup("/server/console");
+    }
+
+	L4_ThreadId_t myself = L4_Myself ();
+	IF_CONSOLESERVER_setactivethread((CORBA_Object)consoleid, 0, &myself, &env);
+	IF_CONSOLESERVER_putstring((CORBA_Object)consoleid, "This is simplethread1", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE, &env);
 
 
     /* Spin forever */
