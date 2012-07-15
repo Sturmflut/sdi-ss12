@@ -1,0 +1,19 @@
+//
+// File:  src/root/logger.idl
+//
+// Description: Interface for logger
+//
+
+/* The logger interface description */
+
+/* our C++ datatypes and IDL4 datatypes  */
+import "sdi/types.h";
+#include <types.idl>
+
+#include <ifnaming.idl>
+#include <iffile.idl>
+
+[uuid(IF_FILESERVER_ID)]
+interface IF_FILESERVER : IF_NAMING, IF_FILE {
+
+};

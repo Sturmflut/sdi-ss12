@@ -225,8 +225,7 @@ int main(void) {
     list_modules ((L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
 
 
-    /* Now we search for the third module, 
-       which will (hopefully) be our nameserver */ 
+    /* Nameserver */ 
     L4_BootRec_t* nameserver = find_module_byname ("(cd)/sdios/nameserver", (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
     L4_Word_t namestartip = load_elfimage (nameserver); 
 
@@ -235,6 +234,17 @@ int main(void) {
     L4_ThreadId_t nameid = L4_GlobalId ( SDI_NAMESERVER_DEFAULT_THREADID, 1);
     start_task (nameid, namestartip, utcbarea);
     printf ("nameserver started as %lx\n", nameid.raw);
+
+
+    /* Driver */ 
+    L4_BootRec_t* driverserver = find_module_byname ("(cd)/sdios/driverserver", (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+    L4_Word_t driverstartip = load_elfimage (driverserver); 
+
+    /* some ELF loading and staring */
+    printf ("Starting driverserver ... \n");
+    L4_ThreadId_t driverid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 20, 1);
+    start_task (driverid, driverstartip, utcbarea);
+    printf ("driverserver started as %lx\n", driverid.raw);
 
 
 
