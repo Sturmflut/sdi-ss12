@@ -259,7 +259,6 @@ lib/sdi/Makefile
 src/Makefile
 src/root/Makefile
 src/nameserver/Makefile
-src/test/Makefile
 src/simplethread1/Makefile
 src/simplethread2/Makefile
 

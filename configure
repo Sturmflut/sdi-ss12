@@ -3284,7 +3284,7 @@ esac
 
 
 
-ac_config_files="$ac_config_files config.mk Makefile if/Makefile lib/Makefile lib/sdi/Makefile src/Makefile src/root/Makefile src/nameserver/Makefile src/test/Makefile src/simplethread1/Makefile src/simplethread2/Makefile"
+ac_config_files="$ac_config_files config.mk Makefile if/Makefile lib/Makefile lib/sdi/Makefile src/Makefile src/root/Makefile src/nameserver/Makefile src/simplethread1/Makefile src/simplethread2/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -3999,7 +3999,6 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/root/Makefile") CONFIG_FILES="$CONFIG_FILES src/root/Makefile" ;;
     "src/nameserver/Makefile") CONFIG_FILES="$CONFIG_FILES src/nameserver/Makefile" ;;
-    "src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/test/Makefile" ;;
     "src/simplethread1/Makefile") CONFIG_FILES="$CONFIG_FILES src/simplethread1/Makefile" ;;
     "src/simplethread2/Makefile") CONFIG_FILES="$CONFIG_FILES src/simplethread2/Makefile" ;;
 

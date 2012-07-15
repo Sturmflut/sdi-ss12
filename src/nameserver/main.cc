@@ -15,7 +15,6 @@
 #include <sdi/constants.h>
 #include <stdlib.h>
 
-#include <if/iflocator.h>
 #include <if/iflogging.h>
 
 /* Interface IF_NAMESERVER */
@@ -27,7 +26,6 @@ typedef struct {
 
 name_entry_t names[SDI_NAMESERVER_MAX_ENTRIES];
 
-L4_ThreadId_t locatorid;
 L4_ThreadId_t loggerid;
 CORBA_Environment env (idl4_default_environment);
 
