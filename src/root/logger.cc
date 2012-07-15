@@ -10,8 +10,10 @@
 #include <l4io.h>
 #include <idl4glue.h>
 #include "logger-server.h"
-#include <if/iflocator.h>
 #include <sdi/sdi.h>
+
+#include <nameserver.h>
+
 #include "root.h"
 
 
@@ -37,11 +39,8 @@ void  logger_server()
 
 {
     /* Announce logger service */
-    CORBA_Environment env (idl4_default_environment);
-    IF_LOCATOR_Announce ((CORBA_Object)locatorid, 
-			 IF_LOGGING_ID,
-			 &loggerid,
-			 &env);
+  nameserver_register("/server/logger");
+
   L4_ThreadId_t  partner;
   L4_MsgTag_t  msgtag;
   idl4_msgbuf_t  msgbuf;

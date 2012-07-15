@@ -5,54 +5,80 @@
 //
 
 #include <l4/thread.h>
+#include <l4/space.h>
+#include <l4/message.h>
+#include <l4/ipc.h>
+#include <l4/sigma0.h>
+#include <l4/bootinfo.h>
+#include <l4/kdebug.h>
 
 #include <l4io.h>
+#include <macros.h>
+
+#include <stdlib.h>
 
 #include <sdi/types.h>
 #include <sdi/sdi.h>
 
 #include <idl4glue.h>
-#include <if/iflocator.h>
-#include <if/iflogging.h>
 
-L4_ThreadId_t locatorid; 
+#include <sdi/constants.h>
+
+#include <if/iflogging.h>
+#include <if/ifnameserver.h>
+
+#include <nameserver.h>
+
+
+//extern "C" int printf(const char * format, ...);
+
 
 int main () {
     L4_Msg_t msg;
     L4_MsgTag_t tag;
 
-    /* Guess locatorid */
-    locatorid = L4_GlobalId (L4_ThreadIdUserBase (L4_KernelInterface ()) + 3, 1);
+    char buf[256];
 
-    CORBA_Environment env (idl4_default_environment);    
+	printf("a");
+
+    CORBA_Environment env (idl4_default_environment);
+
     L4_ThreadId_t loggerid = L4_nilthread;
 
-    printf ("Resolve logger ...\n");
     while (L4_IsNilThread (loggerid)) {
-        IF_LOCATOR_Locate ((CORBA_Object)locatorid, IF_LOGGING_ID, &loggerid, &env);
+        loggerid = nameserver_lookup("/server/logger");
     }
 
-    /* Printout message through logger */
-    IF_LOGGING_LogMessage ((CORBA_Object)loggerid, "Hello World Thread 1", &env);
+    IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Registering", &env);
+
+    nameserver_register("/clients/simplethread1");
+
+    IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Registered", &env);
 
 
-    /* Send two words to the companion thread */
-    L4_MsgClear(&msg);
-    L4_MsgAppendWord(&msg, 23);
-    L4_MsgAppendWord(&msg, 42);
-    L4_MsgLoad(&msg);
+    /* Lookup existing query */
+    L4_ThreadId_t result = L4_nilthread;
 
-    tag = L4_Send(L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 1, 1));
+    if((result = nameserver_lookup("/clients/simplethread1")) != L4_Myself ())
+    {
+	snprintf(buf, 256, "[SIMPLETHREAD1] Lookup for /clients/simplethread1 failed, got %lx instead od %lx", &env, result.raw, L4_Myself().raw);
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, buf, &env);
+    }
+    else
+    {
+	snprintf(buf, 256, "[SIMPLETHREAD1] Lookup for /clients/simplethread1 okay, got %lx when expecting %lx", result.raw, L4_Myself().raw);
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, buf, &env);
 
-    IF_LOGGING_LogMessage ((CORBA_Object)loggerid, "Thread 1 finished sending", &env);
+    }
+    /* Lookup non-existant query */
+    if((result = nameserver_lookup("/clients/bernd")) != L4_nilthread)
+    {
+	snprintf(buf, 256, "[SIMPLETHREAD1] Lookup for /clients/bernd did not return L4_nilthread, but %lx", result);
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, buf, &env);
+    }
+    else
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Lookup for /clients/bernd failed as expected", &env);
 
-    /* Receive result from companion */
-    L4_MsgClear(&msg);
-    tag = L4_Receive(L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 1, 1));
-    L4_Store(tag, &msg);
-
-    IF_LOGGING_LogMessage ((CORBA_Object)loggerid, "Thread 1 finished receiving", &env);
-    printf("Thread 1 got sum: %i\n", L4_Get(&msg, 0));
 
 
     /* Spin forever */

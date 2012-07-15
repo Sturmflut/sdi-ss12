@@ -1,0 +1,18 @@
+//
+// File:  if/locator.idl
+//
+// Description: Interface for name resolution
+//
+
+/* our datatypes & exceptions */
+import "sdi/types.h";
+
+#include <types.idl>
+
+[uuid(IF_NAMING_ID)]
+interface IF_NAMING {
+    exception NotFound {};
+
+    L4_ThreadId_t Lookup(in path_t path, out path_t remaining) raises (NotFound);
+
+};

@@ -21,10 +21,11 @@
 
 #include <idl4glue.h>
 
+#include <sdi/constants.h>
+
 /* local threadids */
 L4_ThreadId_t sigma0id;
 L4_ThreadId_t pagerid;
-L4_ThreadId_t locatorid;
 L4_ThreadId_t loggerid;
 
 
@@ -43,7 +44,6 @@ extern char __heap_end;
 
 
 L4_Word_t logger_stack[1024];
-L4_Word_t locator_stack[1024];
 
 
 L4_ThreadId_t start_thread (L4_ThreadId_t threadid, L4_Word_t ip, L4_Word_t sp, void* utcblocation) {
@@ -170,7 +170,6 @@ int main(void) {
 
     pagerid = L4_Myself ();
     sigma0id = L4_Pager ();
-    locatorid = L4_nilthread;
     loggerid = L4_nilthread;
 
     printf ("Early system infos:\n");
@@ -187,64 +186,65 @@ int main(void) {
     utcbarea = L4_FpageLog2 ((L4_Word_t) L4_MyLocalId ().raw,
 			      L4_UtcbAreaSizeLog2 (kip) + 1);
 
-    /* startup our locator */
-    printf ("Starting locator ...\n");
-    /* Generate some threadid */
-    locatorid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 1, 1);
-    start_thread (locatorid, 
-		  (L4_Word_t)&locator_server, 
-		  (L4_Word_t)&locator_stack[1023], 
-		  UTCBaddress(1) ); 
-    printf ("Started with id %lx\n", locatorid.raw);
+    /* We just bring the in the memory of the bootinfo page */
+    if (!request_page (L4_BootInfo (L4_KernelInterface ()))) {
+	// no bootinfo, no chance, no future. Break up
+	panic ("Was not able to get bootinfo");
+    }
+ 
+   /* Quick check */
+    if (!L4_BootInfo_Valid ((void*)L4_BootInfo (L4_KernelInterface ()))) 
+	panic ("Bootinfo not found");
+    list_modules ((L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+
+
+    /* Now we search for the third module, 
+       which will (hopefully) be our nameserver */ 
+    L4_BootRec_t* nameserver = find_module (2, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+    L4_Word_t namestartip = load_elfimage (nameserver); 
+
+    /* some ELF loading and staring */
+    printf ("Starting nameserver ... \n");
+    L4_ThreadId_t nameid = L4_GlobalId ( SDI_NAMESERVER_DEFAULT_THREADID, 1);
+    start_task (nameid, namestartip, utcbarea);
+    printf ("nameserver started as %lx\n", nameid.raw);
+
+
 
     /* startup our logger, to be able to put messages on the screen */
     printf ("Starting logger ... \n");
+
     /* Generate some threadid */
     loggerid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 2, 1);
     start_thread (loggerid, 
 		  (L4_Word_t)&logger_server, 
 		  (L4_Word_t)&logger_stack[1023], 
 		  UTCBaddress(2) ); 
-    printf ("Started with id %lx\n", loggerid.raw);
+    printf ("Started as id %lx\n", loggerid.raw);
 
-    /* We just bring the in the memory of the bootinfo page */
-    if (!request_page (L4_BootInfo (L4_KernelInterface ()))) {
-	// no bootinfo, no chance, no future. Break up
-	panic ("Was not able to get bootinfo");
-    }
-    /* Quick check */
-    if (!L4_BootInfo_Valid ((void*)L4_BootInfo (L4_KernelInterface ()))) 
-	panic ("Bootinfo not found");
-    list_modules ((L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
 
-    /* Now we search for the third module, 
-       which will (hopefully) be our testclient */ 
-    L4_BootRec_t* module2 = find_module (2, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
-    L4_Word_t startip = load_elfimage (module2);
 
-    /* some ELF loading and staring */
-
-    L4_ThreadId_t testid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 3, 1);
-    start_task (testid, startip, utcbarea);
-    printf ("Testclient started as %lx\n", testid.raw);
-
-    /* Now we search for the fourth module, 
-       which will (hopefully) be our simplethread1 */ 
-    L4_BootRec_t* module3 = find_module (3, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+    /* Now we search for the fifth module, 
+       which will (hopefully) be our nameserver */ 
+    printf ("Starting simplethread1 ... \n");
+    L4_BootRec_t* module3 = find_module (4, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
     L4_Word_t simplestartip = load_elfimage (module3); 
 
     /* some ELF loading and staring */
-    L4_ThreadId_t simpleid1 = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 4, 1);
+    L4_ThreadId_t simpleid1 = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 3, 1);
     start_task (simpleid1, simplestartip, utcbarea);
     printf ("SimpleThread1 started as %lx\n", simpleid1.raw);
 
 
-    /* Now we search for the fifth module, 
-       which will (hopefully) be our simplethread1 */ 
-    L4_BootRec_t* module4 = find_module (4, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+
+
+    /* Now we search for the sixth module, 
+       which will (hopefully) be our simplethread2 */ 
+    printf ("Starting simplethread2 ... \n");
+    L4_BootRec_t* module4 = find_module (5, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
     L4_Word_t simplestartip2 = load_elfimage (module4); 
 
-    L4_ThreadId_t simpleid2 = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 5, 1);
+    L4_ThreadId_t simpleid2 = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 4, 1);
     start_task (simpleid2, simplestartip2, utcbarea);
     printf ("SimpleThread2 started as %lx\n", simpleid2.raw);
 
