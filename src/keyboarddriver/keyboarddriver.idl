@@ -9,12 +9,8 @@
 /* our C++ datatypes and IDL4 datatypes  */
 import "sdi/types.h";
 #include <types.idl>
-#include <ifnaming.idl>
-#include <iffile.idl>
+#include <ifkeyboarddriver.idl>
 
-[uuid(IF_DRIVERSERVER_ID)]
-interface IF_DRIVERSERVER : IF_NAMING, IF_FILE {
+interface keyboarddriver : IF_KEYBOARDDRIVER {
 
-        void register(in path_t path);
-        void deregister();
 };

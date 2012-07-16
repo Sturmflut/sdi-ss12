@@ -235,16 +235,20 @@ int main(void) {
     list_modules ((L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
 
 
-    /* Consoleserver */
+    /* Nameserver */
     start_task_byname("(cd)/sdios/nameserver",
 	L4_GlobalId ( SDI_NAMESERVER_DEFAULT_THREADID, 1),
 	utcbarea);
 
-    /* Consoleserver */
+    /* Driverserver */
     start_task_byname("(cd)/sdios/driverserver",
 	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 20, 1),
 	utcbarea);
 
+    /* Keyboarddriver */
+    start_task_byname("(cd)/sdios/keyboarddriver",
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 21, 1),
+	utcbarea);
 
 
     /* startup our logger, to be able to put messages on the screen */
@@ -265,13 +269,13 @@ int main(void) {
 	utcbarea);
     
 
-    /* Console */
+    /* Simplethread1 */
     start_task_byname("(cd)/sdios/simplethread1",
 	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 3, 1),
 	utcbarea);
     
 
-    /* Console */
+    /* Simplethread2 */
     start_task_byname("(cd)/sdios/simplethread2",
 	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 4, 1),
 	utcbarea);

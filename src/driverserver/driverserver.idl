@@ -12,6 +12,6 @@ import "sdi/types.h";
 #include <ifdriverserver.idl>
 
 [uuid(IF_DRIVERSERVER_ID)]
-interface nameserver : IF_DRIVERSERVER {
+interface driverserver : IF_DRIVERSERVER {
 
 };

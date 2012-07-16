@@ -160,9 +160,16 @@ IDL4_PUBLISH_CONSOLESERVER_PUTSTRING(consoleserver_putstring_implementation);
 IDL4_INLINE void  consoleserver_putstringat_implementation(CORBA_Object  _caller, const CORBA_long  x, const CORBA_long  y, const consolestring_t  text, const CORBA_char  attribute, idl4_server_environment * _env)
 
 {
-  /* implementation of IF_CONSOLESERVER::putstringat */
+    /** Find matching console */
+	int console = find_console_for_thread(_caller);
 
-  return;
+	if(console != -1)
+	{
+		for(int i = 0; i < strlen(text); i++)
+			putcharat(console, x + i, y, text[i], attribute);
+	}
+
+	return;
 }
 
 IDL4_PUBLISH_CONSOLESERVER_PUTSTRINGAT(consoleserver_putstringat_implementation);
