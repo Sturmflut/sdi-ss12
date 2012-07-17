@@ -43,19 +43,6 @@ L4_ThreadId_t consoleid = L4_nilthread;
 CORBA_Environment env(idl4_default_environment);
 
 
-void print_charat(int x, int y, char character, char attrib)
-{
-	IF_CONSOLESERVER_putcharat((CORBA_Object)consoleid, x, y, character, attrib, &env); 
-}
-
-
-void print_stringat(int x, int y, char* text, char attrib)
-{
-	IF_CONSOLESERVER_putstringat((CORBA_Object)consoleid, x, y, text, attrib, &env); 
-}
-
-
-
 int main()
 {
 	L4_Msg_t msg;
@@ -75,21 +62,8 @@ int main()
 	while (L4_IsNilThread(loggerid))
 		loggerid = nameserver_lookup("/server/logger");
 
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Registering", &env);
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD2] Active", &env);
 
-	nameserver_register("/clients/simplethread1");
-
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Registered", &env);
-
-
-	/* Print some stuff on the console */
-	while (L4_IsNilThread(consoleid))
-		consoleid = nameserver_lookup("/server/console");
-
-	L4_ThreadId_t myself = L4_Myself();
-	IF_CONSOLESERVER_setactivethread((CORBA_Object)consoleid, 0, &myself, &env);
-
-	
 
 	/* Spin forever */
 	while (42) ;

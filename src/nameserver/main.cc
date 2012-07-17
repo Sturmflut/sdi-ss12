@@ -93,6 +93,7 @@ IDL4_INLINE L4_ThreadId_t  IF_NAMESERVER_Lookup_implementation(CORBA_Object _cal
 		}
 
 	strcpy(*remaining, path);
+
 	return L4_nilthread;
 
 }
@@ -114,7 +115,7 @@ void  IF_NAMESERVER_server()
 
 	idl4_msgbuf_init(&msgbuf);
 	for (cnt = 0; cnt < IF_NAMESERVER_STRBUF_SIZE; cnt++)
-		idl4_msgbuf_add_buffer(&msgbuf, malloc(8000), 8000);
+		idl4_msgbuf_add_buffer(&msgbuf, malloc(16000), 16000);
 
 	while (1) {
 		partner = L4_nilthread;

@@ -19,6 +19,7 @@ IDLS=		types.idl \
 		iffileserver.idl \
 		ifdriverserver.idl \
 		iftask.idl \
-		ifconsoleserver.idl
+		ifconsoleserver.idl \
+		ifkeyboarddriver.idl
 
 include $(top_srcdir)/Mk/idl.mk

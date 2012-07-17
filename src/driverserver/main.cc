@@ -28,7 +28,7 @@ typedef struct {
 
 name_entry_t drivers[SDI_NAMESERVER_MAX_ENTRIES];
 
-L4_ThreadId_t loggerid;
+L4_ThreadId_t loggerid = L4_nilthread;
 CORBA_Environment env(idl4_default_environment);
 
 
@@ -83,9 +83,14 @@ IDL4_INLINE L4_ThreadId_t  driverserver_Lookup_implementation(CORBA_Object  _cal
 
 {
 	int offset = 0;
+	char buf[256];
 
 	if(path[0] == '/')
 		offset = 1;
+
+	snprintf(buf, 256, "[DRIVERSERVER] Lookup %s", path[offset]);
+	
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, buf, &env);
 
         /* Find the first database entry matching the query */
         for (int i = 0; i < SDI_NAMESERVER_MAX_ENTRIES; i++)
@@ -156,10 +161,6 @@ void clear_name_database()
 int main(void)
 {
         clear_name_database();
-
-        CORBA_Environment env(idl4_default_environment);
-
-        L4_ThreadId_t loggerid = L4_nilthread;
 
         while (L4_IsNilThread(loggerid))
                 loggerid = nameserver_lookup("/server/logger");

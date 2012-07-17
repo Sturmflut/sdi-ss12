@@ -16,6 +16,7 @@
 
 #include <sdi/constants.h>
 #include <if/iflogging.h>
+#include <if/ifkeyboarddriver.h>
 
 #include <nameserver.h>
 
@@ -43,6 +44,12 @@ static glyph_t *vidmem = (glyph_t *)0xb8000;
 
 /** Currently active console */
 int active_console = 0;
+
+L4_ThreadId_t keyboarddriverid = L4_nilthread;
+
+
+L4_ThreadId_t loggerid = L4_nilthread;
+CORBA_Environment env(idl4_default_environment);
 
 
 /**
@@ -223,7 +230,7 @@ void  consoleserver_server(void)
 
   idl4_msgbuf_init(&msgbuf);
   for (cnt = 0;cnt < CONSOLESERVER_STRBUF_SIZE;cnt++)
-    idl4_msgbuf_add_buffer(&msgbuf, malloc(8000), 8000);
+    idl4_msgbuf_add_buffer(&msgbuf, malloc(16000), 16000);
 
   while (1)
     {
@@ -290,8 +297,20 @@ void set_active_console(int num)
 
 int main(void)
 {
+	while (L4_IsNilThread(loggerid))
+        	loggerid = nameserver_lookup("/server/logger");
+
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[CONSOLESERVER] Got keyboard", &env);
+
 	/* Register myself with the nameserver */
 	nameserver_register("/server/console");
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[CONSOLESERVER] Registered", &env);
+
+	/* Get keyboard driver */
+	while(L4_IsNilThread(keyboarddriverid))
+		keyboarddriverid = nameserver_lookup("/driver/keyboard");
+
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[CONSOLESERVER] Got keyboard", &env);
 
 	printf(" ");
 

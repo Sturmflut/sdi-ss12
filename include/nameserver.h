@@ -43,9 +43,11 @@ L4_ThreadId_t nameserver_lookup(path_t path)
 	/* Initialize */
 	strncpy(in, path, SDI_NAMESERVER_MAX_ENTRY_LEN);
 
+	next = nameserverid;
+
 	do
 	{
-		next = IF_NAMING_Lookup((CORBA_Object) nameserverid, in, &remp, &env);
+		next = IF_NAMING_Lookup((CORBA_Object) next, in, &remp, &env);
 
 		if(next != L4_nilthread)
 			strncpy(in, remp, SDI_NAMESERVER_MAX_ENTRY_LEN);

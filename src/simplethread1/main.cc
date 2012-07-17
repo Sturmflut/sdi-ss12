@@ -97,12 +97,6 @@ int main()
 	while (L4_IsNilThread(loggerid))
 		loggerid = nameserver_lookup("/server/logger");
 
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Registering", &env);
-
-	nameserver_register("/clients/simplethread1");
-
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD1] Registered", &env);
-
 
 	/* Print some stuff on the console */
 	while (L4_IsNilThread(consoleid))
