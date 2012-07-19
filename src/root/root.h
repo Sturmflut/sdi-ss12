@@ -17,8 +17,10 @@
 extern L4_ThreadId_t sigma0id;   // sigma0, just in case
 extern L4_ThreadId_t pagerid;    // our internal pager
 extern L4_ThreadId_t loggerid;   // messaging service
+extern L4_ThreadId_t driverid;   // driver server
 
 
 extern void logger_server (void);
 extern void pager_loop (void);
+extern void driver_server (void);
 

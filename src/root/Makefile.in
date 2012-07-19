@@ -16,10 +16,12 @@ PROGRAM_DEPS=	$(top_builddir)/lib/sdi/libsdi.a \
 		$(top_srcdir)/include/$(ARCH)/sdi.ld
 
 SRCS=		$(ARCH)-crt0.S \
-		main.cc logger.cc \
-		pager.cc
+		main.cc \
+		pager.cc \
+		logger.cc \
+		driver.cc
 
-IDLS=		logger.idl task.idl
+IDLS=		logger.idl driver.idl
 
 LIBS+=		-ll4 -lio -lsdi
 LDFLAGS+=	-O 3 -Ttext=$(ROOTTASK_LINKBASE) -T $(top_builddir)/include/$(ARCH)/sdi.ld
