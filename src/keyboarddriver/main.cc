@@ -7,18 +7,12 @@
  * Report bugs to haeberlen@ira.uka.de
  *****************************************************************/
 
-#include <idl4glue.h>
-#include "keyboarddriver-server.h"
-#include <l4/types.h>
-#include <l4io.h>
 #include <sdi/sdi.h>
 #include <sdi/constants.h>
-#include <stdlib.h>
+#include "keyboarddriver-server.h"
+#include <l4io.h>
 
 #include <if/iflogging.h>
-
-#include <nameserver.h>
-#include <driverserver.h>
 
 /* Interface keyboarddriver */
 

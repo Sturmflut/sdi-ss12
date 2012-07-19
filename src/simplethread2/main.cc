@@ -4,31 +4,16 @@
 // Description: Testclient
 //
 
-#include <l4/thread.h>
-#include <l4/space.h>
-#include <l4/message.h>
-#include <l4/ipc.h>
-#include <l4/sigma0.h>
-#include <l4/bootinfo.h>
-#include <l4/kdebug.h>
-
 #include <l4io.h>
-#include <macros.h>
-
 #include <stdlib.h>
 
-#include <sdi/types.h>
 #include <sdi/sdi.h>
-
-#include <idl4glue.h>
-
+#include <sdi/types.h>
 #include <sdi/constants.h>
 
 #include <if/iflogging.h>
 #include <if/ifnaming.h>
 #include <if/ifconsoleserver.h>
-
-#include <nameserver.h>
 
 #include <sdi/console_attributes.h>
 #include <sdi/io.h>

@@ -7,13 +7,10 @@
 * Report bugs to haeberlen@ira.uka.de
 *****************************************************************/
 
-#include <idl4glue.h>
-#include "nameserver-server.h"
-#include <l4/types.h>
-#include <l4io.h>
 #include <sdi/sdi.h>
 #include <sdi/constants.h>
-#include <stdlib.h>
+#include <l4io.h>
+#include "nameserver-server.h"
 
 #include <if/iflogging.h>
 

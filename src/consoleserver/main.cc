@@ -7,18 +7,14 @@
  * Report bugs to haeberlen@ira.uka.de
  *****************************************************************/
 
-#include <idl4glue.h>
+#include <sdi/sdi.h>
+#include <sdi/constants.h>
 #include "consoleserver-server.h"
 
-#include <sdi/types.h>
-#include <sdi/sdi.h>
 #include <l4io.h>
 
-#include <sdi/constants.h>
 #include <if/iflogging.h>
 #include <if/ifkeyboarddriver.h>
-
-#include <nameserver.h>
 
 typedef struct {
         char x;
