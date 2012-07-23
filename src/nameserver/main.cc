@@ -7,13 +7,10 @@
 * Report bugs to haeberlen@ira.uka.de
 *****************************************************************/
 
-#include <idl4glue.h>
-#include "nameserver-server.h"
-#include <l4/types.h>
-#include <l4io.h>
 #include <sdi/sdi.h>
 #include <sdi/constants.h>
-#include <stdlib.h>
+#include <l4io.h>
+#include "nameserver-server.h"
 
 #include <if/iflogging.h>
 
@@ -78,6 +75,13 @@ IDL4_PUBLISH_IF_NAMESERVER_DEREGISTER(IF_NAMESERVER_deregister_implementation);
 IDL4_INLINE L4_ThreadId_t  IF_NAMESERVER_Lookup_implementation(CORBA_Object _caller, const path_t path, path_t * remaining, idl4_server_environment * _env)
 
 {
+	/* Is someone looking for me? */
+	if(strlen(path) == 0 || (strlen(path) == 1 && path[0] == '/'))
+	{
+		*remaining = '\0';
+		return L4_Myself();
+	}
+
 	/* Find the first database entry matching the query */
 	for (int i = 0; i < SDI_NAMESERVER_MAX_ENTRIES; i++)
 		if (strncmp(path, names[i].path, strlen(names[i].path)) == 0) {
@@ -86,6 +90,7 @@ IDL4_INLINE L4_ThreadId_t  IF_NAMESERVER_Lookup_implementation(CORBA_Object _cal
 		}
 
 	strcpy(*remaining, path);
+
 	return L4_nilthread;
 
 }
@@ -107,7 +112,7 @@ void  IF_NAMESERVER_server()
 
 	idl4_msgbuf_init(&msgbuf);
 	for (cnt = 0; cnt < IF_NAMESERVER_STRBUF_SIZE; cnt++)
-		idl4_msgbuf_add_buffer(&msgbuf, malloc(8000), 8000);
+		idl4_msgbuf_add_buffer(&msgbuf, malloc(16000), 16000);
 
 	while (1) {
 		partner = L4_nilthread;

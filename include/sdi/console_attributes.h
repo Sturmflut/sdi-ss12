@@ -1,0 +1,36 @@
+#ifndef _CONSOLE_ATTRIBUTES_H
+#define _CONSOLE_ATTRIBUTES_H 1
+
+/* Text colors */
+static const char SDI_CONSOLE_ATTRIBUTE_FGBLACK = 0x00;
+static const char SDI_CONSOLE_ATTRIBUTE_FGBLUE = 0x01;
+static const char SDI_CONSOLE_ATTRIBUTE_FGGREEN = 0x02;
+static const char SDI_CONSOLE_ATTRIBUTE_FGCYAN = 0x03;
+static const char SDI_CONSOLE_ATTRIBUTE_FGRED = 0x04;
+static const char SDI_CONSOLE_ATTRIBUTE_FGMAGENTA = 0x05;
+static const char SDI_CONSOLE_ATTRIBUTE_FGBROWN = 0x06;
+static const char SDI_CONSOLE_ATTRIBUTE_FGLIGHTGREY = 0x07;
+static const char SDI_CONSOLE_ATTRIBUTE_FGDARKGREY = 0x08;
+static const char SDI_CONSOLE_ATTRIBUTE_FGLIGHTBLUE = 0x09;
+static const char SDI_CONSOLE_ATTRIBUTE_FGLIGHTGREEN = 0x0A;
+static const char SDI_CONSOLE_ATTRIBUTE_FGLIGHTCYAN = 0x0B;
+static const char SDI_CONSOLE_ATTRIBUTE_FGLIGHTRED = 0x0C;
+static const char SDI_CONSOLE_ATTRIBUTE_FGLIGHTMAGENTA = 0x0D;
+static const char SDI_CONSOLE_ATTRIBUTE_FGLIGHTYELLOW = 0x0E;
+static const char SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE = 0x0F;
+
+/* Background colors */
+static const char SDI_CONSOLE_ATTRIBUTE_BGBLACK = 0x00;
+static const char SDI_CONSOLE_ATTRIBUTE_BGBLUE = 0x10;
+static const char SDI_CONSOLE_ATTRIBUTE_BGGREEN = 0x20;
+static const char SDI_CONSOLE_ATTRIBUTE_BGCYAN = 0x30;
+static const char SDI_CONSOLE_ATTRIBUTE_BGRED = 0x40;
+static const char SDI_CONSOLE_ATTRIBUTE_BGMAGENTA = 0x50;
+static const char SDI_CONSOLE_ATTRIBUTE_BGBROWN = 0x60;
+static const char SDI_CONSOLE_ATTRIBUTE_BGLIGHTGREY = 0x70;
+
+/* Extra attributes */
+static const char SDI_CONSOLE_ATTRIBUTE_BLINK = 0x80;
+
+#endif
+

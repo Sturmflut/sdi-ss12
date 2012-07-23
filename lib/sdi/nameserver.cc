@@ -1,7 +1,8 @@
-#ifndef _NAMESERVER_H
-#define _NAMESERVER_H 1
+#include <sdi/sdi.h>
+#include <idl4glue.h>
 
 #include <sdi/constants.h>
+#include <stdlib.h>
 
 #include <if/ifnameserver.h>
 
@@ -43,9 +44,11 @@ L4_ThreadId_t nameserver_lookup(path_t path)
 	/* Initialize */
 	strncpy(in, path, SDI_NAMESERVER_MAX_ENTRY_LEN);
 
+	next = nameserverid;
+
 	do
 	{
-		next = IF_NAMING_Lookup((CORBA_Object) nameserverid, in, &remp, &env);
+		next = IF_NAMING_Lookup((CORBA_Object) next, in, &remp, &env);
 
 		if(next != L4_nilthread)
 			strncpy(in, remp, SDI_NAMESERVER_MAX_ENTRY_LEN);
@@ -59,5 +62,4 @@ L4_ThreadId_t nameserver_lookup(path_t path)
 	return next;
 }
 
-#endif
 

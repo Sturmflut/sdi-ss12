@@ -1,7 +1,7 @@
 ##
-## File:  src/root/Makefile.in
+## File:  src/test/Makefile.in
 ##
-## Description: Makefile for root
+## Description: Makefile
 ##
 
 srcdir=		@srcdir@
@@ -11,21 +11,17 @@ top_builddir=	@top_builddir@
 include $(top_srcdir)/Mk/base.mk
 
 
-PROGRAM=	root
+PROGRAM=	keyboarddriver
 PROGRAM_DEPS=	$(top_builddir)/lib/sdi/libsdi.a \
 		$(top_srcdir)/include/$(ARCH)/sdi.ld
 
 SRCS=		$(ARCH)-crt0.S \
-		main.cc \
-		pager.cc \
-		logger.cc \
-		driver.cc
+		main.cc
 
-IDLS=		logger.idl driver.idl
+IDLS=           keyboarddriver.idl
 
 LIBS+=		-ll4 -lio -lsdi
-LDFLAGS+=	-O 3 -Ttext=$(ROOTTASK_LINKBASE) -T $(top_builddir)/include/$(ARCH)/sdi.ld
-
+LDFLAGS+=	-Ttext=00740000 -T $(top_builddir)/include/$(ARCH)/sdi.ld
 
 
 include $(top_srcdir)/Mk/prog.mk

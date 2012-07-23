@@ -7,12 +7,10 @@
  * Report bugs to haeberlen@ira.uka.de
  *****************************************************************/
 
-#include <l4io.h>
-#include <idl4glue.h>
-#include "logger-server.h"
+//#include <l4io.h>
+//#include <idl4glue.h>
 #include <sdi/sdi.h>
-
-#include <nameserver.h>
+#include "logger-server.h"
 
 #include "root.h"
 
@@ -48,7 +46,7 @@ void  logger_server()
 
   idl4_msgbuf_init(&msgbuf);
   for (cnt = 0;cnt < LOGGER_STRBUF_SIZE;cnt++)
-    idl4_msgbuf_add_buffer(&msgbuf, malloc(8000), 8000);
+    idl4_msgbuf_add_buffer(&msgbuf, malloc(1024), 1024);
 
   while (1)
     {

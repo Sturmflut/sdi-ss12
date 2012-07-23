@@ -1,0 +1,25 @@
+//
+// File:  src/root/logger.idl
+//
+// Description: Interface for logger
+//
+
+/* The logger interface description */
+
+/* our C++ datatypes and IDL4 datatypes  */
+import "sdi/types.h";
+#include <types.idl>
+
+[uuid(IF_CONSOLESERVER_ID)]
+interface IF_CONSOLESERVER {
+	void putchar(in char character, in char attrib);
+	void putcharat(in int x, in int y, in char character, in char attrib);
+
+	void putstring(in consolestring_t character, in char attrib);
+	void putstringat(in int x, in int y, in consolestring_t character, in char attrib);
+
+	void setactivethread(in int console, in L4_ThreadId_t thread);
+	int getconsolenum();
+
+	char getchar();	
+};

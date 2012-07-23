@@ -1,0 +1,23 @@
+//
+// File:  src/root/logger.idl
+//
+// Description: Interface for logger
+//
+
+/* The logger interface description */
+
+/* our C++ datatypes and IDL4 datatypes  */
+import "sdi/types.h";
+#include <types.idl>
+
+[uuid(IF_KEYBOARDDRIVER_ID)]
+interface IF_KEYBOARDDRIVER {
+	const int MODIFIER_LEFTSHIFT = 1;
+	const int MODIFIER_RIGHTSHIFT = 2; 
+	const int MODIFIER_ALT = 4; 
+	const int MODIFIER_ALTGR = 8;
+	const int MODIFIER_LEFTCTRL = 16;
+	const int MODIFIER_RIGHTCTRL = 32;
+
+	boolean getKey(out int key, out char modifier);
+};

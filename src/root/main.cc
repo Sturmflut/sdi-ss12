@@ -27,6 +27,7 @@
 L4_ThreadId_t sigma0id;
 L4_ThreadId_t pagerid;
 L4_ThreadId_t loggerid;
+L4_ThreadId_t driverid;
 
 
 L4_Word_t pagesize;
@@ -44,6 +45,7 @@ extern char __heap_end;
 
 
 L4_Word_t logger_stack[1024];
+L4_Word_t driver_stack[1024];
 
 
 L4_ThreadId_t start_thread (L4_ThreadId_t threadid, L4_Word_t ip, L4_Word_t sp, void* utcblocation) {
@@ -93,13 +95,22 @@ L4_Bool_t request_page (L4_Word_t addr) {
 
 void list_modules (const L4_BootInfo_t* bootinfo) {
     L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
-    for (unsigned int i=0; i < L4_BootInfo_Entries (bootinfo); i++) {
-	printf ("Module: start %lx size %lx type: %d\n", 
-		L4_Module_Start (bootrec),
-		L4_Module_Size (bootrec),
-		(int)L4_Type (bootrec));
+    for (unsigned int i=0; i < L4_BootInfo_Entries (bootinfo); i++){
+	if((int)L4_Type (bootrec) == 1)
+		printf ("Module: start %lx size %lx type: %d cmdline: %s\n", 
+			L4_Module_Start (bootrec),
+			L4_Module_Size (bootrec),
+			(int)L4_Type (bootrec),
+			L4_Module_Cmdline (bootrec));
+		else
+		printf ("Module: start %lx size %lx type: %d\n", 
+			L4_Module_Start (bootrec),
+			L4_Module_Size (bootrec),
+			(int)L4_Type (bootrec));
+
 	bootrec = L4_Next (bootrec);
     }
+    
 }
 
 L4_BootRec_t* find_module (unsigned int index, const L4_BootInfo_t* bootinfo) {
@@ -109,6 +120,24 @@ L4_BootRec_t* find_module (unsigned int index, const L4_BootInfo_t* bootinfo) {
     for (unsigned int i = 0; i < index; i++)
 	bootrec = L4_Next (bootrec);
     return bootrec;
+}
+
+L4_BootRec_t* find_module_byname (char* name, const L4_BootInfo_t* bootinfo) {
+    L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
+    int i = 0;
+
+   do
+   {
+	if((int)L4_Type (bootrec) == 1 && 
+		strncmp(L4_Module_Cmdline (bootrec), name, strlen(name)) == 0)
+		return bootrec;
+
+	if(i < L4_BootInfo_Entries (bootinfo))
+		bootrec = L4_Next (bootrec);
+	i++;
+   } while(i < L4_BootInfo_Entries (bootinfo));
+
+  panic ("Modules not found");
 }
 
 L4_Word_t load_elfimage (L4_BootRec_t* mod) {
@@ -162,6 +191,16 @@ L4_Word_t load_elfimage (L4_BootRec_t* mod) {
     return (hdr->e_entry);
 }
 
+void start_task_byname(char* path, L4_ThreadId_t taskid, L4_Fpage_t nutcbarea)
+{
+    printf ("Starting %s ... \n", path);
+    L4_BootRec_t* taskrec = find_module_byname (path, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+    L4_Word_t startip = load_elfimage (taskrec);
+
+    /* some ELF loading and staring */
+    start_task (taskid, startip, utcbarea);
+    printf ("%s started with thread id %lx\n", path, taskid.raw);
+}
 
 #define UTCBaddress(x) ((void*)(((L4_Word_t)L4_MyLocalId().raw + utcbsize * (x)) & ~(utcbsize - 1)))
 
@@ -171,6 +210,7 @@ int main(void) {
     pagerid = L4_Myself ();
     sigma0id = L4_Pager ();
     loggerid = L4_nilthread;
+    driverid = L4_nilthread;
 
     printf ("Early system infos:\n");
     printf ("Threads: Myself:%lx Sigma0:%lx\n", L4_Myself ().raw, L4_Pager ().raw);
@@ -198,17 +238,10 @@ int main(void) {
     list_modules ((L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
 
 
-    /* Now we search for the third module, 
-       which will (hopefully) be our nameserver */ 
-    L4_BootRec_t* nameserver = find_module (2, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
-    L4_Word_t namestartip = load_elfimage (nameserver); 
-
-    /* some ELF loading and staring */
-    printf ("Starting nameserver ... \n");
-    L4_ThreadId_t nameid = L4_GlobalId ( SDI_NAMESERVER_DEFAULT_THREADID, 1);
-    start_task (nameid, namestartip, utcbarea);
-    printf ("nameserver started as %lx\n", nameid.raw);
-
+    /* Nameserver */
+    start_task_byname("(cd)/sdios/nameserver",
+	L4_GlobalId ( SDI_NAMESERVER_DEFAULT_THREADID, 1),
+	utcbarea);
 
 
     /* startup our logger, to be able to put messages on the screen */
@@ -222,40 +255,46 @@ int main(void) {
 		  UTCBaddress(2) ); 
     printf ("Started as id %lx\n", loggerid.raw);
 
+    
+    /* startup our driverserver, to be able to use drivers */
+    printf ("Starting driverserver ... \n");
+
+    /* Generate some threadid */
+    driverid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 3, 1);
+    start_thread (driverid, 
+		  (L4_Word_t)&driver_server, 
+		  (L4_Word_t)&driver_stack[1023], 
+		  UTCBaddress(3) ); 
+    printf ("Started as id %lx\n", driverid.raw);
+
+    /* Keyboarddriver */
+    start_task_byname("(cd)/sdios/keyboarddriver",
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 21, 1),
+	utcbarea);
+    
 
 
-    /* Now we search for the fifth module, 
-       which will (hopefully) be our nameserver */ 
-    printf ("Starting simplethread1 ... \n");
-    L4_BootRec_t* module3 = find_module (3, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
-    L4_Word_t simplestartip = load_elfimage (module3); 
+    /* Console */
+    start_task_byname("(cd)/sdios/consoleserver",
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 30, 1),
+	utcbarea);
 
-    /* some ELF loading and staring */
-    L4_ThreadId_t simpleid1 = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 3, 1);
-    start_task (simpleid1, simplestartip, utcbarea);
-    printf ("SimpleThread1 started as %lx\n", simpleid1.raw);
+    /* Memory server */
+    start_task_byname("(cd)/sdios/memory",
+            L4_GlobalId(L4_ThreadNo(L4_Myself ()) + 6, 1),
+            utcbarea);
+    
 
+    /* Simplethread1 */
+    start_task_byname("(cd)/sdios/simplethread1",
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 40, 1),
+	utcbarea);
+    
+    /* Simplethread2 */
+    start_task_byname("(cd)/sdios/simplethread2",
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 41, 1),
+	utcbarea);
 
-
-
-    /* Now we search for the sixth module, 
-       which will (hopefully) be our simplethread2 */ 
-    printf ("Starting simplethread2 ... \n");
-    L4_BootRec_t* module4 = find_module (4, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
-    L4_Word_t simplestartip2 = load_elfimage (module4); 
-
-    L4_ThreadId_t simpleid2 = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 4, 1);
-    start_task (simpleid2, simplestartip2, utcbarea);
-    printf ("SimpleThread2 started as %lx\n", simpleid2.raw);
-
-    /* Now we search for the sixth module, 
-       which will (hopefully) be our Memory Manager*/ 
-    L4_BootRec_t* module5 = find_module (5, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
-    L4_Word_t memorystartip = load_elfimage (module5); 
-
-    L4_ThreadId_t memoryid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 6, 1);
-    start_task (memoryid, memorystartip, utcbarea);
-    printf ("Memory Manager started as %lx\n", memoryid.raw);
 
     /* now it is time to become the pager for all those threads we 
        created recently */
