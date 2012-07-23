@@ -14,7 +14,7 @@ include $(top_srcdir)/Mk/base.mk
 IDLS=		types.idl \
 		iflogging.idl \
 		iftask.idl \
-		ifmemory.idl
+		ifmemory.idl \
 		iflogging.idl \
 		ifnaming.idl \
 		ifnameserver.idl \
