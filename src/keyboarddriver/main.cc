@@ -28,9 +28,9 @@ IDL4_INLINE CORBA_boolean  keyboarddriver_getKey_implementation(CORBA_Object  _c
 
 IDL4_PUBLISH_KEYBOARDDRIVER_GETKEY(keyboarddriver_getKey_implementation);
 
-void * keyboarddriver_vtable_10[KEYBOARDDRIVER_DEFAULT_VTABLE_SIZE] = KEYBOARDDRIVER_DEFAULT_VTABLE_10;
+void * keyboarddriver_vtable_11[KEYBOARDDRIVER_DEFAULT_VTABLE_SIZE] = KEYBOARDDRIVER_DEFAULT_VTABLE_11;
 void * keyboarddriver_vtable_discard[KEYBOARDDRIVER_DEFAULT_VTABLE_SIZE] = KEYBOARDDRIVER_DEFAULT_VTABLE_DISCARD;
-void ** keyboarddriver_itable[16] = { keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_10, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard };
+void ** keyboarddriver_itable[16] = { keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_11, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard };
 
 void  keyboarddriver_server(void)
 

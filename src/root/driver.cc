@@ -110,10 +110,10 @@ IDL4_INLINE L4_ThreadId_t  driver_Lookup_implementation(CORBA_Object  _caller, c
 
 IDL4_PUBLISH_DRIVER_LOOKUP(driver_Lookup_implementation);
 
-void * driver_vtable_4[DRIVER_DEFAULT_VTABLE_SIZE] = DRIVER_DEFAULT_VTABLE_4;
-void * driver_vtable_8[DRIVER_DEFAULT_VTABLE_SIZE] = DRIVER_DEFAULT_VTABLE_8;
+void * driver_vtable_5[DRIVER_DEFAULT_VTABLE_SIZE] = DRIVER_DEFAULT_VTABLE_5;
+void * driver_vtable_9[DRIVER_DEFAULT_VTABLE_SIZE] = DRIVER_DEFAULT_VTABLE_9;
 void * driver_vtable_discard[DRIVER_DEFAULT_VTABLE_SIZE] = DRIVER_DEFAULT_VTABLE_DISCARD;
-void ** driver_itable[16] = { driver_vtable_discard, driver_vtable_discard, driver_vtable_discard, driver_vtable_discard, driver_vtable_4, driver_vtable_discard, driver_vtable_discard, driver_vtable_discard, driver_vtable_8, driver_vtable_discard, driver_vtable_discard, driver_vtable_discard, driver_vtable_discard, driver_vtable_discard, driver_vtable_discard, driver_vtable_discard };
+void ** driver_itable[16] = { driver_vtable_discard, driver_vtable_discard, driver_vtable_discard, driver_vtable_discard, driver_vtable_5, driver_vtable_discard, driver_vtable_discard, driver_vtable_discard, driver_vtable_9, driver_vtable_discard, driver_vtable_discard, driver_vtable_discard, driver_vtable_discard, driver_vtable_discard, driver_vtable_discard, driver_vtable_discard };
 
 void  driver_server(void)
 
