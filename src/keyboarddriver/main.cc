@@ -75,8 +75,6 @@ int main(void)
 
         L4_ThreadId_t loggerid = L4_nilthread;
 
-	printf(" ");
-
         while (L4_IsNilThread(loggerid))
                 loggerid = nameserver_lookup("/server/logger");
 

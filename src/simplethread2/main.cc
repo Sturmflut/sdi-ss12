@@ -38,8 +38,6 @@ int main()
 	int scancode;
 	int scanstatus;
 
-	printf("a");
-
 	CORBA_Environment env(idl4_default_environment);
 
 	L4_ThreadId_t loggerid = L4_nilthread;

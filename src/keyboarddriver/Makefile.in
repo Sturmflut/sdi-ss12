@@ -20,7 +20,7 @@ SRCS=		$(ARCH)-crt0.S \
 
 IDLS=           keyboarddriver.idl
 
-LIBS+=		-ll4 -lio -lsdi
+LIBS+=		-ll4 -lsdi -lio
 LDFLAGS+=	-Ttext=00740000 -T $(top_builddir)/include/$(ARCH)/sdi.ld
 
 

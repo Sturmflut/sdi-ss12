@@ -23,7 +23,7 @@ SRCS=		$(ARCH)-crt0.S \
 
 IDLS=		logger.idl driver.idl
 
-LIBS+=		-ll4 -lio -lsdi
+LIBS+=		-ll4 -lsdi -lio -lsdi
 LDFLAGS+=	-O 3 -Ttext=$(ROOTTASK_LINKBASE) -T $(top_builddir)/include/$(ARCH)/sdi.ld
 
 

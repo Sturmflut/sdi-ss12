@@ -49,8 +49,13 @@ IDL4_INLINE void  IF_NAMESERVER_register_implementation(CORBA_Object _caller, co
 	if (i >= 0) {
 		strncpy(names[i].path, path, SDI_NAMESERVER_MAX_ENTRY_LEN);
 		names[i].registrant = _caller;
-	}else
-		printf("[NAMESERVER] Error: Could not register thread %lx for path \"%s\", database full\n", _caller.raw, path);
+	}else {
+        // We can't safely use the logger-server here, because it might
+        // not exist yet. Also, we can't use printf here, because it
+        // causes weird problems when using printf outside of the root
+        // task.
+		//printf("[NAMESERVER] Error: Could not register thread %lx for path \"%s\", database full\n", _caller.raw, path);
+    }
 
 	return;
 }

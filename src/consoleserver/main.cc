@@ -308,8 +308,6 @@ int main(void)
 
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[CONSOLESERVER] Got keyboard", &env);
 
-	printf(" ");
-
         init_consoles();
         set_active_console(0);
 
