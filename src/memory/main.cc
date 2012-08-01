@@ -7,14 +7,22 @@
  * Report bugs to haeberlen@ira.uka.de
  *****************************************************************/
 
+#include <sdi/sdi.h>
+#include <sdi/constants.h>
 #include <l4io.h>
-#include <idl4glue.h>
 #include "memory-server.h"
+
+/*
+#include <idl4glue.h>
+#include <l4io.h>
 #include <l4/types.h>
 #include <sdi/sdi.h>
 #include <sdi/types.h>
 #include <macros.h>
 #include <l4/kdebug.h>
+
+#include "memory-server.h"
+*/
 
 /* Interface memory */
 
