@@ -53,11 +53,7 @@ L4_ThreadId_t nameserver_lookup(path_t path)
 		if(next != L4_nilthread)
 			strncpy(in, remp, SDI_NAMESERVER_MAX_ENTRY_LEN);
 
-		//CORBA_string_free(*rem);
-
 	} while(next != L4_nilthread && strlen(remp) > 0);
-
-	//CORBA_string_free(in);
 
 	return next;
 }

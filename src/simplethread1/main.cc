@@ -45,7 +45,6 @@ void animation_loop()
 	print_stringat(23, 6, " ___) | |_| | |_____| |_| |___) |", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
 	print_stringat(23, 7, "|____/|____/___|     \\___/|____/ ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
 
-
 	while(1)
 	{
 		/* Scrolling step */

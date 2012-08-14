@@ -68,7 +68,7 @@ __heap_ptr:
 	.long __heap_start
 	.global __heap_start
 __heap_start:	
-	.space 32*1024
+	.space 96*1024
 	.global __heap_end
 __heap_end:
 
