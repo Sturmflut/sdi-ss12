@@ -10,6 +10,7 @@
 #include <l4/ipc.h>
 #include <l4/sigma0.h>
 #include <l4/bootinfo.h>
+#include <l4/kip.h>
 
 #include <stdlib.h>
 
@@ -112,6 +113,20 @@ void list_modules (const L4_BootInfo_t* bootinfo) {
     }
     
 }
+
+void list_memdesc(void* kip)
+{
+	for(int i = 0; i < L4_NumMemoryDescriptors(kip); i++)
+	{
+		L4_MemoryDesc_t* mdesc = L4_MemoryDesc(kip, i);
+
+		if(L4_IsVirtual(mdesc))
+			printf("Virtual Memory: low %p  high %p  type %i\n", L4_Low(mdesc), L4_High(mdesc), L4_Type(mdesc));
+		else
+			printf("Physical Memory: low %p  high %p  type %i\n", L4_Low(mdesc), L4_High(mdesc), L4_Type(mdesc));
+	}
+}
+
 
 L4_BootRec_t* find_module (unsigned int index, const L4_BootInfo_t* bootinfo) {
     if (L4_BootInfo_Entries (bootinfo) < index) 
@@ -225,6 +240,8 @@ int main(void) {
 
     utcbarea = L4_FpageLog2 ((L4_Word_t) L4_MyLocalId ().raw,
 			      L4_UtcbAreaSizeLog2 (kip) + 1);
+
+    list_memdesc(kip);
 
     /* We just bring the in the memory of the bootinfo page */
     if (!request_page (L4_BootInfo (L4_KernelInterface ()))) {

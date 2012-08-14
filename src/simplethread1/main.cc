@@ -45,7 +45,7 @@ void animation_loop()
 	print_stringat(23, 6, " ___) | |_| | |_____| |_| |___) |", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
 	print_stringat(23, 7, "|____/|____/___|     \\___/|____/ ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
 
-	void *p1, *p2;
+	void *p1, *p2, *p3;
 
 	while(1)
 	{
@@ -63,9 +63,11 @@ void animation_loop()
 				print_charat(x + i, 23, banner[i], SDI_CONSOLE_ATTRIBUTE_FGLIGHTRED);
 
 		p1 = malloc(10);
-		p2 = malloc(10);
+		p2 = malloc(4097);
+		p3 = malloc(10);
 		sleep(150);
 		free(p2);
+		free(p3);
 		free(p1);
 	}
 }
