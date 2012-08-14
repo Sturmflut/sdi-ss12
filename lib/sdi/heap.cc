@@ -69,7 +69,7 @@ void* alloc (L4_Word_t size)
 			{
 				SLOT_SETTAKEN(j);
 				SLOT_SETNEXTTAKEN(j);
-				//printf("Thread %lx, slot %i value %i\n", L4_Myself().raw, j, *((char*)__heap_start + j));
+				printf("Thread %lx, slot %i value %i\n", L4_Myself().raw, j, *((char*)__heap_start + j));
 			}
 
 			SLOT_SETTAKEN(++j);
