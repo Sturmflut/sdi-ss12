@@ -1,16 +1,8 @@
-//
-// File:  if/types.idl
-//
-// Description: Basic IDL types for SDI
-//
-
-
 #ifndef _sdi_if_types_h__
 #define _sdi_if_types_h__
 
 /* our SDI C++ datatypes from include  */
 import "sdi/types.h";
-
 
 /* some IDL datatypes we might need */
 

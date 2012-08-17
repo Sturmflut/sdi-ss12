@@ -1,7 +1,7 @@
 import "sdi/types.h";
 #include <types.idl>
 
-[uuid(IF_FILE_ID)]
-interface IF_FILE {
+[uuid(IF_PAGER_ID)]
+interface IF_PAGER {
 
 };
