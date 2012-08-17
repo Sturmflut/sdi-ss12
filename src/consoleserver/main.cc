@@ -296,8 +296,6 @@ int main(void)
 	while (L4_IsNilThread(loggerid))
         	loggerid = nameserver_lookup("/server/logger");
 
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[CONSOLESERVER] Got keyboard", &env);
-
 	/* Register myself with the nameserver */
 	nameserver_register("/server/console");
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[CONSOLESERVER] Registered", &env);
