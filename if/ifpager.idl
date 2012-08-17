@@ -9,6 +9,6 @@ interface IF_PAGER {
                       in L4_Word_t privileges,
                       out fpage page);
 
-	void alloc(in fpage page, L4_Word_t size);
+	void alloc(in fpage page, in L4_Word_t size);
 	void free(in fpage page);
 };

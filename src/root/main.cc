@@ -327,7 +327,7 @@ int main(void) {
 
     /* now it is time to become the pager for all those threads we 
        created recently */
-    pager_loop();
+    pager_server();
 
     panic ("Unexpected return from PagerLoop()");
 }

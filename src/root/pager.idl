@@ -1,0 +1,10 @@
+import "sdi/types.h";
+#include <types.idl>
+#include <ifpager.idl>
+
+
+interface pager : IF_PAGER {
+
+    /* Nothing more needed */
+      
+};

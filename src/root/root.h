@@ -21,6 +21,7 @@ extern L4_ThreadId_t driverid;   // driver server
 
 
 extern void logger_server (void);
-extern void pager_loop (void);
+extern void pager_server (void);
 extern void driver_server (void);
 
+extern void  pager_pagefault_implementation_real(CORBA_Object  _caller, const L4_Word_t  address, const L4_Word_t  ip, const L4_Word_t  privileges, idl4_fpage_t * page, idl4_server_environment * _env);
