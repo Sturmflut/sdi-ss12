@@ -1,128 +1,213 @@
-//
-// File: lib/sdi/heap.cc
-//
-// Description: VERY simple heap implemenetation 
-//
+/*
+ * malloc/free by O.Dreesen
+ *
+ * first TRY:
+ *   lists w/magics
+ * and now the second TRY
+ *   let the kernel map all the stuff (if there is something to do)
+ */
 
 #include <stdlib.h>
-#include <l4io.h>
 
-#include <sdi/types.h>
 #include <sdi/sdi.h>
 
-/* Heap Managment */
 
-// import symbols from crt0.S
+/* -- HELPER CODE --------------------------------------------------------- */
+
+#ifndef MAP_FAILED
+#define MAP_FAILED ((void*)-1)
+#endif
+
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
+
+typedef struct {
+  void*  next;
+  size_t size;
+} __alloc_t;
+
+#define BLOCK_START(b)	(((void*)(b))-sizeof(__alloc_t))
+#define BLOCK_RET(b)	(((void*)(b))+sizeof(__alloc_t))
+
+#define MEM_BLOCK_SIZE	4096
+#define PAGE_ALIGN(s)	(((s)+MEM_BLOCK_SIZE-1)&(unsigned long)(~(MEM_BLOCK_SIZE-1)))
+
+/* a simple mmap :) */
+#if defined(__i386__)
+#define REGPARM(x) __attribute__((regparm(x)))
+#else
+#define REGPARM(x)
+#endif
 
 extern char __heap_start[];
-extern char  __heap_end[];
+extern char __heap_end[];
 extern void* __heap_ptr;
 
-static const int	BLOCK_SIZE = 512;
-static int		NUM_SLOTS;
-
-static int addr_to_slot(void* addr)
-{
-	return ((char*)addr - (char*)__heap_start) / BLOCK_SIZE;
+static void REGPARM(1) *do_mmap(size_t size) {
+    if (__heap_ptr==NULL)
+        bailout ("__heap_ptr not initialized check *-crt0.S , halted");
+    void* ret = __heap_ptr;
+    __heap_ptr = (void*)((L4_Word_t)__heap_ptr + size);
+    if ((L4_Word_t)__heap_ptr > (L4_Word_t)&__heap_end)
+        bailout ("no more heap left, halted");
+    return ret;
 }
 
-static bool slot_istaken(int i)
-{
-	return __heap_start[i] & 1;
+/* -- SMALL MEM ----------------------------------------------------------- */
+
+static __alloc_t* __small_mem[8];
+
+#define __SMALL_NR(i)		(MEM_BLOCK_SIZE/(i))
+
+#define __MIN_SMALL_SIZE	__SMALL_NR(256)		/*   16 /   32 */
+#define __MAX_SMALL_SIZE	__SMALL_NR(2)		/* 2048 / 4096 */
+
+#define GET_SIZE(s)		(__MIN_SMALL_SIZE<<get_index((s)))
+
+#define FIRST_SMALL(p)		(((unsigned long)(p))&(~(MEM_BLOCK_SIZE-1)))
+
+static inline int __ind_shift() { return (MEM_BLOCK_SIZE==4096)?4:5; }
+
+static size_t REGPARM(1) get_index(size_t _size) {
+  register size_t idx=0;
+//  if (_size) {	/* we already check this in the callers */
+    register size_t size=((_size-1)&(MEM_BLOCK_SIZE-1))>>__ind_shift();
+    while(size) { size>>=1; ++idx; }
+//  }
+  return idx;
 }
 
-static void slot_settaken(int i)
-{
-	__heap_start[i] |= 1;
+/* small mem */
+static void __small_free(void*_ptr,size_t _size) REGPARM(2);
+
+static void REGPARM(2) __small_free(void*_ptr,size_t _size) {
+  __alloc_t* ptr = (__alloc_t*) BLOCK_START(_ptr);
+  size_t size=_size;
+  size_t idx=get_index(size);
+
+#ifdef WANT_FREE_OVERWRITE
+  memset(ptr,0x55,size);	/* allways zero out small mem */
+#else
+  memset(ptr,0,size);	/* allways zero out small mem */
+#endif
+
+  ptr->next=__small_mem[idx];
+  __small_mem[idx]=ptr;
 }
 
-static void slot_cleartaken(int i)
-{
-	__heap_start[i] &= ~(1);
+static void* REGPARM(1) __small_malloc(size_t _size) {
+  __alloc_t *ptr;
+  size_t size=_size;
+  size_t idx;
+
+  idx=get_index(size);
+  ptr=__small_mem[idx];
+
+  if (ptr==0)  {	/* no free blocks ? */
+    register int i,nr;
+    ptr = (__alloc_t*) do_mmap(MEM_BLOCK_SIZE);
+    if (ptr==MAP_FAILED) return MAP_FAILED;
+
+    __small_mem[idx]=ptr;
+
+    nr=__SMALL_NR(size)-1;
+    for (i=0;i<nr;i++) {
+      ptr->next=(((void*)ptr)+size);
+      ptr = (__alloc_t*) ptr->next;
+    }
+    ptr->next=0;
+
+    ptr=__small_mem[idx];
+  }
+
+  /* get a free block */
+  __small_mem[idx] = (__alloc_t*) ptr->next;
+  ptr->next=0;
+
+  return ptr;
 }
 
-static bool slot_nexttaken(int i)
-{
-	return __heap_start[i] & 2;
+/* -- PUBLIC FUNCTIONS ---------------------------------------------------- */
+
+static void _alloc_libc_free(void *ptr) {
+  register size_t size;
+  if (ptr) {
+    size=((__alloc_t*)BLOCK_START(ptr))->size;
+    if (size) {
+      if (size<=__MAX_SMALL_SIZE)
+	__small_free(ptr,size);
+      //else
+	//munmap(BLOCK_START(ptr),size);
+    }
+  }
 }
 
-static void slot_setnexttaken(int i)
-{
-	__heap_start[i] |= 2;
+#ifdef WANT_MALLOC_ZERO
+static __alloc_t zeromem[2];
+#endif
+
+static void* _alloc_libc_malloc(size_t size) {
+  __alloc_t* ptr;
+  size_t need;
+#ifdef WANT_MALLOC_ZERO
+  if (!size) return BLOCK_RET(zeromem);
+#else
+  if (!size) goto err_out;
+#endif
+  size+=sizeof(__alloc_t);
+  if (size<sizeof(__alloc_t)) goto err_out;
+  if (size<=__MAX_SMALL_SIZE) {
+    need=GET_SIZE(size);
+    ptr=(__alloc_t*) __small_malloc(need);
+  }
+  else {
+    need=PAGE_ALIGN(size);
+    if (!need) ptr=(__alloc_t*)MAP_FAILED; else ptr=(__alloc_t*) do_mmap(need);
+  }
+  if (ptr==MAP_FAILED) goto err_out;
+  ptr->size=need;
+  return BLOCK_RET(ptr);
+err_out:
+  return 0;
 }
 
-static void slot_clearnexttaken(int i)
-{
-	__heap_start[i] &= ~(2);
+void* __libc_calloc(size_t nmemb, size_t _size) {
+  register size_t size=_size*nmemb;
+  if (nmemb && size/nmemb!=_size) {
+    return 0;
+  }
+#ifdef WANT_FREE_OVERWRITE
+  if (size<__MAX_SMALL_SIZE) {
+    void* x=malloc(size);
+    memset(x,0,size);
+    return x;
+  } else
+#endif
+  return malloc(size);
 }
 
-
-void* alloc (L4_Word_t size) 
-{
-	if (__heap_ptr==NULL)
-		bailout ("__heap_ptr not initialized check *-crt0.S , halted");
-
-	// Initialize heap and bitmap
-	//printf("Thread %lx __heap_start %p __heap_end %p __heap_ptr %p\n", &__heap_start, &__heap_end, __heap_ptr);
-	if(&__heap_start == __heap_ptr)
-	{
-		memset(&__heap_start, 0, (char*)&__heap_end - (char*)&__heap_start);
-
-		__heap_ptr = (void*)(__heap_ptr + (((char*)&__heap_end - (char*)&__heap_start) / BLOCK_SIZE));
-		NUM_SLOTS = ((char*)&__heap_end - (char*)__heap_ptr) / BLOCK_SIZE;
-		//printf("Thread %lx zeroing heap, %i slots, __heap_start %p, __heap_ptr %p\n", L4_Myself().raw, NUM_SLOTS, &__heap_start, __heap_ptr);
-	}
-
-	// Scan for a big enough piece
-	for(char* p = (char*)__heap_ptr; p < ((char*) &__heap_end); p += BLOCK_SIZE)
-	{
-		int slot = addr_to_slot(p);
-		bool free = true;
-		
-		for(int i = slot; free &&
-			( (i - slot) < ((size / BLOCK_SIZE) + 1)) &&
-			( i < (((char*)&__heap_end - (char*)__heap_ptr) / BLOCK_SIZE)); i++)
-			if(slot_istaken(i))
-				free = false;
-
-		if(free)
-		{
-			int j;
-			for(j = slot; (j - slot) < ((size / BLOCK_SIZE) + 1); j++)
-			{
-				slot_settaken(j);
-				slot_setnexttaken(j);
-				printf("Thread %lx, slot %i value %i\n", L4_Myself().raw, j, *((char*)__heap_start + j));
-			}
-
-			slot_settaken(++j);
-			//printf("Thread %lx, slot %i value %i\n", L4_Myself().raw, j, *((char*)__heap_start + j));
-
-			//printf("Thread %lx handing out %p for request size %i, slot %i\n", L4_Myself().raw, p, size, slot);
-			return p;
-		}
-	}
-
-	bailout ("No heap left");
+void* __libc_malloc(size_t size){
+	return _alloc_libc_malloc(size);
 }
 
-void free (void* freeptr) {
-	int i = addr_to_slot(freeptr);
+void* alloc (L4_Word_t size) {
+	return _alloc_libc_malloc(size);
+}
 
-	if(!slot_istaken(i))
-	{
-		//printf("Thread %lx couldn't free %p, slot value %i\n", L4_Myself().raw, freeptr, *((char*)__heap_start + i));
-		bailout("free() called on untaken slot");
-	}
+void* calloc(size_t nmemb, size_t _size) {
+	return __libc_calloc(nmemb, _size);
+}
 
-	for(; slot_istaken(i) && slot_nexttaken(i); i++)
-	{
-		slot_cleartaken(i);
-		slot_clearnexttaken(i);
-	}
+void __libc_free(void *ptr) {
+_alloc_libc_free(ptr);
+}
 
-	slot_cleartaken(++i);
-	
-	//printf("Thread %lx freed %i slots after %p\n", L4_Myself().raw, i - addr_to_slot(freeptr), freeptr);	
+void free(void *ptr) {
+	_alloc_libc_free(ptr);
+}
+
+void if_freenameindex(void* ptr) {
+	free(ptr);
 }
 

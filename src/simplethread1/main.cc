@@ -62,13 +62,7 @@ void animation_loop()
 			if(x + i > 0)
 				print_charat(x + i, 23, banner[i], SDI_CONSOLE_ATTRIBUTE_FGLIGHTRED);
 
-		p1 = malloc(10);
-		p2 = malloc(4097);
-		p3 = malloc(10);
 		sleep(150);
-		free(p2);
-		free(p3);
-		free(p1);
 	}
 }
 

@@ -228,20 +228,36 @@ int main(void) {
     driverid = L4_nilthread;
 
     printf ("Early system infos:\n");
-    printf ("Threads: Myself:%lx Sigma0:%lx\n", L4_Myself ().raw, L4_Pager ().raw);
+    printf ("Threads: Myself:%lx My local id: Sigma0:%lx\n", L4_Myself ().raw, L4_MyLocalId ().raw, L4_Pager ().raw);
     pagesize = 1 << lsBit (L4_PageSizeMask (kip));
+    list_memdesc(kip);
     printf ("Pagesize: %d\n", (int)pagesize);
     kiparea = L4_FpageLog2 ((L4_Word_t)kip, L4_KipAreaSizeLog2 (kip));
     printf ("KernelInterfacePage: %lx size: %d\n", L4_Address (kiparea), (int)L4_Size (kiparea));
     printf ("Bootinfo: %lx\n", L4_BootInfo (kip));
     printf ("ELFimage: from %p to %p\n", &__elf_start, &__elf_end);
     printf ("Heap: start: %p end: %p\n", &__heap_start, &__heap_end);
+
+    //int pagecount = 0;
+    //L4_Fpage_t page;
+
+    //do {
+        //page = L4_Sigma0_GetAny (sigma0id, pagesize, L4_Fpage (-1, pagesize));
+
+	//if(!L4_IsNilFpage (page))
+	//{
+            //pagecount++;
+	//}
+    //}while(!(L4_IsNilFpage (page)));
+
+    //printf("Got %i pages of size %i from sigma0\n", pagecount, pagesize);
+
     utcbsize = L4_UtcbSize (kip);
 
     utcbarea = L4_FpageLog2 ((L4_Word_t) L4_MyLocalId ().raw,
 			      L4_UtcbAreaSizeLog2 (kip) + 1);
+    printf ("UTCB Area: %lx size: %d\n", L4_Address (utcbarea), (int)L4_Size (utcbarea));
 
-    list_memdesc(kip);
 
     /* We just bring the in the memory of the bootinfo page */
     if (!request_page (L4_BootInfo (L4_KernelInterface ()))) {
