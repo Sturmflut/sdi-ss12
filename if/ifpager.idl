@@ -3,5 +3,12 @@ import "sdi/types.h";
 
 [uuid(IF_PAGER_ID)]
 interface IF_PAGER {
+	[kernelmsg(idl4::pagefault)]
+	void    pagefault(in L4_Word_t address,
+                      in L4_Word_t ip,
+                      in L4_Word_t privileges,
+                      out fpage page);
 
+	void alloc(in fpage page, L4_Word_t size);
+	void free(in fpage page);
 };
