@@ -35,6 +35,7 @@ L4_ThreadId_t nameserver_lookup(path_t path)
 	CORBA_Environment env (idl4_default_environment);
 
 	L4_ThreadId_t next = L4_nilthread;
+	L4_ThreadId_t cur = L4_nilthread;
 	CORBA_char in[SDI_NAMESERVER_MAX_ENTRY_LEN + 1];
 	CORBA_char rem[SDI_NAMESERVER_MAX_ENTRY_LEN + 1];
 	CORBA_char * remp = (CORBA_char*) &rem;
@@ -45,15 +46,15 @@ L4_ThreadId_t nameserver_lookup(path_t path)
 	strncpy(in, path, SDI_NAMESERVER_MAX_ENTRY_LEN);
 
 	next = nameserverid;
-
 	do
 	{
+		cur = next;
 		next = IF_NAMING_Lookup((CORBA_Object) next, in, &remp, &env);
 
 		if(next != L4_nilthread)
 			strncpy(in, remp, SDI_NAMESERVER_MAX_ENTRY_LEN);
 
-	} while(next != L4_nilthread && strlen(remp) > 0);
+	} while(cur != next && next != L4_nilthread && strlen(remp) > 0);
 
 	return next;
 }
