@@ -1,0 +1,26 @@
+\subsection{Speicherverwaltung}
+
+\subsubsection{Pager}
+
+\begin{itemize}
+	\item Zu Beginn Blöcke von Sigma0 holen (z.B. 4 MB) und in Free-List speichern. Siehe "Sigma0 User Protocol" im Handbuch, und die Methoden in l4\_user/include/l4/sigma0.h
+	
+	\item Bitmap über die Free-List legen, damit auch kleinere Blöcke als 4 MB herausgegeben werden können
+	
+	\item Design-Frage: Wie gibt man Speicher an die Anwendung heraus? Folgende Optionen:
+	\begin{enumerate}
+		\item Der Pager verwaltet den Adressraum des Threads. In diesem Fall liefert ein vom Thread aufgerufenes alloc() die Adresse zurück, an der der Speicher in den Namespace eingeblendet werden wird. Bei der ersten Page Fault auf den neu allokierten Speicher wird dieser dann tatsächlich eingeblendet.
+		 \item Der Thread verwaltet seinen Adressraum selbst. Dies ist eigentlich die bessere Idee, da dies den Pager sehr vereinfacht und die Möglichkeiten des Threads maximiert, z.B. könnte in diesem Fall der Thread dynamisch Libraries nachladen, ohne dass der Pager dies wissen muss. In diesem Fall würde alloc() als Resultat ein MapItem zurückliefern, und es würde gar nie zu einer Page Fault kommen. Andererseits muss in diesem Fall der Thread selbst in sein RcvWindow schreiben, wo in seinem Adressraum das Mapping landen soll. Dies setzt voraus, dass der Thread ein lokales Heap-Management hat, welches selbst entscheiden kann, an welche freie Adresse etwas eingeblendet werden soll.
+	\end{enumerate}
+	
+	In beiden Fällen muss noch geklärt werden, wie mit Stack und Heap umgegangen wird. Man könnte z.B. festlegen, dass Code immer an Adresse 0 kommt, der Heap bei 0x1000000 (16 MB) beginnt, und der Stack von 0xffffffff abwärts wächst. Der Pager würde dann Code und Stack bereits vor dem Thread-Start in den Adressraum einblenden. 
+	
+	\item Wie funktioniert free()?
+	
+	\item Wie fordert man geschützten Systemspeicher an, z.B. die MULTIBOOT-Info (für den Fileserver) oder den Videospeicher?
+\end{itemize}
+
+\subsubsection{Lokale Heap-Verwaltung}
+
+Vorhandene Heap-Bibliothek portieren, z.B. dietlibc oder dlmalloc. dietlibc malloc()/free() ist bereits portiert. dlmalloc wurde von Jens Kehne (Mitarbeiter von Herrn Dr. Stoess) empfohlen.
+

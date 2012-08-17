@@ -1,0 +1,29 @@
+\section{Bootvorgang}
+
+\begin{itemize}
+	\item GRUB lädt Kickstart, L4 und Module und übergibt einen MULTIBOOT-Block
+	\item GRUB startet Kickstart und übergibt den MULTIBOOT-Block
+	\item Kickstart initialisiert die Hardware, startet L4 und übergibt den MULTIBOOT-Block
+	\item L4 initialisiert sich und startet die Root-Task
+
+	\item Die Root-Task startet die folgenden Threads im eigenen Adressraum:
+	\begin{itemize}
+		\item Task server
+		\item Driver server
+		\item Logger
+	\end{itemize}
+	
+	\item Die Root-Task startet die folgenden Tasks in separaten Adressräumen:
+	\begin{itemize}
+		\item File server
+		\item Nameserver
+		\item Keyboard driver
+		\item Console server
+		\item simplethread1
+		\item simplethread2
+	\end{itemize}
+	
+	\item Die Root-Task wird zum Pager
+	
+Nachtrag: Sollte bekannt werden, wie man auch außerhalb des Root-Namespaces privilegierte Systemcalls rufen kann, so könnten der Task Server und der Driver Server ebenfalls in eigenen Adressräumen laufen.
+\end{itemize}

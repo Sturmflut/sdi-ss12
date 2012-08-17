@@ -1,0 +1,9 @@
+\subsection{Task Server}
+
+\subsubsection{ELF-Loader}
+
+Übernahme und Erweiterung des Beispielcodes
+
+\subsubsection{Task-IDs und Thread-IDs}
+
+Idee: Thread-ID besteht aus Task-ID (die vorderen x Bit) und Thread-ID (z.B. die hinteren 8 Bit). Auf diese Weise können die Server (z.B. Memory und Console) ohne Aufwand feststellen, welche Threads im gleichen Adressraum laufen, und man spart sich die Pflege zusätzlicher Listen.

@@ -1,0 +1,16 @@
+\subsection{Console Server}
+
+\lstinputlisting{../if/ifconsoleserver.idl}
+
+Funktionsumfang:
+\begin{itemize}
+	\item Virtuelle Terminals (aktuell 8)
+	\item Buffering von In- und Output
+	\item Aktuell kein Screen Driver, sondern direkter Zugriff auf den Video-Speicher bei 0xb8000
+\end{itemize}
+
+Aktuelles Design: Jedes virtuelle Terminal hat einen eigenen Bildschirm- und Tastaturpuffer, sowie eine aktive ThreadID, welche ihm zugeordnet ist. Ruft ein Thread put*() oder get*(), so beziehen sich diese nur auf das Terminal, welches dem Thread zugeordnet ist. Ist der Aufrufer dem Console Server unbekannt, endet die Anfrage ohne Ergebnis.
+
+Wie der Zugriff mehrerer Threads im selben Adressraum, sowie die Übergabe der Kontrolle an weitere, vom Thread zusätzlich gestartete Tasks (z.B. eine Shell startet ein Kommando) laufen soll, ist aktuell nicht geklärt.
+
+Der Console Server basiert auf dem Screen Driver und dem Keyboard Driver. Das umschalten zwischen den Terminals soll später ähnlich zu Linux über die Tastenkombationen <Strg>+<Fn> ermöglicht werden, dies ist aktuell aber nicht implementiert.
