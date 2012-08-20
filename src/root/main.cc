@@ -220,7 +220,13 @@ void start_task_byname(char* path, L4_ThreadId_t taskid, L4_Fpage_t nutcbarea)
 #define UTCBaddress(x) ((void*)(((L4_Word_t)L4_MyLocalId().raw + utcbsize * (x)) & ~(utcbsize - 1)))
 
 int main(void) {
-    L4_KernelInterfacePage_t* kip = (L4_KernelInterfacePage_t*)L4_KernelInterface ();
+    L4_Word_t ApiVersion, ApiFlags, KernelId;
+
+    L4_KernelInterfacePage_t* kip = (L4_KernelInterfacePage_t*)L4_KernelInterface (
+	&ApiVersion,
+	&ApiFlags,
+	&KernelId);
+    printf("Kernel API Version: %lx Flags: %lx KernelId: %lx\n", ApiVersion, ApiFlags, KernelId);
 
     pagerid = L4_Myself ();
     sigma0id = L4_Pager ();
@@ -228,11 +234,18 @@ int main(void) {
     driverid = L4_nilthread;
 
     printf ("Early system infos:\n");
-    printf ("Threads: Myself:%lx My local id: Sigma0:%lx\n", L4_Myself ().raw, L4_MyLocalId ().raw, L4_Pager ().raw);
-    pagesize = 1 << lsBit (L4_PageSizeMask (kip));
+
     list_memdesc(kip);
+
+    pagesize = 1 << lsBit (L4_PageSizeMask (kip));
     printf ("Pagesize: %d\n", (int)pagesize);
+
     kiparea = L4_FpageLog2 ((L4_Word_t)kip, L4_KipAreaSizeLog2 (kip));
+
+    printf("Thread Bits: %lx ThreadIdSystemBase: %lx ThreadIdUserBase: %lx\n",
+	L4_ThreadIdBits(kip), L4_ThreadIdSystemBase(kip), L4_ThreadIdUserBase(kip));
+
+    printf ("Threads: Myself:%lx My local id:%lx Sigma0: %lx\n", L4_Myself ().raw, L4_MyLocalId ().raw, L4_Pager ().raw);
     printf ("KernelInterfacePage: %lx size: %d\n", L4_Address (kiparea), (int)L4_Size (kiparea));
     printf ("Bootinfo: %lx\n", L4_BootInfo (kip));
     printf ("ELFimage: from %p to %p\n", &__elf_start, &__elf_end);
@@ -253,6 +266,7 @@ int main(void) {
     //printf("Got %i pages of size %i from sigma0\n", pagecount, pagesize);
 
     utcbsize = L4_UtcbSize (kip);
+    printf("UTCB size: %d\n", utcbsize);
 
     utcbarea = L4_FpageLog2 ((L4_Word_t) L4_MyLocalId ().raw,
 			      L4_UtcbAreaSizeLog2 (kip) + 1);
@@ -262,7 +276,7 @@ int main(void) {
     /* We just bring the in the memory of the bootinfo page */
     if (!request_page (L4_BootInfo (L4_KernelInterface ()))) {
 	// no bootinfo, no chance, no future. Break up
-	panic ("Was not able to get bootinfo");
+    	panic ("Was not able to get bootinfo");
     }
  
    /* Quick check */
