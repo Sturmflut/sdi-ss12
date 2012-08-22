@@ -2,28 +2,33 @@
 
 \begin{itemize}
 	\item GRUB lädt Kickstart, L4 und Module und übergibt einen MULTIBOOT-Block
-	\item GRUB startet Kickstart und übergibt den MULTIBOOT-Block
 	\item Kickstart initialisiert die Hardware, startet L4 und übergibt den MULTIBOOT-Block
 	\item L4 initialisiert sich und startet die Root-Task
 
-	\item Die Root-Task startet die folgenden Threads im eigenen Adressraum:
-	\begin{itemize}
-		\item Task server
-		\item Driver server
-		\item Logger
-	\end{itemize}
+	\item Die Root-Task startet den Task Server und den File Server jeweils wie folgt und mit festen ThreadIds. \textbf{Es ist noch zu klären, wie der Task Server ThreadControl aus seinem Adressraum aufrufen kann.}
+	\begin{enumerate}
+		\item Dekodieren des ELF-Headers
+		\item Eine Seite von Sigma0 holen, welche groß genug für das Code-Segment ist
+		\item Den Teil des ELF-Images, der den Code enthält, in die erhaltene Page kopieren
+		\item ThreadControl aufrufen und Namespace erzeugen
+		\item In der internen Pager-Datenstruktur vermerken, dass für diese ThreadId an dieser Adresse die erhaltene Page geliefert werden soll
+		\item Eine Seite von Sigma0 holen, welche als Stack fungiert
+		\item In der internen Pager-Datenstruktur vermerken, dass für diese ThreadId an dieser Adresse die erhaltene Page geliefert werden soll (für Stack)
+		\item SpaceControl und ThreadControl aufrufen, um den Thread zu starten. Der Pager ist die Root-Task.
+	\end{enumerate}
 	
-	\item Die Root-Task startet die folgenden Tasks in separaten Adressräumen:
-	\begin{itemize}
-		\item File server
-		\item Nameserver
-		\item Keyboard driver
-		\item Console server
-		\item simplethread1
-		\item simplethread2
-	\end{itemize}
+	\item Die Root-Task wird zum Pager. Alle weiteren Tasks und Threads werden über den Task Server erzeugt.
 	
-	\item Die Root-Task wird zum Pager
+	\item Der Task Server lädt die Konfigurationsdatei taskstart.cfg vom File Server (bekannt über dessen feste ThreadId, kein Naming!). Sie enthält den Pfad aller noch zu startenden Tasks, sowie deren initiale ThreadId (sofern diese nötig ist, um privilegiert zu werden).
 	
-Nachtrag: Sollte bekannt werden, wie man auch außerhalb des Root-Namespaces privilegierte Systemcalls rufen kann, so könnten der Task Server und der Driver Server ebenfalls in eigenen Adressräumen laufen.
+	\item Der Task Server startet alle weiteren Tasks.
+	
+	\item Der File Server benötigt Zugriff auf die MULTIBOOT-Info (physikalische Adresse bekannt, L4\_BootInfo). Der Pager muss die Möglichkeit bieten, physikalischen Speicher zu mappen.
+	
+	\item Der Bildschirmtreiber benötigt Zugriff auf den Videospeicher bei 0xB8000.
+	
+	\item Der Driver Server benötigt die Möglichkeit, Interrupts zu attachen (\textbf{Es ist noch zu klären, wie der Driver Server ThreadControl aus seinem Adressraum aufrufen kann.})
+	
+	\item Der Tastaturtreiber benötigt Zugriff auf die Ports 0x62 und 0x64 (per default erlaubt), sowie auf den Interrupt 2 (attach\_interrupt des Driver Servers).
+	
 \end{itemize}
