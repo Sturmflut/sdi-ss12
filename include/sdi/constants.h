@@ -2,6 +2,12 @@
 #define _CONSTANTS_H 1
 
 
+/* TASKSERVER */
+/** Default nameserver thread id */
+static const int SDI_TASKSERVER_DEFAULT_THREADID = 10;
+
+
+
 /* NAMESERVER */
 /** Maximum number of entries in the nameserver database */
 static const int SDI_NAMESERVER_MAX_ENTRIES = 16;

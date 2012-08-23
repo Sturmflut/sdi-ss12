@@ -258,12 +258,15 @@ lib/Makefile
 lib/sdi/Makefile
 src/Makefile
 src/root/Makefile
+src/memoryserver/Makefile
+src/fileserver/Makefile
 src/nameserver/Makefile
-src/consoleserver/Makefile
-src/keyboarddriver/Makefile
-src/simplethread1/Makefile
-src/simplethread2/Makefile
 
 ])
+# src/nameserver/Makefile
+# src/consoleserver/Makefile
+# src/keyboarddriver/Makefile
+# src/simplethread1/Makefile
+# src/simplethread2/Makefile
 
 AC_OUTPUT

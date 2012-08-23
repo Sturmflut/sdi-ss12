@@ -16,7 +16,7 @@ typedef string<256> consolestring_t;
 
 const interfaceid_t IF_LOGGING_ID = 1;
 const interfaceid_t IF_LOCATOR_ID = 2;
-const interfaceid_t IF_TASK_ID = 3;
+const interfaceid_t IF_TASKSERVER_ID = 3;
 const interfaceid_t IF_NAMING_ID = 4;
 const interfaceid_t IF_NAMESERVER_ID = 5;
 const interfaceid_t IF_FILE_ID = 6;

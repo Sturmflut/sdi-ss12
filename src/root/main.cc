@@ -27,9 +27,7 @@
 /* local threadids */
 L4_ThreadId_t sigma0id;
 L4_ThreadId_t pagerid;
-L4_ThreadId_t loggerid;
-L4_ThreadId_t driverid;
-
+L4_ThreadId_t minipagerid;
 
 L4_Word_t pagesize;
 L4_Word_t utcbsize;
@@ -44,10 +42,7 @@ extern char __elf_end;
 extern char __heap_start;
 extern char __heap_end;
 
-
-L4_Word_t logger_stack[1024];
-L4_Word_t driver_stack[1024];
-
+L4_Word_t minipager_stack[1024];
 
 L4_ThreadId_t start_thread (L4_ThreadId_t threadid, L4_Word_t ip, L4_Word_t sp, void* utcblocation) {
     printf ("New thread with ip:%lx / sp:%lx\n", ip, sp);
@@ -61,11 +56,11 @@ L4_ThreadId_t start_thread (L4_ThreadId_t threadid, L4_Word_t ip, L4_Word_t sp, 
     return threadid;
 }
 
-L4_ThreadId_t start_task (L4_ThreadId_t threadid, L4_Word_t ip, L4_Fpage_t nutcbarea) {
+L4_ThreadId_t start_task (L4_ThreadId_t threadid, L4_ThreadId_t pagerid, L4_Word_t ip, L4_Fpage_t nutcbarea) {
     printf ("New task with ip:%lx\n", ip);
     /* First ThreadControl to setup initial thread */
     if (!L4_ThreadControl (threadid, threadid, L4_Myself (), L4_nilthread, (void*)-1UL))
-	panic ("ThreadControl failed\n");
+	panic ("First ThreadControl failed\n");
 
     L4_Word_t dummy;
 
@@ -74,17 +69,12 @@ L4_ThreadId_t start_task (L4_ThreadId_t threadid, L4_Word_t ip, L4_Fpage_t nutcb
 	panic ("SpaceControl failed\n");
 
     /* Second ThreadControl, activate thread */
-    if (!L4_ThreadControl (threadid, threadid, L4_nilthread, L4_Myself (), 
+    if (!L4_ThreadControl (threadid, threadid, L4_nilthread, pagerid, 
 			   (void*)L4_Address (nutcbarea)))
-	panic ("ThreadControl failed\n");
+	panic ("Second ThreadControl failed\n");
 
     /* send startup IPC */
-    L4_Msg_t msg;
-    L4_Clear (&msg);
-    L4_Append (&msg, ip);
-    L4_Append (&msg, (0));
-    L4_Load (&msg);
-    L4_Send (threadid);
+    L4_Start (threadid, 0, ip);
 
     return threadid;
 }
@@ -206,6 +196,17 @@ L4_Word_t load_elfimage (L4_BootRec_t* mod) {
     return (hdr->e_entry);
 }
 
+void start_task_byname_realmem(char* path, L4_ThreadId_t taskid, L4_ThreadId_t pagerid, L4_Fpage_t nutcbarea)
+{
+    printf ("Starting %s ... \n", path);
+    L4_BootRec_t* taskrec = find_module_byname (path, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
+    L4_Word_t startip = load_elfimage (taskrec);
+
+    /* some ELF loading and staring */
+    start_task (taskid, pagerid, startip, utcbarea);
+    printf ("%s started with thread id %lx\n", path, taskid.raw);
+}
+
 void start_task_byname(char* path, L4_ThreadId_t taskid, L4_Fpage_t nutcbarea)
 {
     printf ("Starting %s ... \n", path);
@@ -213,7 +214,7 @@ void start_task_byname(char* path, L4_ThreadId_t taskid, L4_Fpage_t nutcbarea)
     L4_Word_t startip = load_elfimage (taskrec);
 
     /* some ELF loading and staring */
-    start_task (taskid, startip, utcbarea);
+    start_task (taskid, pagerid, startip, utcbarea);
     printf ("%s started with thread id %lx\n", path, taskid.raw);
 }
 
@@ -230,8 +231,7 @@ int main(void) {
 
     pagerid = L4_Myself ();
     sigma0id = L4_Pager ();
-    loggerid = L4_nilthread;
-    driverid = L4_nilthread;
+    minipagerid = L4_nilthread;
 
     printf ("Early system infos:\n");
 
@@ -285,63 +285,84 @@ int main(void) {
     list_modules ((L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
 
 
-    /* Nameserver */
-    start_task_byname("(cd)/sdios/nameserver",
-	L4_GlobalId ( SDI_NAMESERVER_DEFAULT_THREADID, 1),
+    /* Start Minipager */
+    printf ("Starting minipager ... \n");
+    minipagerid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 1, 1);
+    start_thread (minipagerid, 
+    		  (L4_Word_t)&minipager_server, 
+    		  (L4_Word_t)&minipager_stack[1023], 
+    		  UTCBaddress(1) ); 
+    printf ("Started as id %lx\n", minipagerid.raw);
+
+
+    /* Start Memory Server */
+    start_task_byname_realmem("(cd)/sdios/memoryserver",
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 10, 1),
+	minipagerid,
+	utcbarea);
+
+
+    /* Start File Server */
+    start_task_byname_realmem("(cd)/sdios/fileserver",
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 11, 1),
+	minipagerid,
 	utcbarea);
 
 
     /* startup our logger, to be able to put messages on the screen */
-    printf ("Starting logger ... \n");
+    //printf ("Starting logger ... \n");
 
     /* Generate some threadid */
-    loggerid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 2, 1);
-    start_thread (loggerid, 
-		  (L4_Word_t)&logger_server, 
-		  (L4_Word_t)&logger_stack[1023], 
-		  UTCBaddress(2) ); 
-    printf ("Started as id %lx\n", loggerid.raw);
+    //loggerid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 2, 1);
+    //start_thread (loggerid, 
+    //		  (L4_Word_t)&logger_server, 
+    //		  (L4_Word_t)&logger_stack[1023], 
+    //		  UTCBaddress(2) ); 
+    //printf ("Started as id %lx\n", loggerid.raw);
 
     
     /* startup our driverserver, to be able to use drivers */
-    printf ("Starting driverserver ... \n");
+    //printf ("Starting driverserver ... \n");
 
     /* Generate some threadid */
-    driverid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 3, 1);
-    start_thread (driverid, 
-		  (L4_Word_t)&driver_server, 
-		  (L4_Word_t)&driver_stack[1023], 
-		  UTCBaddress(3) ); 
-    printf ("Started as id %lx\n", driverid.raw);
+    //driverid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 3, 1);
+    //start_thread (driverid, 
+    //		  (L4_Word_t)&driver_server, 
+    //		  (L4_Word_t)&driver_stack[1023], 
+    //		  UTCBaddress(3) ); 
+    //printf ("Started as id %lx\n", driverid.raw);
 
     /* Keyboarddriver */
-    start_task_byname("(cd)/sdios/keyboarddriver",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 21, 1),
-	utcbarea);
+    //start_task_byname("(cd)/sdios/keyboarddriver",
+    //	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 21, 1),
+//	utcbarea);
     
 
 
     /* Console */
-    start_task_byname("(cd)/sdios/consoleserver",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 30, 1),
-	utcbarea);
+    //start_task_byname("(cd)/sdios/consoleserver",
+//	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 30, 1),
+//	utcbarea);
     
 
     /* Simplethread1 */
-    start_task_byname("(cd)/sdios/simplethread1",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 40, 1),
-	utcbarea);
+    //start_task_byname("(cd)/sdios/simplethread1",
+//	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 40, 1),
+//	utcbarea);
     
 
     /* Simplethread2 */
-    start_task_byname("(cd)/sdios/simplethread2",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 41, 1),
-	utcbarea);
+    //start_task_byname("(cd)/sdios/simplethread2",
+//	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 41, 1),
+//	utcbarea);
 
 
     /* now it is time to become the pager for all those threads we 
        created recently */
-    pager_server();
+
+    list_memdesc(kip);
+
+    taskserver_server();
 
     panic ("Unexpected return from PagerLoop()");
 }
