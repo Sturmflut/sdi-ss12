@@ -18,7 +18,7 @@ int main(void)
 
 		if(!L4_IsNilFpage (page))
 		{
-		    printf("Got page %lx\n", L4_Address(page));
+//		    printf("Got page %lx\n", L4_Address(page));
 		    pagecount++;
 		}
 	}while(!(L4_IsNilFpage (page)));

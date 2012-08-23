@@ -13,3 +13,4 @@ module=(cd)/sdios/root
 module=(cd)/sdios/memoryserver
 module=(cd)/sdios/fileserver
 module=(cd)/sdios/nameserver
+module=(cd)/sdios/simplethread1

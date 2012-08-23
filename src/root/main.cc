@@ -24,6 +24,8 @@
 
 #include <sdi/constants.h>
 
+#include <if/iffileserver.h>
+
 /* local threadids */
 L4_ThreadId_t sigma0id;
 L4_ThreadId_t pagerid;
@@ -196,15 +198,18 @@ L4_Word_t load_elfimage (L4_BootRec_t* mod) {
     return (hdr->e_entry);
 }
 
-void start_task_byname_realmem(char* path, L4_ThreadId_t taskid, L4_ThreadId_t pagerid, L4_Fpage_t nutcbarea)
+L4_ThreadId_t start_task_byname_realmem(char* path, L4_ThreadId_t taskid, L4_ThreadId_t pagerid, L4_Fpage_t nutcbarea)
 {
+    L4_ThreadId_t t;
     printf ("Starting %s ... \n", path);
     L4_BootRec_t* taskrec = find_module_byname (path, (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
     L4_Word_t startip = load_elfimage (taskrec);
 
     /* some ELF loading and staring */
-    start_task (taskid, pagerid, startip, utcbarea);
+    t = start_task (taskid, pagerid, startip, utcbarea);
     printf ("%s started with thread id %lx\n", path, taskid.raw);
+
+    return t;
 }
 
 void start_task_byname(char* path, L4_ThreadId_t taskid, L4_Fpage_t nutcbarea)
@@ -305,6 +310,13 @@ int main(void) {
     /* Start File Server */
     start_task_byname_realmem("(cd)/sdios/fileserver",
 	L4_GlobalId ( SDI_FILESERVER_DEFAULT_THREADID, 1),
+	minipagerid,
+	utcbarea);
+
+
+    /* Start File Server */
+    start_task_byname_realmem("(cd)/sdios/simplethread1",
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 8, 1),
 	minipagerid,
 	utcbarea);
 
