@@ -9,7 +9,7 @@
 /**
  Register the calling thread for the given path at the default nameserver
 */
-void nameserver_register(path_t path)
+void nameserver_register(string64_t path)
 {
         CORBA_Environment env (idl4_default_environment);
         L4_ThreadId_t nameserverid = L4_GlobalId (SDI_NAMESERVER_DEFAULT_THREADID, 1);
@@ -30,7 +30,7 @@ void nameserver_deregister()
 /**
  Recursive lookup of path path on the default nameserver (port 5353)
 */
-L4_ThreadId_t nameserver_lookup(path_t path)
+L4_ThreadId_t nameserver_lookup(string64_t path)
 {
 	CORBA_Environment env (idl4_default_environment);
 

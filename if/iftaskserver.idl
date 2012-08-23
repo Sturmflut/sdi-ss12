@@ -1,0 +1,18 @@
+import "sdi/types.h";
+#include <types.idl>
+
+#include <ifnaming.idl>
+#include <iffile.idl>
+
+[uuid(IF_TASKSERVER_ID)]
+interface IF_TASKSERVER : IF_NAMING, IF_FILE {
+    L4_ThreadId_t create_task(in path_t path);
+    L4_ThreadId_t create_thread(in L4_Word_t ip, in L4_Word_t sp);
+        
+    void kill_task(in L4_ThreadId_t task_id);
+    void kill_thread(in L4_ThreadId_t thread_id);
+    
+    void set_priority(in L4_ThreadId_t thread_id, in L4_Word_t prio);
+
+    void destroyed(in L4_ThreadId_t thread_id);
+};

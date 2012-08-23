@@ -1,0 +1,10 @@
+import "sdi/types.h";
+#include <types.idl>
+
+interface minipager {
+	[kernelmsg(idl4::pagefault)]
+	void    pagefault(in L4_Word_t address,
+		in L4_Word_t ip,
+		in L4_Word_t privileges,
+		out fpage page);
+};

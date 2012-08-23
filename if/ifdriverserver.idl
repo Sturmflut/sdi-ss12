@@ -4,8 +4,8 @@ import "sdi/types.h";
 #include <iffile.idl>
 
 [uuid(IF_DRIVERSERVER_ID)]
-interface IF_DRIVERSERVER : IF_NAMING, IF_FILE {
-
+interface IF_DRIVERSERVER : IF_NAMING {
+	/** Register */
         void register(in path_t path);
         void deregister();
 };

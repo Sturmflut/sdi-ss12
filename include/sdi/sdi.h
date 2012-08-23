@@ -29,18 +29,17 @@ extern void sleep (int msec);
 #include <if/ifdriverserver.h>
 
 // Nameserver convenience API
-extern void nameserver_register(path_t path);
+extern void nameserver_register(string64_t path);
 extern void nameserver_deregister();
-extern L4_ThreadId_t nameserver_lookup(path_t path);
+extern L4_ThreadId_t nameserver_lookup(string64_t path);
 
 // Driver server convenience API
-extern void driverserver_register(path_t path);
+extern void driverserver_register(string64_t path);
 extern void driverserver_deregister();
 
 
 #define bailout(S) L4_KDB_Enter( S )
 #define assert(X) if (!(X)) bailout( #X )
 
+#endif
 
-
-#endif /* !__INCLUDE_SDI_SDI_H__ */

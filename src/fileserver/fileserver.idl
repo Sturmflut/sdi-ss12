@@ -1,0 +1,7 @@
+import "sdi/types.h";
+#include <types.idl>
+#include <iffileserver.idl>
+
+interface fileserver : IF_FILESERVER {
+
+};

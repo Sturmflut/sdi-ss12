@@ -4,8 +4,7 @@ import "sdi/types.h";
 
 [uuid(IF_NAMING_ID)]
 interface IF_NAMING {
-    exception NotFound {};
 
-    L4_ThreadId_t Lookup(in path_t path, out path_t remaining) raises (NotFound);
+    L4_ThreadId_t Lookup(in path_t path, [prealloc] out path_t remaining);
 
 };

@@ -11,15 +11,6 @@ top_builddir=	@top_builddir@
 
 include $(top_srcdir)/Mk/base.mk
 
-IDLS=		types.idl \
-		iflogging.idl \
-		ifnaming.idl \
-		ifnameserver.idl \
-		iffile.idl \
-		iffileserver.idl \
-		ifdriverserver.idl \
-		iftaskserver.idl \
-		ifconsoleserver.idl \
-		ifkeyboarddriver.idl
+IDLS=		ifconsoleserver.idl ifdriverserver.idl iffile.idl iffileserver.idl ifkeyboarddriver.idl iflogging.idl ifmemoryserver.idl ifnameserver.idl ifnaming.idl iftaskserver.idl types.idl
 
 include $(top_srcdir)/Mk/idl.mk
