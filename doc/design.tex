@@ -3,6 +3,7 @@
 \begin{center}
 \begin{tikzpicture}[block/.style={rectangle,very thick,draw=kit-blue100,top color=white,bottom color=kit-blue30,minimum size=10mm,align=center}]
 
+	\node at (-4,0) [block] (logger) {Logger};
 	\node at (-2,0) [block] (driver) {Driver};
 	\node at (0,0) [block] (memory) {Memory};
 	\node at (2,0) [block] (task) {Task};
@@ -13,7 +14,6 @@
 	\node at (-2,1.5) [block] (keyboard) {Keyboard};
 	\node at (0,1.5) [block] (console) {Console};
 	\node at (2,1.5) [block] (screen) {Screen};
-	\node at (4,1.5) [block] (logger) {Logger};
 
 	\draw (-4,2.2) -- (5,2.2) node () {};
 
@@ -21,3 +21,5 @@
 	\node at (1.5,3) [block] (simplethread2) {simplethread2};
 \end{tikzpicture}
 \end{center}
+
+Angestrebt wird ein Design, bei dem nur die elementarsten Server privilegierte Calls ausführen können/müssen.
