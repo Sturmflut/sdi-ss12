@@ -297,16 +297,23 @@ int main(void) {
 
     /* Start Memory Server */
     start_task_byname_realmem("(cd)/sdios/memoryserver",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 10, 1),
+	L4_GlobalId ( SDI_MEMORYSERVER_DEFAULT_THREADID, 1),
 	minipagerid,
 	utcbarea);
 
 
     /* Start File Server */
     start_task_byname_realmem("(cd)/sdios/fileserver",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 11, 1),
+	L4_GlobalId ( SDI_FILESERVER_DEFAULT_THREADID, 1),
 	minipagerid,
 	utcbarea);
+
+
+    /* Start Name Server */
+    //start_task_byname_realmem("(cd)/sdios/nameserver",
+//	L4_GlobalId ( SDI_NAMESERVER_DEFAULT_THREADID, 1),
+//	minipagerid,
+//	utcbarea);
 
 
     /* startup our logger, to be able to put messages on the screen */

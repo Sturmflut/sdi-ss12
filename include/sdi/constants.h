@@ -4,9 +4,15 @@
 
 /* TASKSERVER */
 /** Default nameserver thread id */
-static const int SDI_TASKSERVER_DEFAULT_THREADID = 10;
+static const int SDI_TASKSERVER_DEFAULT_THREADID = 50;
 
+/* MEMORYSERVER */
+/** Default memoryserver thread id */
+static const int SDI_MEMORYSERVER_DEFAULT_THREADID = 60;
 
+/* FILESERVER */
+/** Default fileserver thread id */
+static const int SDI_FILESERVER_DEFAULT_THREADID = 70;
 
 /* NAMESERVER */
 /** Maximum number of entries in the nameserver database */
@@ -16,7 +22,7 @@ static const int SDI_NAMESERVER_MAX_ENTRIES = 16;
 static const int SDI_NAMESERVER_MAX_ENTRY_LEN = 64;
 
 /** Default nameserver thread id */
-static const int SDI_NAMESERVER_DEFAULT_THREADID = 5353;
+static const int SDI_NAMESERVER_DEFAULT_THREADID = 80;
 
 
 
