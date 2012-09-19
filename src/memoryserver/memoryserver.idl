@@ -1,7 +1,7 @@
 //
-// File:  src/root/logger.idl
+// File:  src/memoryserver/memoryserver.idl
 //
-// Description: Interface for logger
+// Description: Interface for memoryserver
 //
 
 /* The logger interface description */
@@ -9,6 +9,7 @@
 /* our C++ datatypes and IDL4 datatypes  */
 import "sdi/types.h";
 #include <types.idl>
+#include <ifmemoryserver.idl>
 
 interface memoryserver : IF_MEMORYSERVER {
 
