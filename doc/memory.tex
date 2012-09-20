@@ -1,10 +1,41 @@
 \subsection{Speicherverwaltung}
 
+\lstinputlisting{../if/ifmemoryserver.idl}
+
 \subsubsection{Pager}
 
+\begin{center}
+\begin{tikzpicture}[block/.style={rectangle,very thick,draw=kit-blue100,top color=white,bottom color=kit-blue30,minimum size=10mm,align=center}]
+
+	\node at (0,0) [block] (sigma0) {Sigma0};
+	\node at (0,-2) [block] (minipager) {minipager};
+
+	\node at (-2.5,-4) [block] (memoryserver) {memoryserver};
+	\node at (0,-4) [block] (taskserver) {taskserver};
+	\node at (2,-4) [block] (nameserver) {nameserver};
+	\node at (4,-4) [block] (fileserver) {fileserver};
+
+	\node at (-5,-6) [block] (consoleserver) {consoleserver};
+	\node at (-2.5,-6) [block] (simplethread1) {simplethread1};
+	\node at (0,-6) [block] (again) {...};
+
+	\draw[very thick,<->] (sigma0.south) -- (minipager.north);
+
+	\draw[very thick,<->] (minipager.south) -- (memoryserver.north);
+	\draw[very thick,<->] (sigma0.west) -- (memoryserver.north);
+	\draw[very thick,<->] (minipager.south) -- (taskserver.north);
+	\draw[very thick,<->] (minipager.south) -- (nameserver.north);
+	\draw[very thick,<->] (minipager.south) -- (fileserver.north);
+
+	\draw[very thick,<->] (memoryserver.south) -- (consoleserver.north);
+	\draw[very thick,<->] (memoryserver.south) -- (simplethread1.north);
+	\draw[very thick,<->] (memoryserver.south) -- (again.north);
+\end{tikzpicture}
+\end{center}
+
 \begin{itemize}
-	\item Der Thread verwaltet seinen Adressraum selbst. Dies ist eigentlich die bessere Idee, da dies den Pager sehr vereinfacht und die Möglichkeiten des Threads maximiert, z.B. könnte in diesem Fall der Thread dynamisch Libraries nachladen, ohne dass der Pager dies wissen muss. Andererseits muss in diesem Fall der Thread selbst in sein RcvWindow schreiben, wo in seinem Adressraum das Mapping landen soll. Dies setzt voraus, dass der Thread ein lokales Heap-Management hat, welches selbst entscheiden kann, an welche freie Adresse etwas eingeblendet werden soll.
-	\end{enumerate}
+	\item Minipager: Nur zuständig für die Kern-Server
+	\item Der Thread verwaltet seinen Adressraum selbst. Dies ist die bessere Idee, da dies den Pager sehr vereinfacht und die Möglichkeiten des Threads maximiert, z.B. könnten dynamisch Libraries nachgeladen werden, ohne dass der Pager dies wissen muss. Allerdings muss  der Thread selbst entscheiden, wo in seinem Adressraum das Mapping landen soll. Dies setzt voraus, dass der Thread ein lokales Heap-Management hat, welches selbst entscheiden kann, an welche freie Adresse etwas eingeblendet werden soll.
 	
 	\item free: Der Pager ruft ein rekursives Flush auf die Page auf, dadurch werden alle Mappings entfernt, und die Seite an Sigma0 zurückgegeben.
 \end{itemize}

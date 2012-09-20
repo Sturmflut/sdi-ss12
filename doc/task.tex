@@ -1,9 +1,17 @@
 \subsection{Task Server}
 
-\subsubsection{ELF-Loader}
+\lstinputlisting{../if/iftaskserver.idl}
 
-Übernahme und Erweiterung des Beispielcodes
 
 \subsubsection{Task-IDs und Thread-IDs}
 
-Idee: Thread-ID besteht aus Task-ID (die vorderen x Bit) und Thread-ID (z.B. die hinteren 8 Bit). Auf diese Weise können die Server (z.B. Memory und Console) ohne Aufwand feststellen, welche Threads im gleichen Adressraum laufen, und man spart sich die Pflege zusätzlicher Listen.
+Eine globale Thread-ID besteht aus der Task-ID (vordere x Bits) und einem Zähler (hintere x Bits). Der Zähler nummeriert die Threads innerhalb eines Tasks durch. Die ThreadId des Adressraumes des Tasks, die ThreadId des ersten Threads im Task und die TaskId sind identisch. Beispiels:
+
+\begin{itemize}
+	\item Der Zähler ist 8 Bit lang
+	\item Die TaskId ist 10 Bit lang
+	\item Globale ThreadId Nummer 0x00070 : Task 0x00070, Adressraum 0x00070, Thread 0x00070, Thread Nummer 0 innerhalb des Tasks
+	\item Globale ThreadId Nummer 0x00077 : Task 0x00070, Adressraum 0x00070, Thread 0x00077, Thread Nummer 7 innerhalb des Tasks
+\end{itemize}
+
+Die von L4 definierte Local Thread Id ist etwas völlig anderes!
