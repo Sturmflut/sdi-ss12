@@ -19,34 +19,38 @@
 #include <sdi/io.h>
 
 
-static const int KBD_DATA_REG = 0x60;
-static const int KBD_STATUS_REG = 0x64;
-
-
-
 L4_ThreadId_t consoleid = L4_nilthread;
-CORBA_Environment env(idl4_default_environment);
+L4_ThreadId_t loggerid = L4_nilthread;
 
+CORBA_Environment env(idl4_default_environment);
 
 int main()
 {
-	L4_Msg_t msg;
-	L4_MsgTag_t tag;
-
-	char buf[257];
+	char logbuf[80];
 
 	int scancode;
 	int scanstatus;
-
-	CORBA_Environment env(idl4_default_environment);
-
-	L4_ThreadId_t loggerid = L4_nilthread;
 
 	while (L4_IsNilThread(loggerid))
 		loggerid = nameserver_lookup("/server/logger");
 
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD2] Active", &env);
 
+	char tbuf[10];
+	buf_t buf;
+	buf._buffer = (CORBA_char*)&tbuf;
+	buf._maximum = 10;	
+
+	/* Resolve fileserver */
+	L4_ThreadId_t fileid;
+	while (L4_IsNilThread(fileid))
+		fileid = nameserver_lookup("/file");
+
+	/* Call fileserver */
+	IF_FILE_read((CORBA_Object) fileid, 0, 0, 0, &buf, &env);
+
+	snprintf(logbuf, sizeof(logbuf), "[TEST] %s Len %i\n", buf._buffer, buf._length);
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuf, &env);
 
 	/* Spin forever */
 	while (42) ;
