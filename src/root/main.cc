@@ -326,7 +326,12 @@ int main(void) {
 	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 22, 1),
 	utcbarea);
     
-    
+ 	/*Memoryserver */
+//	start_task_byname("(cd)/sdios/memoryserver",
+//	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 23, 1),
+//	utcbarea);
+
+   
     /* Keyboarddriver */
     start_task_byname("(cd)/sdios/keyboarddriver",
 	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 30, 1),
@@ -348,7 +353,6 @@ int main(void) {
     start_task_byname("(cd)/sdios/simplethread2",
 	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 51, 1),
 	utcbarea);
-
 
     /* now it is time to become the pager for all those threads we 
        created recently */

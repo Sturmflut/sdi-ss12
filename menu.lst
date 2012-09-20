@@ -17,3 +17,4 @@ module=(cd)/sdios/consoleserver
 module=(cd)/sdios/keyboarddriver
 module=(cd)/sdios/simplethread1
 module=(cd)/sdios/simplethread2
+module=(cd)/sdios/memoryserver
