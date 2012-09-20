@@ -9,11 +9,11 @@
 
 #include <sdi/sdi.h>
 #include <sdi/constants.h>
-#include "driver-server.h"
+#include <l4io.h>
+
+#include "driverserver-server.h"
 
 #include <if/iflogging.h>
-
-#include "root.h"
 
 typedef struct {
         char path[SDI_NAMESERVER_MAX_ENTRY_LEN + 1];
@@ -22,8 +22,9 @@ typedef struct {
 
 name_entry_t drivers[SDI_NAMESERVER_MAX_ENTRIES];
 
-CORBA_Environment env(idl4_default_environment);
 
+CORBA_Environment env(idl4_default_environment);
+L4_ThreadId_t loggerid = L4_nilthread;
 
 
 
@@ -124,8 +125,11 @@ void  driver_server(void)
   long  cnt;
 
 
-	// STartup
+	// Startup
         clear_name_database();
+
+	 while (L4_IsNilThread(loggerid))
+		loggerid = nameserver_lookup("/server/logger");
 
         IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[DRIVER] Registering", &env);
 
@@ -161,5 +165,12 @@ void  driver_server(void)
 void  driver_discard(void)
 
 {
+}
+
+
+
+int main(void)
+{
+	driver_server();
 }
 

@@ -29,7 +29,6 @@ L4_ThreadId_t sigma0id;
 L4_ThreadId_t pagerid;
 L4_ThreadId_t loggerid;
 L4_ThreadId_t taskserverid;
-L4_ThreadId_t driverid;
 
 
 L4_Word_t pagesize;
@@ -48,7 +47,6 @@ extern char __heap_end;
 
 L4_Word_t logger_stack[1024];
 L4_Word_t taskserver_stack[1024];
-L4_Word_t driver_stack[1024];
 
 
 L4_ThreadId_t start_thread (L4_ThreadId_t threadid, L4_Word_t ip, L4_Word_t sp, void* utcblocation) {
@@ -234,7 +232,6 @@ int main(void) {
     sigma0id = L4_Pager ();
     loggerid = L4_nilthread;
     taskserverid = L4_nilthread;
-    driverid = L4_nilthread;
 
     printf ("Early system infos:\n");
 
@@ -317,25 +314,19 @@ int main(void) {
 		  UTCBaddress(3) ); 
     printf ("Started as id %lx\n", taskserverid.raw);
 
-    
-    /* startup our driverserver, to be able to use drivers */
-    printf ("Starting driverserver ... \n");
 
-    /* Generate some threadid */
-    driverid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 4, 1);
-    start_thread (driverid, 
-		  (L4_Word_t)&driver_server, 
-		  (L4_Word_t)&driver_stack[1023], 
-		  UTCBaddress(4) ); 
-    printf ("Started as id %lx\n", driverid.raw);
 
-    /* Keyboarddriver */
-    start_task_byname("(cd)/sdios/keyboarddriver",
+    /* Driverserver */
+    start_task_byname("(cd)/sdios/driverserver",
 	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 21, 1),
 	utcbarea);
     
-
-
+    
+    /* Keyboarddriver */
+    start_task_byname("(cd)/sdios/keyboarddriver",
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 22, 1),
+	utcbarea);
+    
     /* Console */
     start_task_byname("(cd)/sdios/consoleserver",
 	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 30, 1),
