@@ -1,7 +1,7 @@
 ##
-## File:  src/test/Makefile.in
+## File:  src/root/Makefile.in
 ##
-## Description: Makefile
+## Description: Makefile for root
 ##
 
 srcdir=		@srcdir@
@@ -10,18 +10,17 @@ top_builddir=	@top_builddir@
 
 include $(top_srcdir)/Mk/base.mk
 
-
-PROGRAM=	simplethread2
+PROGRAM=	fileserver
 PROGRAM_DEPS=	$(top_builddir)/lib/sdi/libsdi.a \
 		$(top_srcdir)/include/$(ARCH)/sdi.ld
 
 SRCS=		$(ARCH)-crt0.S \
-		main.cc
+		main.cc \
+		fileserver_idl.cc
 
-IDLS=           
+IDLS=		fileserver.idl
 
 LIBS+=		-ll4 -lsdi -lio
-LDFLAGS+=	-Ttext=00780000 -T $(top_builddir)/include/$(ARCH)/sdi.ld
-
+LDFLAGS+=	-Ttext=00640000 -T $(top_builddir)/include/$(ARCH)/sdi.ld
 
 include $(top_srcdir)/Mk/prog.mk

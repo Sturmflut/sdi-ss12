@@ -320,28 +320,33 @@ int main(void) {
     start_task_byname("(cd)/sdios/driverserver",
 	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 21, 1),
 	utcbarea);
+
+    /* FIleserver */
+    start_task_byname("(cd)/sdios/fileserver",
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 22, 1),
+	utcbarea);
     
     
     /* Keyboarddriver */
     start_task_byname("(cd)/sdios/keyboarddriver",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 22, 1),
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 30, 1),
 	utcbarea);
     
     /* Console */
     start_task_byname("(cd)/sdios/consoleserver",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 30, 1),
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 40, 1),
 	utcbarea);
     
 
     /* Simplethread1 */
     start_task_byname("(cd)/sdios/simplethread1",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 40, 1),
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 50, 1),
 	utcbarea);
     
 
     /* Simplethread2 */
     start_task_byname("(cd)/sdios/simplethread2",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 41, 1),
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 51, 1),
 	utcbarea);
 
 
