@@ -28,6 +28,7 @@
 L4_ThreadId_t sigma0id;
 L4_ThreadId_t pagerid;
 L4_ThreadId_t loggerid;
+L4_ThreadId_t taskserverid;
 L4_ThreadId_t driverid;
 
 
@@ -46,6 +47,7 @@ extern char __heap_end;
 
 
 L4_Word_t logger_stack[1024];
+L4_Word_t taskserver_stack[1024];
 L4_Word_t driver_stack[1024];
 
 
@@ -231,6 +233,7 @@ int main(void) {
     pagerid = L4_Myself ();
     sigma0id = L4_Pager ();
     loggerid = L4_nilthread;
+    taskserverid = L4_nilthread;
     driverid = L4_nilthread;
 
     printf ("Early system infos:\n");
@@ -302,16 +305,28 @@ int main(void) {
 		  UTCBaddress(2) ); 
     printf ("Started as id %lx\n", loggerid.raw);
 
+
+    /* startup our logger, to be able to put messages on the screen */
+    printf ("Starting taskserver ... \n");
+
+    /* Generate some threadid */
+    taskserverid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 3, 1);
+    start_thread (taskserverid, 
+		  (L4_Word_t)&taskserver_server, 
+		  (L4_Word_t)&taskserver_stack[1023], 
+		  UTCBaddress(3) ); 
+    printf ("Started as id %lx\n", taskserverid.raw);
+
     
     /* startup our driverserver, to be able to use drivers */
     printf ("Starting driverserver ... \n");
 
     /* Generate some threadid */
-    driverid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 3, 1);
+    driverid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 4, 1);
     start_thread (driverid, 
 		  (L4_Word_t)&driver_server, 
 		  (L4_Word_t)&driver_stack[1023], 
-		  UTCBaddress(3) ); 
+		  UTCBaddress(4) ); 
     printf ("Started as id %lx\n", driverid.raw);
 
     /* Keyboarddriver */

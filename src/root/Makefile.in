@@ -20,9 +20,10 @@ SRCS=		$(ARCH)-crt0.S \
 		pager_idl.cc \
 		pager_impl.cc \
 		logger.cc \
+		taskserver_idl.cc \
 		driver.cc
 
-IDLS=		logger.idl driver.idl pager.idl
+IDLS=		logger.idl driver.idl pager.idl taskserver.idl
 
 LIBS+=		-ll4 -lsdi -lio -lsdi
 LDFLAGS+=	-O 3 -Ttext=$(ROOTTASK_LINKBASE) -T $(top_builddir)/include/$(ARCH)/sdi.ld

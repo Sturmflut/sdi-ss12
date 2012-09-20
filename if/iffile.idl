@@ -3,5 +3,22 @@ import "sdi/types.h";
 
 [uuid(IF_FILE_ID)]
 interface IF_FILE {
+	L4_Word_t get_file_id(in path_t path);
 
+	L4_Word_t read(in L4_Word_t file_id, in L4_Word_t offset, in L4_Word_t count,
+		[prealloc] out buf_t buf);
+
+	L4_Word_t write(in L4_Word_t file_id, in L4_Word_t offset, in L4_Word_t count,
+		in buf_t buf);
+
+	L4_Word_t get_file_size(in path_t path);
+	L4_Word_t get_file_type(in path_t path);
+
+	boolean remove(in L4_Word_t file_id);
+
+	boolean mkdir(in path_t path);
+	boolean rmdir(in path_t path);
+
+	L4_Word_t get_dir_size(in path_t path);
+	boolean get_dir_entry(in path_t path, in L4_Word_t entry, [prealloc] out path_t buf);
 };

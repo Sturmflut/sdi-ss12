@@ -4,9 +4,9 @@ import "sdi/types.h";
 #include <ifnaming.idl>
 #include <iffile.idl>
 
-[uuid(IF_TASK_ID)]
-interface IF_TASK : IF_NAMING, IF_FILE {
-    L4_ThreadId_t create_task(in path_t path);
+[uuid(IF_TASKSERVER_ID)]
+interface IF_TASKSERVER : IF_NAMING, IF_FILE {
+    L4_ThreadId_t create_task(in path_t path, in path_t cmdline);
     L4_ThreadId_t create_thread(in L4_Word_t ip, in L4_Word_t sp);
         
     void kill_task(in L4_ThreadId_t task_id);
@@ -15,5 +15,6 @@ interface IF_TASK : IF_NAMING, IF_FILE {
     void set_priority(in L4_ThreadId_t thread_id, in L4_Word_t prio);
 
     void destroyed(in L4_ThreadId_t thread_id);
-};
 
+    void attach_interrupt(in L4_Word_t int_num);
+};

@@ -11,6 +11,7 @@ typedef string<256> logmessage_t;
 typedef string<64> path_t;
 typedef sequence<char> buffer_t;
 typedef string<256> consolestring_t;
+typedef sequence<char> buf_t;
 
 /* IDL interface consts */
 
@@ -25,6 +26,7 @@ const interfaceid_t IF_DRIVERSERVER_ID = 8;
 const interfaceid_t IF_CONSOLESERVER_ID = 9;
 const interfaceid_t IF_KEYBOARDDRIVER_ID = 10;
 const interfaceid_t IF_PAGER_ID = 11;
+const interfaceid_t IF_TASKSERVER_ID = 11;
 
 const interfaceid_t MAX_INTERFACEID = 16;
 
