@@ -9,7 +9,14 @@
 
 #include <sdi/sdi.h>
 
+#include <if/iflogging.h>
+
 #include "taskserver-server.h"
+
+#include "root.h"
+
+CORBA_Environment env(idl4_default_environment);
+
 
 /* Interface taskserver */
 
@@ -228,8 +235,14 @@ void ** taskserver_itable[16] = { taskserver_vtable_discard, taskserver_vtable_d
 void  taskserver_server(void)
 
 {
-    /* Announce logger service */
-  nameserver_register("/server/task");
+    /* Announce task service */
+        IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[TASK] Registering", &env);
+
+        nameserver_register("/task");
+
+        IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[TASK] Registered...", &env);
+
+
 
   L4_ThreadId_t  partner;
   L4_MsgTag_t  msgtag;
