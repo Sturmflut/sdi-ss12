@@ -327,9 +327,9 @@ int main(void) {
 	utcbarea);
     
  	/*Memoryserver */
-//	start_task_byname("(cd)/sdios/memoryserver",
-//	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 23, 1),
-//	utcbarea);
+	start_task_byname("(cd)/sdios/memoryserver",
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 23, 1),
+	utcbarea);
 
    
     /* Keyboarddriver */

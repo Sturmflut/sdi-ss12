@@ -1,0 +1,24 @@
+import "sdi/types.h";
+#include <types.idl>
+
+[uuid(IF_MEMORYSERVER_ID)]
+interface IF_MEMORYSERVER {
+	L4_Word_t map_io_pages(in L4_ThreadId_t threadid, in L4_Word_t virt_start_address,
+		in L4_Word_t phys_start_address, in int size);
+
+	L4_Word_t map_anon_pages(in L4_ThreadId_t threadid, in L4_Word_t type,
+		in L4_Word_t virt_start_address, in L4_Word_t size);
+
+	L4_Word_t map_file_pages(in L4_ThreadId_t threadid, in L4_Word_t type,
+		 in path_t path, in L4_Word_t offset, in L4_Word_t virt_start_address,
+		 in L4_Word_t size, in L4_Word_t realsize);
+
+	void unmap_pages(in L4_Word_t virt_start_address);
+
+	void startup(in L4_ThreadId_t threadid, in L4_Word_t ip, in L4_Word_t sp);
+	void destroyed(in L4_ThreadId_t threadid);
+
+	[kernelmsg(idl4::pagefault)]
+	void pagefault(in L4_Word_t address, in L4_Word_t ip, in L4_Word_t privileges,
+		out fpage page);
+};
