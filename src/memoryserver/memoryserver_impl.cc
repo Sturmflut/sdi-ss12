@@ -10,7 +10,7 @@ unsigned char Taskheader_index;
 
 unsigned char findOrCreateTaskEntry(L4_ThreadId_t threadid)
 {
-	unsigned char taskheader_entry;
+	char taskheader_entry = -1;
 
 	for(int i = 0; i < NUM_T_ENTRY; i = i+1)
 	{
@@ -73,13 +73,13 @@ char isAddressConflict(Taskheader_t * myTaskheader, L4_Word_t virt_start_address
 
 void memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_ThreadId_t * threadid, const L4_Word_t  type, const L4_Word_t  virt_start_address, const L4_Word_t  size, idl4_server_environment * _env)
 {
-	unsigned char taskheader_entry = -1;
+	char taskheader_entry = -1;
 	
 	//TODO: _caller == taskserver || threadid
 	//TODO: validate virt_start_address
 
 	//find taskheader entry
-	findOrCreateTaskEntry(*threadid);
+	taskheader_entry = findOrCreateTaskEntry(*threadid);
 
 	L4_Word_t virt_end_address = virt_start_address + size;
 	Taskheader_t *myTaskheader = &taskList[taskheader_entry];	
