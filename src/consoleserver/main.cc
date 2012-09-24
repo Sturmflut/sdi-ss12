@@ -301,10 +301,10 @@ int main(void)
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[CONSOLESERVER] Registered", &env);
 
 	/* Get keyboard driver */
-	while(L4_IsNilThread(keyboarddriverid))
-		keyboarddriverid = nameserver_lookup("/driver/keyboard");
+//	while(L4_IsNilThread(keyboarddriverid))
+//		keyboarddriverid = nameserver_lookup("/driver/keyboard");
 
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[CONSOLESERVER] Got keyboard", &env);
+//	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[CONSOLESERVER] Got keyboard", &env);
 
         init_consoles();
         set_active_console(0);
