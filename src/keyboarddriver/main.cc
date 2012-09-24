@@ -9,71 +9,21 @@
 
 #include <sdi/sdi.h>
 #include <sdi/constants.h>
-#include "keyboarddriver-server.h"
 #include <l4io.h>
 
 #include <if/iflogging.h>
+#include <if/iftaskserver.h>
 
-/* Interface keyboarddriver */
+#include "keyboarddriver.h"
 
-IDL4_INLINE CORBA_boolean  keyboarddriver_getKey_implementation(CORBA_Object  _caller, CORBA_long * key, CORBA_char * modifier, idl4_server_environment * _env)
+L4_ThreadId_t loggerid;
 
-{
-  CORBA_boolean  __retval = 0;
-
-  /* implementation of IF_KEYBOARDDRIVER::getKey */
-  
-  return __retval;
-}
-
-IDL4_PUBLISH_KEYBOARDDRIVER_GETKEY(keyboarddriver_getKey_implementation);
-
-void * keyboarddriver_vtable_10[KEYBOARDDRIVER_DEFAULT_VTABLE_SIZE] = KEYBOARDDRIVER_DEFAULT_VTABLE_10;
-void * keyboarddriver_vtable_discard[KEYBOARDDRIVER_DEFAULT_VTABLE_SIZE] = KEYBOARDDRIVER_DEFAULT_VTABLE_DISCARD;
-void ** keyboarddriver_itable[16] = { keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_10, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard, keyboarddriver_vtable_discard };
-
-void  keyboarddriver_server(void)
-
-{
-  L4_ThreadId_t  partner;
-  L4_MsgTag_t  msgtag;
-  idl4_msgbuf_t  msgbuf;
-  long  cnt;
-
-  idl4_msgbuf_init(&msgbuf);
-  for (cnt = 0;cnt < KEYBOARDDRIVER_STRBUF_SIZE;cnt++)
-    idl4_msgbuf_add_buffer(&msgbuf, malloc(8000), 8000);
-
-  while (1)
-    {
-      partner = L4_nilthread;
-      msgtag.raw = 0;
-      cnt = 0;
-
-      while (1)
-        {
-          idl4_msgbuf_sync(&msgbuf);
-
-          idl4_reply_and_wait(&partner, &msgtag, &msgbuf, &cnt);
-
-          if (idl4_is_error(&msgtag))
-            break;
-
-          idl4_process_request(&partner, &msgtag, &msgbuf, &cnt, keyboarddriver_itable[idl4_get_interface_id(&msgtag) & KEYBOARDDRIVER_IID_MASK][idl4_get_function_id(&msgtag) & KEYBOARDDRIVER_FID_MASK]);
-        }
-    }
-}
-
-void  keyboarddriver_discard(void)
-
-{
-}
 
 int main(void)
 {
         CORBA_Environment env(idl4_default_environment);
 
-        L4_ThreadId_t loggerid = L4_nilthread;
+        loggerid = L4_nilthread;
 
         while (L4_IsNilThread(loggerid))
                 loggerid = nameserver_lookup("/server/logger");
@@ -83,6 +33,16 @@ int main(void)
 	driverserver_register("keyboard");
 
         IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[KEYBOARDDRIVER] Registered...", &env);
+
+        L4_ThreadId_t taskserverid = L4_nilthread;
+
+        while (L4_IsNilThread(taskserverid))
+                taskserverid = nameserver_lookup("/task");
+
+	// Attach keyboard interrupt
+	IF_TASKSERVER_attach_interrupt((CORBA_Object)taskserverid, 0x01, &env);
+
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[KEYBOARDDRIVER] Registered Interrupt...", &env);
 
 	keyboarddriver_server();
 }

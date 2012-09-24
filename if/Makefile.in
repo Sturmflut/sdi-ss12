@@ -18,7 +18,7 @@ IDLS=		types.idl \
 		iffile.idl \
 		iffileserver.idl \
 		ifdriverserver.idl \
-		iftask.idl \
+		iftaskserver.idl \
 		ifconsoleserver.idl \
 		ifkeyboarddriver.idl \
 		ifmemoryserver.idl

@@ -17,6 +17,8 @@
 
 CORBA_Environment env(idl4_default_environment);
 
+char buf_msg[TASKSERVER_STRBUF_SIZE][512];
+
 
 /* Interface taskserver */
 
@@ -87,9 +89,8 @@ IDL4_PUBLISH_TASKSERVER_DESTROYED(taskserver_destroyed_implementation);
 IDL4_INLINE void  taskserver_attach_interrupt_implementation(CORBA_Object  _caller, const L4_Word_t  int_num, idl4_server_environment * _env)
 
 {
-  /* implementation of IF_TASKSERVER::attach_interrupt */
-  
-  return;
+	if(!L4_AssociateInterrupt(L4_GlobalId(int_num, 1), _caller))
+		IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[TASK] AssociateInterrupt failed", &env);
 }
 
 IDL4_PUBLISH_TASKSERVER_ATTACH_INTERRUPT(taskserver_attach_interrupt_implementation);
@@ -235,13 +236,12 @@ void ** taskserver_itable[16] = { taskserver_vtable_discard, taskserver_vtable_d
 void  taskserver_server(void)
 
 {
-    /* Announce task service */
-        IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[TASK] Registering", &env);
+  /* Announce task service */
+  IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[TASK] Registering", &env);
 
-        nameserver_register("/task");
+  nameserver_register("/task");
 
-        IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[TASK] Registered...", &env);
-
+  IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[TASK] Registered...", &env);
 
 
   L4_ThreadId_t  partner;
@@ -251,7 +251,7 @@ void  taskserver_server(void)
 
   idl4_msgbuf_init(&msgbuf);
   for (cnt = 0;cnt < TASKSERVER_STRBUF_SIZE;cnt++)
-    idl4_msgbuf_add_buffer(&msgbuf, malloc(8000), 8000);
+    idl4_msgbuf_add_buffer(&msgbuf, buf_msg[cnt], 512);
 
   while (1)
     {

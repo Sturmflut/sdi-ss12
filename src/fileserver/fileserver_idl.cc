@@ -10,7 +10,7 @@
 #include <sdi/sdi.h>
 #include <sdi/constants.h>
 #include <l4io.h>
-
+#include <l4/bootinfo.h>
 #include "fileserver-server.h"
 
 /* Interface fileserver */
@@ -31,7 +31,44 @@ IDL4_INLINE L4_Word_t  fileserver_get_file_id_implementation(CORBA_Object  _call
 
 {
   L4_Word_t  __retval = 0;
+  L4_BootInfo_t* bootinfo = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
+  L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
+     for (unsigned int i=0; i < L4_BootInfo_Entries (bootinfo); i++) {
+    	 if((int)L4_Type (bootrec) == 1) {	//only records of type 1 are relevant
+    		char *cmdline = L4_Module_Cmdline(bootrec);
+        	//printf("%d) %s\n", i, cmdline);
+    		char *mpath;
+    		//removes initial '/'
+    		if (strncmp(path, "/", 1) == 0)
+    			mpath = path+1;
 
+        	/**
+    		 * Find last_occurrence of '/' - character
+    		 */
+    		char *pch;
+    		pch=strchr(cmdline,'/');
+    		unsigned int last_occurrence = 0;
+    		while (pch!=NULL)
+    		{
+    			last_occurrence = pch-cmdline+1;
+//    			printf ("found at %d\n",last_occurrence);
+    			pch=strchr(pch+1,'/');
+    		}
+    		if (last_occurrence != 0)		//'/' found; now cut string
+    			cmdline+=last_occurrence;
+
+    		/**
+    		 * Now compare both strings:
+    		 *  given path with modified boot
+    		 *  if equal, remember i and leave for-loop
+    		 */
+    		if (strncmp(cmdline, mpath, strlen(cmdline)) == 0) {
+    			__retval = i;
+    			break;
+    		}
+         }
+    	 bootrec = L4_Next (bootrec);
+     }
   /* implementation of IF_FILE::get_file_id */
   
   return __retval;
@@ -42,9 +79,17 @@ IDL4_PUBLISH_FILESERVER_GET_FILE_ID(fileserver_get_file_id_implementation);
 IDL4_INLINE L4_Word_t  fileserver_read_implementation(CORBA_Object  _caller, const L4_Word_t  file_id, const L4_Word_t  offset, const L4_Word_t  count, buf_t * buf, idl4_server_environment * _env)
 
 {
-	buf->_maximum = 5;
-	buf->_length = 5;
-	strncpy( buf->_buffer, "Test\0", 5);
+	L4_Word_t  __retval = 0;
+
+	L4_BootInfo_t* bootrec = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
+
+//	L4_Word_t addr = L4_Module_Start(*bootrec);
+
+//	buf->_maximum = 5;
+//	buf->_length = 5;
+//	strncpy( buf->_buffer, "Test\0", 5);
+
+	return 0;
 }
 
 IDL4_PUBLISH_FILESERVER_READ(fileserver_read_implementation);
