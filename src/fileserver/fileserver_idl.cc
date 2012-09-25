@@ -10,7 +10,7 @@
 #include <sdi/sdi.h>
 #include <sdi/constants.h>
 #include <l4io.h>
-
+#include <l4/bootinfo.h>
 #include "fileserver-server.h"
 
 /* Interface fileserver */
@@ -31,7 +31,39 @@ IDL4_INLINE L4_Word_t  fileserver_get_file_id_implementation(CORBA_Object  _call
 
 {
   L4_Word_t  __retval = 0;
+  L4_BootInfo_t* bootinfo = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
+  L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
+     for (unsigned int i=0; i < L4_BootInfo_Entries (bootinfo); i++) {
+    	 if((int)L4_Type (bootrec) == 1) {	//only records of type 1 are relevant
+    		char *cmdline = L4_Module_Cmdline(bootrec);
+        	//printf("%d) %s\n", i, cmdline);
 
+        	/**
+    		 * Find last_occurrence of '/' - character
+    		 */
+    		char *pch;
+    		pch=strchr(cmdline,'/');
+    		unsigned int last_occurrence = 0;
+    		while (pch!=NULL)
+    		{
+    			last_occurrence = pch-cmdline;
+    			printf ("found at %d\n",last_occurrence);
+    			pch=strchr(pch+1,'/');
+    		}
+    		if (last_occurrence != 0)		//'/' found; now cut string
+    			cmdline+=last_occurrence;
+
+    		/**
+    		 * Now compare both strings:
+    		 *  given path with modified boot
+    		 *  if equal, remember i and leave for-loop
+    		 */
+    		if (strncmp(cmdline, path, strlen(cmdline)) == 0) {
+    			__retval = i;
+    			break;
+    		}
+         }
+     }
   /* implementation of IF_FILE::get_file_id */
   
   return __retval;
