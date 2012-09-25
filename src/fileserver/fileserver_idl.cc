@@ -37,6 +37,10 @@ IDL4_INLINE L4_Word_t  fileserver_get_file_id_implementation(CORBA_Object  _call
     	 if((int)L4_Type (bootrec) == 1) {	//only records of type 1 are relevant
     		char *cmdline = L4_Module_Cmdline(bootrec);
         	//printf("%d) %s\n", i, cmdline);
+    		char *mpath;
+    		//removes initial '/'
+    		if (strncmp(path, "/", 1) == 0)
+    			mpath = path+1;
 
         	/**
     		 * Find last_occurrence of '/' - character
@@ -46,8 +50,8 @@ IDL4_INLINE L4_Word_t  fileserver_get_file_id_implementation(CORBA_Object  _call
     		unsigned int last_occurrence = 0;
     		while (pch!=NULL)
     		{
-    			last_occurrence = pch-cmdline;
-    			printf ("found at %d\n",last_occurrence);
+    			last_occurrence = pch-cmdline+1;
+//    			printf ("found at %d\n",last_occurrence);
     			pch=strchr(pch+1,'/');
     		}
     		if (last_occurrence != 0)		//'/' found; now cut string
@@ -58,7 +62,7 @@ IDL4_INLINE L4_Word_t  fileserver_get_file_id_implementation(CORBA_Object  _call
     		 *  given path with modified boot
     		 *  if equal, remember i and leave for-loop
     		 */
-    		if (strncmp(cmdline, path, strlen(cmdline)) == 0) {
+    		if (strncmp(cmdline, mpath, strlen(cmdline)) == 0) {
     			__retval = i;
     			break;
     		}
