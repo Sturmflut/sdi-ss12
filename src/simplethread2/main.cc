@@ -14,6 +14,7 @@
 #include <if/iflogging.h>
 #include <if/ifnaming.h>
 #include <if/ifconsoleserver.h>
+#include <if/iffileserver.h>
 
 #include <sdi/console_attributes.h>
 #include <sdi/io.h>
@@ -51,6 +52,11 @@ int main()
 
 	snprintf(logbuf, sizeof(logbuf), "[TEST] %s Len %i\n", buf._buffer, buf._length);
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuf, &env);
+
+	/* testing get_file_id */
+	char *path = "/memoryserver";
+	L4_Word_t res = IF_FILESERVER_get_file_id(fileid, path, &env)
+	printf("file id of %s is %d", path, res);
 
 	/* Spin forever */
 	while (42) ;
