@@ -67,6 +67,7 @@ IDL4_INLINE L4_Word_t  fileserver_get_file_id_implementation(CORBA_Object  _call
     			break;
     		}
          }
+    	 bootrec = L4_Next (bootrec);
      }
   /* implementation of IF_FILE::get_file_id */
   
@@ -78,9 +79,17 @@ IDL4_PUBLISH_FILESERVER_GET_FILE_ID(fileserver_get_file_id_implementation);
 IDL4_INLINE L4_Word_t  fileserver_read_implementation(CORBA_Object  _caller, const L4_Word_t  file_id, const L4_Word_t  offset, const L4_Word_t  count, buf_t * buf, idl4_server_environment * _env)
 
 {
-	buf->_maximum = 5;
-	buf->_length = 5;
-	strncpy( buf->_buffer, "Test\0", 5);
+	L4_Word_t  __retval = 0;
+
+	L4_BootInfo_t* bootrec = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
+
+//	L4_Word_t addr = L4_Module_Start(*bootrec);
+
+//	buf->_maximum = 5;
+//	buf->_length = 5;
+//	strncpy( buf->_buffer, "Test\0", 5);
+
+	return 0;
 }
 
 IDL4_PUBLISH_FILESERVER_READ(fileserver_read_implementation);
