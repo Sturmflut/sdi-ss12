@@ -7,17 +7,19 @@
  * Report bugs to haeberlen@ira.uka.de
  *****************************************************************/
 
+#include "memoryserver.h"
 #include <l4io.h>
 
-#include <sdi/sdi.h>
+//#include <sdi/sdi.h>
 #include <sdi/constants.h>
 
 #include <if/iflogging.h>
 
-#include "memoryserver.h"
 
 L4_ThreadId_t loggerid;
+L4_ThreadId_t sigma0id;
 CORBA_Environment env (idl4_default_environment);
+char logbuf[80];
 
 int main(void)
 {
@@ -30,34 +32,9 @@ int main(void)
 
         IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[MEMORY] Registered...", &env);
 
-
-	/*Get all available pages*/
-//	int pagecount = 0;
-//	L4_Fpage_t page;
-//	L4_ThreadId_t sigma0id = L4_GlobalId ( 48, 1);
-
-//	printf("memsrv getting pages from %lx\n", sigma0id.raw);
-
-//	do {
-//		page = L4_Sigma0_GetPage (sigma0id, L4_Fpage (-1, 4*1024*1024));
-
-//		if(!L4_IsNilFpage (page))
-//		{
-//			printf("Gor page %lx\n", L4_Address(page));
-//			pagecount++;
-//		}
-//	}while(!(L4_IsNilFpage (page)));
-
-//	printf("Got %i pages of size %i from sigma0\n", pagecount, 4*1024*1024);
-
-//	printf("memoryserver Pager: %lx\n", L4_Pager().raw);
-
-//		while (L4_IsNilThread(loggerid))
-  //      	loggerid = nameserver_lookup("/server/logger");
-
-	/* Register myself with the nameserver */
-//	nameserver_register("/server/memory");
-//	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[MEMORYSERVER] Registered", &env);
+//initialize data
+Taskheader_index = 0;
+sigma0id = L4_Pager();
 
 	memoryserver_server();	
 }

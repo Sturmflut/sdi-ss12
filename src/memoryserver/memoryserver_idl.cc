@@ -7,8 +7,9 @@
  * Report bugs to haeberlen@ira.uka.de
  *****************************************************************/
 
-#include <sdi/sdi.h>
+//#include <sdi/sdi.h>
 
+#include "memoryserver.h"
 #include "memoryserver-server.h"
 
 /* Interface memoryserver */
@@ -19,7 +20,7 @@ IDL4_INLINE L4_Word_t  memoryserver_map_io_pages_implementation(CORBA_Object  _c
   L4_Word_t  __retval = 0;
 
   /* implementation of IF_MEMORYSERVER::map_io_pages */
-  
+
   return __retval;
 }
 
@@ -31,7 +32,9 @@ IDL4_INLINE L4_Word_t  memoryserver_map_anon_pages_implementation(CORBA_Object  
   L4_Word_t  __retval = 0;
 
   /* implementation of IF_MEMORYSERVER::map_anon_pages */
-  
+  memoryserver_map_anon_pages_real(_caller, threadid, type, virt_start_address, size, _env);
+
+
   return __retval;
 }
 
@@ -63,7 +66,8 @@ IDL4_INLINE void  memoryserver_startup_implementation(CORBA_Object  _caller, con
 
 {
   /* implementation of IF_MEMORYSERVER::startup */
-  
+  memoryserver_startup_real(_caller, threadid, ip, sp, _env);
+
   return;
 }
 
@@ -83,7 +87,8 @@ IDL4_INLINE void  memoryserver_pagefault_implementation(CORBA_Object  _caller, c
 
 {
   /* implementation of IF_MEMORYSERVER::pagefault */
-  
+  memoryserver_pagefault_real(_caller, address, ip, privileges, page, _env);
+
   return;
 }
 

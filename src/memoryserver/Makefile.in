@@ -22,6 +22,6 @@ SRCS=		$(ARCH)-crt0.S \
 IDLS=		memoryserver.idl
 
 LIBS+=		-ll4 -lsdi -lio
-LDFLAGS+=	-Ttext=00740000 -T $(top_builddir)/include/$(ARCH)/sdi.ld
+LDFLAGS+=	-Ttext=00540000 -T $(top_builddir)/include/$(ARCH)/sdi.ld
 
 include $(top_srcdir)/Mk/prog.mk
