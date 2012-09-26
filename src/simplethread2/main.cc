@@ -58,7 +58,7 @@ int main()
 	L4_Word_t res = IF_FILESERVER_get_file_id(fileid, path, &env);
 	printf("get file id for >%s< returns >>%d<< (except 0)\n", path, res);
 
-	char *path2 = "simplethread1";
+	char *path2 = "/simplethread1";
 	L4_Word_t res2 = IF_FILESERVER_get_file_id(fileid, path2, &env);
 	printf("get file id for >%s< returns >>%d<< (except >0)\n", path2, res2);
 
