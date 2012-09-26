@@ -56,19 +56,19 @@ int main()
 	/* testing get_file_id */
 	char *path = "/nameserver";
 	L4_Word_t res = IF_FILESERVER_get_file_id(fileid, path, &env);
-	printf("get file id for >%s< returns >>%d<< (except !0)", path, res);
+	printf("get file id for >%s< returns >>%d<< (except 0)\n", path, res);
 
-	char *path2 = "/test";
+	char *path2 = "simplethread1";
 	L4_Word_t res2 = IF_FILESERVER_get_file_id(fileid, path2, &env);
-	printf("get file id for >%s< returns >>%d<< (except !0)", path2, res2);
+	printf("get file id for >%s< returns >>%d<< (except >0)\n", path2, res2);
 
-	char *path3 = "test2";
+	char *path3 = "simplethread2";
 	L4_Word_t res3 = IF_FILESERVER_get_file_id(fileid, path3, &env);
-	printf("get file id for >%s< returns >>%d<< (except !0)", path3, res3);
+	printf("get file id for >%s< returns >>%d<< (except >0)\n", path3, res3);
 
-	char *path4 = "test1";
+	char *path4 = "simplethread3";
 	L4_Word_t res4 = IF_FILESERVER_get_file_id(fileid, path4, &env);
-	printf("get file id for >%s< returns >>%d<< (except 0)", path4, res4);
+	printf("get file id for >%s< returns >>%d<< (except -1)\n", path4, res4);
 
 	/* Spin forever */
 	while (42) ;
