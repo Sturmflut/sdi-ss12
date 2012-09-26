@@ -30,14 +30,15 @@ IDL4_PUBLISH_FILESERVER_LOOKUP(fileserver_Lookup_implementation);
 IDL4_INLINE L4_Word_t  fileserver_get_file_id_implementation(CORBA_Object  _caller, const path_t  path, idl4_server_environment * _env)
 
 {
-  L4_Word_t  __retval = 0;
+  L4_Word_t  __retval = -1;
   L4_BootInfo_t* bootinfo = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
   L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
+  	 unsigned int type1_cnt = 0;
      for (unsigned int i=0; i < L4_BootInfo_Entries (bootinfo); i++) {
     	 if((int)L4_Type (bootrec) == 1) {	//only records of type 1 are relevant
     		char *cmdline = L4_Module_Cmdline(bootrec);
         	//printf("%d) %s\n", i, cmdline);
-    		char *mpath;
+    		char *mpath = path;
     		//removes initial '/'
     		if (strncmp(path, "/", 1) == 0)
     			mpath = path+1;
@@ -63,9 +64,10 @@ IDL4_INLINE L4_Word_t  fileserver_get_file_id_implementation(CORBA_Object  _call
     		 *  if equal, remember i and leave for-loop
     		 */
     		if (strncmp(cmdline, mpath, strlen(cmdline)) == 0) {
-    			__retval = i;
+    			__retval = type1_cnt;
     			break;
     		}
+    		++type1_cnt;
          }
     	 bootrec = L4_Next (bootrec);
      }
@@ -81,15 +83,36 @@ IDL4_INLINE L4_Word_t  fileserver_read_implementation(CORBA_Object  _caller, con
 {
 	L4_Word_t  __retval = 0;
 
-	L4_BootInfo_t* bootrec = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
+	  L4_BootInfo_t* bootinfo = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
+	  L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
+	  unsigned int type1_cnt = 0;
+	  unsigned int i;
+	  for (i=0; i < L4_BootInfo_Entries (bootinfo); i++) {
+			 if((int)L4_Type (bootrec) == 1) { //only records of type 1 are relevant
+				 if (type1_cnt == file_id)
+					 break;
+				 ++type1_cnt;
+			 }
+			 bootrec = L4_Next (bootrec);
+	   }
 
-//	L4_Word_t addr = L4_Module_Start(*bootrec);
+	  if (i < L4_BootInfo_Entries(bootinfo)) {
+		  /**
+		   * At this point matching bootrecord was found (according to given file_id)
+		   */
+		  L4_Word_t addr = L4_Module_Start(bootrec); //get memory adr of module
+	  }
+//	  else
+//		  __retval = 0;
+
+	  	//at this point we have
+//		L4_Word_t addr = L4_Module_Start(*bootrec);
 
 //	buf->_maximum = 5;
 //	buf->_length = 5;
 //	strncpy( buf->_buffer, "Test\0", 5);
 
-	return 0;
+	return __retval;
 }
 
 IDL4_PUBLISH_FILESERVER_READ(fileserver_read_implementation);
