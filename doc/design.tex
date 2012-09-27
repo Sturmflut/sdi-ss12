@@ -3,22 +3,23 @@
 \begin{center}
 \begin{tikzpicture}[block/.style={rectangle,very thick,draw=kit-blue100,top color=white,bottom color=kit-blue30,minimum size=10mm,align=center}]
 
-	\node at (-4,0) [block] (logger) {Logger};
-	\node at (-2,0) [block] (driver) {Driver};
-	\node at (0,0) [block] (memory) {Memory};
+	\node at (-2,0) [block] (logger) {Logger};
+	\node at (0,0) [block] (minipager) {Minipager};
 	\node at (2,0) [block] (task) {Task};
-	\node at (4,0) [block] (file) {File};
 
 	\draw (-4,0.7) -- (5,0.7) node () {};
 
-	\node at (-2,1.5) [block] (keyboard) {Keyboard};
+	\node at (-2,1.5) [block] (nameserver) {Nameserver};
 	\node at (0,1.5) [block] (console) {Console};
-	\node at (2,1.5) [block] (screen) {Screen};
+	\node at (2,1.5) [block] (screen) {Memory};
+	\node at (4,1.5) [block] (file) {File};
 
 	\draw (-4,2.2) -- (5,2.2) node () {};
 
-	\node at (-1.5,3) [block] (simplethread1) {simplethread1};
-	\node at (1.5,3) [block] (simplethread2) {simplethread2};
+	\node at (-2,3) [block] (shell1) {Shell 1};
+	\node at (0,3) [block] (shell2) {Shell 2};
+	\node at (2,3) [block] (shell3) {Task 1};
+	\node at (4,3) [block] (task) {Task 2};
 \end{tikzpicture}
 \end{center}
 
