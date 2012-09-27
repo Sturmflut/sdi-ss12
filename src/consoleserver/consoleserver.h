@@ -11,6 +11,16 @@ typedef struct {
         char attribute;
 } glyph_t __attribute__((packed));
 
+typedef struct {
+	char key;
+	char modifier;
+} keypress_t;
+
+typedef struct {
+	char 		count;
+	keypress_t	keys[10];
+} keybuffer_t;
+
 
 
 extern L4_ThreadId_t loggerid;

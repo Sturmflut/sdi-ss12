@@ -37,6 +37,7 @@ void animation_loop()
 {
 	int x = 85;
 	const char* banner = "Karlsruhe Institute of Technology";
+	char buf[30];
 
 	/** Print logo */
 	print_stringat(23, 3, " ____  ____ ___       ___  ____  ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
@@ -46,9 +47,18 @@ void animation_loop()
 	print_stringat(23, 7, "|____/|____/___|     \\___/|____/ ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
 
 	void *p1, *p2, *p3;
+	char key, modifier;
 
 	while(1)
 	{
+		// Read key
+		if(IF_CONSOLESERVER_getKey((CORBA_Object)consoleid, &key, &modifier, &env))
+		{
+			snprintf(buf, sizeof(buf), "%x %x", key, modifier);
+			print_stringat(1, 1, buf, SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE);
+		}
+		
+
 		/* Scrolling step */
 		x--;
 		if(x < -strlen(banner))

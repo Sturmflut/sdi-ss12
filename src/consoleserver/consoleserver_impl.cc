@@ -37,6 +37,9 @@ glyph_t backbuffer[SDI_CONSOLESERVER_NUM_CONSOLES][80 * 25];
 /** Cursors */
 cursor_t cursors[SDI_CONSOLESERVER_NUM_CONSOLES] = {0, 0};
 
+/** Keybuffers */
+keybuffer_t keybuffers[SDI_CONSOLESERVER_NUM_CONSOLES];
+
 /** Thread mapping */
 L4_ThreadId_t active_threads[SDI_CONSOLESERVER_NUM_CONSOLES];
 
@@ -147,6 +150,24 @@ void init_consoles()
         }
 }
 
+/**
+ Clear all keyboard buffers
+*/
+void init_keybuffers()
+{
+        for(int i = 0; i < SDI_CONSOLESERVER_NUM_CONSOLES;i++)
+        {
+		keybuffers[i].count = 0;
+
+		for(int j = 0; j < 10; j++)
+		{
+			keybuffers[i].keys[j].key = '\0';
+			keybuffers[i].keys[j].modifier = 0;
+		}
+	}
+}
+
+
 
 void set_active_console(int num)
 {
@@ -196,22 +217,6 @@ void  consoleserver_interrupt_impl()
 		if(scancode == KEY_ALT_UP)
 			modifier_status &= (~KEYMASK_ALT);
 
-		if(modifier_status == 0)
-			modstring="";
-		if(modifier_status == KEYMASK_SHIFT)
-			modstring="Shift";
-		if(modifier_status == KEYMASK_CTRL)
-			modstring="Ctrl";
-		if(modifier_status == KEYMASK_ALT)
-			modstring="Alt";
-		if(modifier_status == KEYMASK_ALT+KEYMASK_SHIFT)
-			modstring="Shift+Alt";
-		if(modifier_status == KEYMASK_ALT+KEYMASK_CTRL)
-			modstring="Alt+Ctrl";
-		if(modifier_status == KEYMASK_CTRL+KEYMASK_SHIFT)
-			modstring="Shift+Ctrl";
-		if(modifier_status == KEYMASK_CTRL+KEYMASK_SHIFT+KEYMASK_ALT)
-			modstring="Shift+Alt+Ctrl";
 
 		// Handle keys
 		if(scancode >= 0x01 && scancode <= 0x58)
@@ -225,15 +230,25 @@ void  consoleserver_interrupt_impl()
 
 			if(key != 0)
 			{
-				// Switch consoles
-				if(modifier_status == KEYMASK_CTRL && (key >= '1' && key <= '9'))
+				// Magic key? Switch consoles
+				if(modifier_status == KEYMASK_CTRL && (key >= '1' && key <= '8'))
 				{
 					set_active_console(key-'1');
-			        	snprintf(logbuf, sizeof(logbuf), "[KEYBOARD] Switch to console %i", key-'1');
-				        IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuf, &env);
 					return;
 				}
-			
+		
+				// Put the keypress into the buffer
+				if(keybuffers[active_console].count >= 10)
+				{
+					IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[KEYBOARD] Buffer full!", &env);
+					return;
+				}
+
+				keybuffers[active_console].keys[keybuffers[active_console].count].key = key;
+				keybuffers[active_console].keys[keybuffers[active_console].count].modifier = modifier_status;
+				keybuffers[active_console].count++;
+
+				// Debugging output
 			        snprintf(logbuf, sizeof(logbuf), "[KEYBOARD] Interrupt! %s + %c (%2x)", modstring, key, key);
 			        IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuf, &env);
 			}
@@ -325,7 +340,26 @@ CORBA_long consoleserver_getconsolenum_impl(CORBA_Object  _caller)
 */
 CORBA_boolean consoleserver_getKey_impl(CORBA_Object  _caller, CORBA_char * key, CORBA_char * modifier)
 {
-	
+	/** Find matching console */
+        int console = find_console_for_thread(_caller);
+
+        if(console != -1 && keybuffers[console].count > 0)
+        {
+		// Return data
+		*key = keybuffers[console].keys[0].key;
+		*modifier = keybuffers[console].keys[0].modifier;
+
+		// Move buffer
+		for(int i = 1; i < 10; i++)
+			keybuffers[console].keys[i-1] = keybuffers[console].keys[i];
+
+		// Correct count
+		keybuffers[console].count--;
+
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -336,6 +370,9 @@ void consoleserver_init()
 	// Init the consoles	
         init_consoles();
         set_active_console(0);
+
+	// Init the keybuffers
+	init_keybuffers();
 	
 	// Register the keyboard interrupt
         L4_ThreadId_t taskserverid = L4_nilthread;
