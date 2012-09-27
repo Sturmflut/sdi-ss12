@@ -46,9 +46,9 @@ IDL4_INLINE void  pager_free_implementation(CORBA_Object  _caller, const idl4_fp
 
 IDL4_PUBLISH_PAGER_FREE(pager_free_implementation);
 
-void * pager_vtable_11[PAGER_DEFAULT_VTABLE_SIZE] = PAGER_DEFAULT_VTABLE_11;
+void * pager_vtable_10[PAGER_DEFAULT_VTABLE_SIZE] = PAGER_DEFAULT_VTABLE_10;
 void * pager_vtable_discard[PAGER_DEFAULT_VTABLE_SIZE] = PAGER_DEFAULT_VTABLE_DISCARD;
-void ** pager_itable[16] = { pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_11, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard };
+void ** pager_itable[16] = { pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_10, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard, pager_vtable_discard };
 void * pager_ktable[PAGER_DEFAULT_KTABLE_SIZE] = PAGER_DEFAULT_KTABLE;
 
 char buf[2][1024];
