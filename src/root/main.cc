@@ -317,9 +317,9 @@ int main(void) {
 
 
     /* Driverserver */
-    start_task_byname("(cd)/sdios/driverserver",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 21, 1),
-	utcbarea);
+//    start_task_byname("(cd)/sdios/driverserver",
+//	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 21, 1),
+//	utcbarea);
 
     /* FIleserver */
     start_task_byname("(cd)/sdios/fileserver",
@@ -333,9 +333,9 @@ int main(void) {
 
    
     /* Keyboarddriver */
-    start_task_byname("(cd)/sdios/keyboarddriver",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 30, 1),
-	utcbarea);
+//    start_task_byname("(cd)/sdios/keyboarddriver",
+//	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 30, 1),
+//	utcbarea);
     
     /* Console */
     start_task_byname("(cd)/sdios/consoleserver",
