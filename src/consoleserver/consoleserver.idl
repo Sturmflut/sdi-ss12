@@ -13,5 +13,5 @@ import "sdi/types.h";
 
 [uuid(IF_CONSOLESERVER_ID)]
 interface consoleserver : IF_CONSOLESERVER {
-
+	[kernelmsg(idl4::interrupt)] void interrupt();
 };
