@@ -81,17 +81,36 @@ IDL4_PUBLISH_FILESERVER_GET_FILE_ID(fileserver_get_file_id_implementation);
 IDL4_INLINE L4_Word_t  fileserver_read_implementation(CORBA_Object  _caller, const L4_Word_t  file_id, const L4_Word_t  offset, const L4_Word_t  count, buf_t * buf, idl4_server_environment * _env)
 
 {
-	L4_Word_t  __retval = 0;
+//	L4_Word_t  __retval = 0;
+	  buf->_length = 0;
 
-	L4_BootInfo_t* bootrec = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
+	  L4_BootInfo_t* bootinfo = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
+	  L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
+	  unsigned int type1_cnt = 0;
+	  unsigned int i;
+	  for (i=0; i < L4_BootInfo_Entries (bootinfo); i++) {
+			 if((int)L4_Type (bootrec) == 1) { //only records of type 1 are relevant
+				 if (type1_cnt == file_id)
+					 break;
+				 ++type1_cnt;
+			 }
+			 bootrec = L4_Next (bootrec);
+	   }
 
-//	L4_Word_t addr = L4_Module_Start(*bootrec);
+	  if (i < L4_BootInfo_Entries(bootinfo)) {
 
-//	buf->_maximum = 5;
-//	buf->_length = 5;
-//	strncpy( buf->_buffer, "Test\0", 5);
-
-	return 0;
+		  /**
+		   * At this point matching bootrecord was found (according to given file_id)
+		   */
+		    if(offset < L4_Module_Size (bootrec))
+		    {
+		        buf->_length = min(count, L4_Module_Size (bootrec) - offset);
+		        memcpy( buf->_buffer, (void*) (L4_Module_Start (bootrec) + offset), buf->_length);
+		    }
+		    //else
+		        //Offset out of range
+	  }
+	  return buf->_length;
 }
 
 IDL4_PUBLISH_FILESERVER_READ(fileserver_read_implementation);
@@ -173,8 +192,16 @@ IDL4_INLINE L4_Word_t  fileserver_get_dir_size_implementation(CORBA_Object  _cal
 {
   L4_Word_t  __retval = 0;
 
-  /* implementation of IF_FILE::get_dir_size */
-  
+  L4_BootInfo_t* bootinfo = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
+  L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
+//  unsigned int type2_cnt = 0;
+  unsigned int i;
+  for (i=0; i < L4_BootInfo_Entries (bootinfo); i++) {
+	  if((int)L4_Type (bootrec) == 2) { //only records of type 2 are relevant
+		  ++__retval;
+  	  }
+      bootrec = L4_Next (bootrec);
+  }
   return __retval;
 }
 
