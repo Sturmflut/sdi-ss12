@@ -8,6 +8,7 @@
  *****************************************************************/
 
 #include <sdi/sdi.h>
+#include <l4io.h>
 
 #include "consoleserver-server.h"
 
@@ -44,6 +45,7 @@ IDL4_PUBLISH_CONSOLESERVER_PUTCHARAT(consoleserver_putcharat_implementation);
 IDL4_INLINE void  consoleserver_putstring_implementation(CORBA_Object  _caller, const consolestring_t  text, const CORBA_char  attrib, idl4_server_environment * _env)
 
 {
+	printf("putstring");
 	consoleserver_putstring_impl(_caller, text, attrib);
 }
 

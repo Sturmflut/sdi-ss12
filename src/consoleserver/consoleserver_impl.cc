@@ -97,15 +97,16 @@ void putcharat(int consolenum, int x, int y, char character, char attribute)
 
 void putchar(int consolenum, char character, char attribute)
 {
-        if(consolenum < 0 || consolenum >= SDI_CONSOLESERVER_NUM_CONSOLES)
+        if(consolenum < 0 || consolenum >= SDI_CONSOLESERVER_NUM_CONSOLES || character == '\0' || character == '\t')
                 return;
 
+	if(character != '\n')
         putcharat(consolenum, cursors[consolenum].x, cursors[consolenum].y, character, attribute);
 
         cursors[consolenum].x++;
 
         /** Line wrap */
-        if(cursors[consolenum].x >= 80)
+        if(cursors[consolenum].x >= 80 || character == '\n')
         {
                 cursors[consolenum].x = 0;
                 cursors[consolenum].y++;
@@ -289,7 +290,7 @@ void  consoleserver_putcharat_impl(CORBA_Object  _caller, const CORBA_long  x, c
 */
 void  consoleserver_putstring_impl(CORBA_Object  _caller, const consolestring_t  text, const CORBA_char  attrib)
 {
-    /** Find matching console */
+	/** Find matching console */
         int console = find_console_for_thread(_caller);
 
         if(console != -1)

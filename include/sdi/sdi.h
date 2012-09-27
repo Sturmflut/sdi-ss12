@@ -26,17 +26,15 @@ extern void sleep (int msec);
 #include <idl4glue.h>
 
 #include <if/ifnameserver.h>
-#include <if/ifdriverserver.h>
 
 // Nameserver convenience API
-extern void nameserver_register(path_t path);
-extern void nameserver_deregister();
-extern L4_ThreadId_t nameserver_lookup(path_t path);
+void nameserver_register(path_t path);
+void nameserver_deregister();
+L4_ThreadId_t nameserver_lookup(path_t path);
 
-// Driver server convenience API
-extern void driverserver_register(path_t path);
-extern void driverserver_deregister();
 
+// Consoleserver convenience API
+int console_printf(const char *format, ...);
 
 #define bailout(S) L4_KDB_Enter( S )
 #define assert(X) if (!(X)) bailout( #X )

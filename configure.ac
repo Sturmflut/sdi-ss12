@@ -264,6 +264,7 @@ src/fileserver/Makefile
 src/consoleserver/Makefile
 src/simplethread1/Makefile
 src/simplethread2/Makefile
+src/shell/Makefile
 
 ])
 

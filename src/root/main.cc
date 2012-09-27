@@ -353,6 +353,12 @@ int main(void) {
     start_task_byname("(cd)/sdios/simplethread2",
 	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 51, 1),
 	utcbarea);
+    
+
+    /* Simplethread2 */
+    start_task_byname("(cd)/sdios/shell",
+	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 52, 1),
+	utcbarea);
 
     /* now it is time to become the pager for all those threads we 
        created recently */
