@@ -22,8 +22,8 @@ void  pager_pagefault_implementation_real(CORBA_Object  _caller, const L4_Word_t
 {
 	L4_Word_t page_bits = lsBit (L4_PageSizeMask ((L4_KernelInterfacePage_t*)L4_KernelInterface ()));
 
-	printf ("Pager got msg from %lx (%p, %p)\n",
-	    _caller.raw, (void *) address, (void *) ip);
+	//printf ("Pager got msg from %lx (%p, %p)\n",
+	//    _caller.raw, (void *) address, (void *) ip);
 
 	/* This is really ugly, we just touch this address to bring 
 	the page into our address space */
