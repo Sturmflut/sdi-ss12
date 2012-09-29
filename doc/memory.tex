@@ -38,6 +38,13 @@
 	\item Der Thread verwaltet seinen Adressraum selbst. Dies ist die bessere Idee, da dies den Pager sehr vereinfacht und die Möglichkeiten des Threads maximiert, z.B. könnten dynamisch Libraries nachgeladen werden, ohne dass der Pager dies wissen muss. Allerdings muss  der Thread selbst entscheiden, wo in seinem Adressraum das Mapping landen soll. Dies setzt voraus, dass der Thread ein lokales Heap-Management hat, welches selbst entscheiden kann, an welche freie Adresse etwas eingeblendet werden soll.
 	
 	\item free: Der Pager ruft ein rekursives Flush auf die Page auf, dadurch werden alle Mappings entfernt, und die Seite an Sigma0 zurückgegeben.
+    \item Starten eines Tasks: Um einen Thread zu starten, wird zunächst
+        die create\_task Methode des Task-Servers aufgerufen. Dieser
+        kommuniziert mit dem Loader, um die Teile der ELF-File zu
+        finden, die eingeblendet werden müssen. Für diese Teile der
+        ELF-File werden beim Memory-Server file-mappings angelegt.
+        Anschließend wird die Startup\_IPC durch den Memoryserver
+        gesendet.
 \end{itemize}
 
 \subsubsection{Lokale Heap-Verwaltung}
