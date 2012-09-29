@@ -12,6 +12,7 @@
 #include <if/iflogging.h>
 
 #include "taskserver-server.h"
+#include "taskserver.h"
 
 #include "root.h"
 
@@ -25,11 +26,7 @@ char buf_msg[TASKSERVER_STRBUF_SIZE][512];
 IDL4_INLINE L4_ThreadId_t  taskserver_create_task_implementation(CORBA_Object  _caller, const path_t  path, const path_t  cmdline, idl4_server_environment * _env)
 
 {
-  L4_ThreadId_t  __retval = { local: { X: { 0, 0 } } };
-
-  /* implementation of IF_TASKSERVER::create_task */
-  
-  return __retval;
+  return taskserver_create_task_real(_caller, path, cmdline, _env);
 }
 
 IDL4_PUBLISH_TASKSERVER_CREATE_TASK(taskserver_create_task_implementation);

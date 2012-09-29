@@ -71,7 +71,7 @@ char isAddressConflict(Taskheader_t * myTaskheader, L4_Word_t virt_start_address
 	return 0;
 }	
 
-void memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_ThreadId_t * threadid, const L4_Word_t  type, const L4_Word_t  virt_start_address, const L4_Word_t  size, idl4_server_environment * _env)
+L4_Word_t memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_ThreadId_t * threadid, const L4_Word_t  type, const L4_Word_t  virt_start_address, const L4_Word_t  size, idl4_server_environment * _env)
 {
 	char taskheader_entry = -1;
 	
@@ -85,8 +85,9 @@ void memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_ThreadId_t
 	Taskheader_t *myTaskheader = &taskList[taskheader_entry];	
 
 	//check address overlappings 
-	if(isAddressConflict(myTaskheader, virt_start_address, virt_end_address))
-		return;
+	if(isAddressConflict(myTaskheader, virt_start_address, virt_end_address)) {
+		return -1; // TODO define proper return values
+    }
 
 	//create new page entry for thread
 	Page_entry_t pe = {NOT_YET_MAPPED, virt_start_address, size};
@@ -95,7 +96,7 @@ void memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_ThreadId_t
 	snprintf(logbuf, sizeof(logbuf), "[MEMORY] Memory mapped for threadid %i at %x\n", *threadid, virt_start_address);
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuf, &env);
 
-	return;
+	return 0;
 }
 
 

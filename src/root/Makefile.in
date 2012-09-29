@@ -20,7 +20,8 @@ SRCS=		$(ARCH)-crt0.S \
 		pager_idl.cc \
 		pager_impl.cc \
 		logger.cc \
-		taskserver_idl.cc 
+		taskserver_idl.cc \
+		taskserver_impl.cc
 
 IDLS=		logger.idl pager.idl taskserver.idl
 
