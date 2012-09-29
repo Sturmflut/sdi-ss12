@@ -1,6 +1,26 @@
+#include <l4io.h>
+
 #include "taskserver.h" 
+#include "root.h"
+
+L4_ThreadId_t last_thread_id = L4_nilthread;
+
+void taskserver_init() {
+    /* Announce task service */
+    IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[TASK] Registering", &env);
+
+    nameserver_register("/task");
+
+    IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[TASK] Registered...", &env);
+    
+    last_thread_id = pagerid;
+
+}
 
 L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  path, const path_t  cmdline, idl4_server_environment * _env) {
+    L4_ThreadId_t threadid = L4_GlobalId(L4_ThreadNo(last_thread_id) + 1, 1);
+    last_thread_id = threadid;
+    
     // 1. Task erstellen (ThreadControl, SpaceControl)
 
     // 2. Taskserver -> Fileserver: Datei laden und zwischspeichern

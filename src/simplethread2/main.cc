@@ -15,6 +15,7 @@
 #include <if/ifnaming.h>
 #include <if/ifconsoleserver.h>
 #include <if/iffileserver.h>
+#include <if/iftaskserver.h>
 
 #include <sdi/console_attributes.h>
 #include <sdi/io.h>
@@ -22,6 +23,7 @@
 
 L4_ThreadId_t consoleid = L4_nilthread;
 L4_ThreadId_t loggerid = L4_nilthread;
+L4_ThreadId_t taskserverid = L4_nilthread;
 
 CORBA_Environment env(idl4_default_environment);
 
@@ -35,8 +37,13 @@ int main()
 	while (L4_IsNilThread(loggerid))
 		loggerid = nameserver_lookup("/server/logger");
 
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD2] Active", &env);
+    while (L4_IsNilThread(taskserverid)) {
+        taskserverid = nameserver_lookup("/task");
+    }
 
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD2] Active", &env);
+    IF_TASKSERVER_create_task((CORBA_Object)taskserverid, "simplethread1", "", &env);
+    
 	char tbuf[10];
 	buf_t buf;
 	buf._buffer = (CORBA_char*)&tbuf;

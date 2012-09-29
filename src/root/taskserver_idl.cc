@@ -9,8 +9,6 @@
 
 #include <sdi/sdi.h>
 
-#include <if/iflogging.h>
-
 #include "taskserver-server.h"
 #include "taskserver.h"
 
@@ -233,13 +231,7 @@ void ** taskserver_itable[16] = { taskserver_vtable_discard, taskserver_vtable_d
 void  taskserver_server(void)
 
 {
-  /* Announce task service */
-  IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[TASK] Registering", &env);
-
-  nameserver_register("/task");
-
-  IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[TASK] Registered...", &env);
-
+  taskserver_init();    
 
   L4_ThreadId_t  partner;
   L4_MsgTag_t  msgtag;
