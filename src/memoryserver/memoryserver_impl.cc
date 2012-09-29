@@ -8,13 +8,13 @@
 Taskheader_t taskList[NUM_T_ENTRY];
 unsigned char Taskheader_index;
 
-unsigned char findOrCreateTaskEntry(L4_ThreadId_t threadid)
+unsigned char findOrCreateTaskEntry(L4_Word_t taskid)
 {
 	char taskheader_entry = -1;
 
 	for(int i = 0; i < NUM_T_ENTRY; i = i+1)
 	{
-		if(taskList[i].threadid == threadid)
+		if(taskList[i].taskid == taskid)
 			taskheader_entry = i;
 	}	
 	
@@ -79,7 +79,7 @@ L4_Word_t memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_Threa
 	//TODO: validate virt_start_address
 
 	//find taskheader entry
-	taskheader_entry = findOrCreateTaskEntry(*threadid);
+	taskheader_entry = findOrCreateTaskEntry(get_task_id(*threadid));
 
 	L4_Word_t virt_end_address = virt_start_address + size;
 	Taskheader_t *myTaskheader = &taskList[taskheader_entry];	
@@ -99,6 +99,34 @@ L4_Word_t memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_Threa
 	return 0;
 }
 
+L4_Word_t  memoryserver_map_file_pages_real(CORBA_Object  _caller, const L4_ThreadId_t * threadid, const L4_Word_t  type, const path_t  path, const L4_Word_t  offset, const L4_Word_t  virt_start_address, const L4_Word_t  size, const L4_Word_t  realsize, idl4_server_environment * _env)
+{
+	char taskheader_entry = -1;
+	
+	//TODO: _caller == taskserver || threadid
+	//TODO: validate virt_start_address
+
+	//find taskheader entry
+	taskheader_entry = findOrCreateTaskEntry(get_task_id(*threadid));
+
+	L4_Word_t virt_end_address = virt_start_address + size;
+	Taskheader_t *myTaskheader = &taskList[taskheader_entry];	
+
+	//check address overlappings 
+	if(isAddressConflict(myTaskheader, virt_start_address, virt_end_address)) {
+		return -1; // TODO define proper return values
+    	}
+
+	//create new file entry for thread
+	File_entry_t fe = {virt_start_address, path, offset, size, realsize, L4_Nilpage};
+	myTaskheader->filemaps[++(myTaskheader->filemaps_index)] = fe;
+
+	snprintf(logbuf, sizeof(logbuf), "[MEMORY] Memory mapped for threadid %i at %x\n", *threadid, virt_start_address);
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuf, &env);
+
+	return 0;
+
+}
 
 void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  address, const L4_Word_t  ip, const L4_Word_t  privileges, idl4_fpage_t * page, idl4_server_environment * _env)
 {
@@ -111,7 +139,7 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 	//search mapping
 	for(int i=0; i<Taskheader_index; i = i+1)
 	{
-		if(taskList[i].threadid == _caller)
+		if(taskList[i].taskid == get_task_id(_caller))
 		{
 			taskListIndex = i;
 			break;
