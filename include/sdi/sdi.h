@@ -39,6 +39,10 @@ int console_printf(const char *format, ...);
 #define bailout(S) L4_KDB_Enter( S )
 #define assert(X) if (!(X)) bailout( #X )
 
+// Taskserver
+L4_Word_t get_task_id(L4_ThreadId_t threadid);
+L4_Word_t get_thread_count(L4_ThreadId_t threadid);
+L4_ThreadId_t create_thread_id(L4_Word_t task_id, L4_Word_t thread_count);
 
 
 #endif /* !__INCLUDE_SDI_SDI_H__ */
