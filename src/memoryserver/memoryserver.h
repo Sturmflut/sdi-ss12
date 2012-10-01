@@ -24,7 +24,7 @@ typedef struct{
 } File_entry_t;
 
 typedef struct{
-      L4_ThreadId_t threadid;
+      L4_Word_t taskid;
       Page_entry_t pages[1000];
       File_entry_t filemaps[10];
 	unsigned int pages_index;

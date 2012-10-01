@@ -8,13 +8,13 @@
 Taskheader_t taskList[NUM_T_ENTRY];
 unsigned char Taskheader_index;
 
-unsigned char findOrCreateTaskEntry(L4_ThreadId_t threadid)
+unsigned char findOrCreateTaskEntry(L4_Word_t taskid)
 {
 	char taskheader_entry = -1;
 
 	for(int i = 0; i < NUM_T_ENTRY; i = i+1)
 	{
-		if(taskList[i].threadid == threadid)
+		if(taskList[i].taskid == taskid)
 			taskheader_entry = i;
 	}	
 	
@@ -79,7 +79,7 @@ L4_Word_t memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_Threa
 	//TODO: validate virt_start_address
 
 	//find taskheader entry
-	taskheader_entry = findOrCreateTaskEntry(*threadid);
+	taskheader_entry = findOrCreateTaskEntry(get_task_id(*threadid));
 
 	L4_Word_t virt_end_address = virt_start_address + size;
 	Taskheader_t *myTaskheader = &taskList[taskheader_entry];	
@@ -111,7 +111,7 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 	//search mapping
 	for(int i=0; i<Taskheader_index; i = i+1)
 	{
-		if(taskList[i].threadid == _caller)
+		if(taskList[i].taskid == get_task_id(_caller))
 		{
 			taskListIndex = i;
 			break;
