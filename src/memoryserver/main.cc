@@ -18,6 +18,7 @@
 
 L4_ThreadId_t loggerid;
 L4_ThreadId_t sigma0id;
+L4_ThreadId_t fileserverid;
 CORBA_Environment env (idl4_default_environment);
 char logbuf[80];
 
@@ -35,6 +36,7 @@ int main(void)
 //initialize data
 Taskheader_index = 0;
 sigma0id = L4_Pager();
+fileserverid = nameserver_lookup("/file");
 
 	memoryserver_server();	
 }

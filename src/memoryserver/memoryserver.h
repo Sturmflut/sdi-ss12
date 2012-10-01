@@ -18,7 +18,7 @@ typedef struct{
       L4_Word_t virt_address;
       path_t path;
       L4_Word_t offset;
-      L4_Word_t size;
+      L4_Word_t size; //size >= realsize
       L4_Word_t realsize;
       L4_Fpage_t page;
 } File_entry_t;
@@ -37,6 +37,7 @@ extern unsigned char Taskheader_index;
 
 extern L4_ThreadId_t loggerid;
 extern L4_ThreadId_t sigma0id;
+extern L4_ThreadId_t fileserverid;
 extern CORBA_Environment env;
 extern char logbuf[80];
 

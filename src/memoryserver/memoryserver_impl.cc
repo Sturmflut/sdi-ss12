@@ -4,6 +4,7 @@
 #include <l4io.h>
 
 #include <if/iflogging.h>
+#include <if/iffileserver.h>
 
 Taskheader_t taskList[NUM_T_ENTRY];
 unsigned char Taskheader_index;
@@ -192,7 +193,8 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 		size = pe->size;
 		virt_address = pe->virt_address;
 	}
-
+	
+	//TODO:Do we have to ensure that the newpage is aligned?
 	L4_Fpage_t newpage = L4_Fpage(-1, size); 
 	
 	/* Send mapitem, unless the recipient resides the same address space */
@@ -204,12 +206,41 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 		idl4_fpage_set_permissions(page, privileges); // or IDL4_PERM_READ|IDL4_PERM_WRITE|IDL4_PERM_EXECUTE
 	}
 
-	//set base adress of segment and increment base_address of next free segment
 	if(!L4_IsNilFpage(newpage))
 	{	
 		if(pe == NULL)
-			pe->base_address = L4_Address(newpage);	
+		{
+			fe->page = newpage;
 
+			buf_t buff;
+			char tbuff[8];
+			buff._buffer = (CORBA_char*)&tbuff;
+			buff._maximum = 8;
+			
+			L4_Word_t fileid = IF_FILESERVER_get_file_id(fileserverid, fe->path, &env);
+
+			int cnt = fe->realsize / 8;
+			for(int i=0; i<=cnt; i++)
+			{
+				L4_Word_t inMax = 8;
+
+			 	if(8*i > fe->realsize)
+				{
+					inMax = fe->realsize - 8*i;
+				}
+					
+				L4_Word_t res_read = IF_FILESERVER_read(fileserverid, fileid, fe->offset + i*8, 8, &buff, &env);
+				
+				//fill page	
+	    		memcpy((void*)(virt_address+ i*8), buff._buffer, inMax);
+			}
+			//fill out the rest with zero
+	    	memset((void*)(virt_address + fe->realsize),0 ,fe->size - fe->realsize);
+		}
+		else
+		{
+			pe->base_address = L4_Address(newpage);	
+		}
 		snprintf(logbuf, sizeof(logbuf), "[MEMORY] Handled page fault for threadid %i at %x\n", _caller, address);
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuf, &env);
 
