@@ -82,20 +82,28 @@ int main()
 	const L4_Word_t  offset = 0;
 	const L4_Word_t  count = 7;
 
-	char logbuff[80];
+	char logbuff[100];
 	buf_t buff;
 	char tbuff[50];
 	buff._buffer = (CORBA_char*)&tbuff;
 	buff._maximum = 50;
 	L4_Word_t res_read = IF_FILESERVER_read(fileid, read_id, offset, count, &buff, &env);
 
-	snprintf(logbuff, sizeof(logbuff), "[TEST FILESERVER read with fileid=%i] %s Len %i\n", read_id, buff._buffer, buff._length);
-//	IF_LOGGING_LogMessage((CORBA_Object)fileid, logbuff, &env);
+	snprintf(logbuff, sizeof(logbuff), "[TEST FILESERVER read with fileid=%i] >>%s<< (Len %i)\n", read_id, buff._buffer, buff._length);
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuff, &env);
 	//printf("%s --- result of read is %i\n", logbuff, res_read);
 
 	/* get_dir_size */
-	L4_Word_t resss = IF_FILE_get_dir_size(fileid, "/",&env);
-	//printf("[TEST FILESERVER get_dir_size of '/' = %d\n", resss);
+	strcpy(logbuff, "");	//empty string
+	res = IF_FILE_get_dir_size(fileid, "/",&env);
+	snprintf(logbuff, sizeof(logbuff), "[TEST FILESERVER get_dir_size of '/'] = %d\n", res);
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuff, &env);
+
+	/* get_file_size */
+	strcpy(logbuff, "");	//empty string
+	res = IF_FILE_get_file_size(fileid, "/keyboarddriver",&env);
+	snprintf(logbuff, sizeof(logbuff), "[TEST FILESERVER get_file_size of '/keyboarddriver'] = %lx\n", res);
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuff, &env);
 	/* Spin forever */
 	while (42) ;
 
