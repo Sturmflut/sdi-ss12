@@ -16,7 +16,7 @@ extern void* alloc (L4_Word_t size);
 extern void free (void* freeptr);
 
 // Logging
-extern int log_printf(const char *format, ...);
+extern int log_printf(L4_ThreadId_t logger_id, const char *format, ...);
 
 // Panic managment 
 extern void panic (const char* message);

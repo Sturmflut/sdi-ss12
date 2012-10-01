@@ -13,17 +13,18 @@
 
 #include <if/iflogging.h>
 
-int log_printf(const char *format, ...)
+int log_printf(L4_ThreadId_t logger_id, const char *format, ...)
 {
 	int retval=0;
 	va_list ap;
 	char buf[256];
 
-	L4_ThreadId_t logger_id;
+	//L4_ThreadId_t logger_id;
 	CORBA_Environment env(idl4_default_environment);
 
-    while (L4_IsNilThread(logger_id))
-        logger_id = nameserver_lookup("/server/logger");
+    // this lookup causes weird effects!
+    //while (L4_IsNilThread(logger_id))
+    //    logger_id = nameserver_lookup("/server/logger");
 
 	va_start(ap, format); /* Initialize the va_list */
 
