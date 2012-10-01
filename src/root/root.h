@@ -19,7 +19,9 @@ extern L4_ThreadId_t pagerid;    // our internal pager
 extern L4_ThreadId_t loggerid;   // messaging service
 extern L4_ThreadId_t driverid;   // driver server
 extern L4_ThreadId_t taskserverid;   // driver server
+extern L4_ThreadId_t memoryserverid; //memory server
 
+extern L4_Fpage_t utcbarea;
 
 extern void logger_server (void);
 extern void pager_server (void);
