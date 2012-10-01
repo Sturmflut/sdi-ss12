@@ -9,6 +9,7 @@
 
 #include <l4/kdebug.h>
 #include <sdi/types.h>
+#include <elf.h>
 
 // Heap managment
 extern void* alloc (L4_Word_t size);
@@ -44,5 +45,7 @@ L4_Word_t get_task_id(L4_ThreadId_t threadid);
 L4_Word_t get_thread_count(L4_ThreadId_t threadid);
 L4_ThreadId_t create_thread_id(L4_Word_t task_id, L4_Word_t thread_count);
 
+// ELF
+Elf32_Phdr* valid_elf_header(Elf32_Ehdr *hdr);
 
 #endif /* !__INCLUDE_SDI_SDI_H__ */

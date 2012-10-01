@@ -166,23 +166,14 @@ L4_Word_t load_elfimage (L4_BootRec_t* mod) {
 	if (!request_page (addr)) {
 	    panic ("could not get module pages from sigma0");
 	}
-    
+
     Elf32_Ehdr* hdr = (Elf32_Ehdr*)L4_Module_Start (mod);
-    Elf32_Phdr* phdr;
-    if ((hdr->e_ident[EI_MAG0] !=  ELFMAG0) || 
-	(hdr->e_ident[EI_MAG1] !=  ELFMAG1) || 
-	(hdr->e_ident[EI_MAG2] !=  ELFMAG2) ||
-	(hdr->e_ident[EI_MAG3] !=  ELFMAG3)) {
-	return NULL;
+    Elf32_Phdr* phdr = valid_elf_header(hdr);
+    
+    if (phdr == NULL) {
+        return NULL;
     }
-    if (hdr->e_type != ET_EXEC) { return NULL; }
-    if (hdr->e_machine != EM_386) { return NULL; }
-    if (hdr->e_version != EV_CURRENT) { return NULL; }
-    if (hdr->e_flags != 0) { return NULL; }
-    phdr = (Elf32_Phdr *) (hdr->e_phoff + (unsigned int) hdr);
-    if (hdr->e_phnum <= 0) {
-	return NULL;
-    }
+
     for (int i = 0; i < hdr->e_phnum; i++) {
 	if (phdr[i].p_type == PT_LOAD) {
 	    L4_Word_t fstart, mstart;
