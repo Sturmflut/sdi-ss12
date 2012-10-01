@@ -101,8 +101,8 @@ int main()
 
 	/* get_file_size */
 	strcpy(logbuff, "");	//empty string
-	res = IF_FILE_get_file_size(fileid, "/keyboarddriver",&env);
-	snprintf(logbuff, sizeof(logbuff), "[TEST FILESERVER get_file_size of '/keyboarddriver'] = %lx\n", res);
+	res = IF_FILE_get_file_size(fileid, "/consoleserver",&env);
+	snprintf(logbuff, sizeof(logbuff), "[TEST FILESERVER get_file_size of '/consoleserver'] = %lx\n", res);
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuff, &env);
 	/* Spin forever */
 	while (42) ;
