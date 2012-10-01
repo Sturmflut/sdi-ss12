@@ -33,46 +33,45 @@ IDL4_INLINE L4_Word_t  fileserver_get_file_id_implementation(CORBA_Object  _call
   L4_Word_t  __retval = -1;
   L4_BootInfo_t* bootinfo = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
   L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
-  	 unsigned int type1_cnt = 0;
-     for (unsigned int i=0; i < L4_BootInfo_Entries (bootinfo); i++) {
-    	 if((int)L4_Type (bootrec) == 1) {	//only records of type 1 are relevant
-    		char *cmdline = L4_Module_Cmdline(bootrec);
-        	//printf("%d) %s\n", i, cmdline);
-    		char *mpath = path;
-    		//removes initial '/'
-    		if (strncmp(path, "/", 1) == 0)
-    			mpath = path+1;
+  unsigned int type1_cnt = 0;
+  for (unsigned int i=0; i < L4_BootInfo_Entries (bootinfo); i++) {
+	 if((int)L4_Type (bootrec) == 1) {	//only records of type 1 are relevant
+		char *cmdline = L4_Module_Cmdline(bootrec);
+		//printf("%d) %s\n", i, cmdline);
+		char *mpath = path;
+		//removes initial '/'
+		if (strncmp(path, "/", 1) == 0)
+			mpath = path+1;
 
-        	/**
-    		 * Find last_occurrence of '/' - character
-    		 */
-    		char *pch;
-    		pch=strchr(cmdline,'/');
-    		unsigned int last_occurrence = 0;
-    		while (pch!=NULL)
-    		{
-    			last_occurrence = pch-cmdline+1;
+		/**
+		 * Find last_occurrence of '/' - character
+		 */
+		char *pch;
+		pch=strchr(cmdline,'/');
+		unsigned int last_occurrence = 0;
+		while (pch!=NULL)
+		{
+			last_occurrence = pch-cmdline+1;
 //    			printf ("found at %d\n",last_occurrence);
-    			pch=strchr(pch+1,'/');
-    		}
-    		if (last_occurrence != 0)		//'/' found; now cut string
-    			cmdline+=last_occurrence;
+			pch=strchr(pch+1,'/');
+		}
+		if (last_occurrence != 0)		//'/' found; now cut string
+			cmdline+=last_occurrence;
 
-    		/**
-    		 * Now compare both strings:
-    		 *  given path with modified boot
-    		 *  if equal, remember i and leave for-loop
-    		 */
-    		if (strncmp(cmdline, mpath, strlen(cmdline)) == 0) {
-    			__retval = type1_cnt;
-    			break;
-    		}
-    		++type1_cnt;
-         }
-    	 bootrec = L4_Next (bootrec);
-     }
-  /* implementation of IF_FILE::get_file_id */
-  
+		/**
+		 * Now compare both strings:
+		 *  given path with modified boot
+		 *  if equal, remember i and leave for-loop
+		 */
+		if (strncmp(cmdline, mpath, strlen(cmdline)) == 0) {
+			__retval = type1_cnt;
+			break;
+		}
+		++type1_cnt;
+	 }
+	 bootrec = L4_Next (bootrec);
+ }
+
   return __retval;
 }
 
@@ -130,11 +129,47 @@ IDL4_PUBLISH_FILESERVER_WRITE(fileserver_write_implementation);
 IDL4_INLINE L4_Word_t  fileserver_get_file_size_implementation(CORBA_Object  _caller, const path_t  path, idl4_server_environment * _env)
 
 {
-  L4_Word_t  __retval = 0;
-
   /* implementation of IF_FILE::get_file_size */
-  
-  return __retval;
+  L4_Word_t  __retval = 0;
+  L4_BootInfo_t* bootinfo = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
+  L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
+  for (unsigned int i=0; i < L4_BootInfo_Entries (bootinfo); i++) {
+	 if((int)L4_Type (bootrec) == 1) {	//only records of type 1 are relevant
+		char *cmdline = L4_Module_Cmdline(bootrec);
+		//printf("%d) %s\n", i, cmdline);
+		char *mpath = path;
+		//removes initial '/'
+		if (strncmp(path, "/", 1) == 0)
+			mpath = path+1;
+
+		/**
+		 * Find last_occurrence of '/' - character
+		 */
+		char *pch;
+		pch=strchr(cmdline,'/');
+		unsigned int last_occurrence = 0;
+		while (pch!=NULL)
+		{
+			last_occurrence = pch-cmdline+1;
+//    			printf ("found at %d\n",last_occurrence);
+			pch=strchr(pch+1,'/');
+		}
+		if (last_occurrence != 0)		//'/' found; now cut string
+			cmdline+=last_occurrence;
+
+		/**
+		 * Now compare both strings:
+		 *  given path with modified boot
+		 *  if equal, get module size and leave for-loop
+		 */
+		if (strncmp(cmdline, mpath, strlen(cmdline)) == 0) {
+			__retval = L4_Module_Size (bootrec);
+			break;
+		}
+	 }
+	 bootrec = L4_Next (bootrec);
+ }
+ return __retval;
 }
 
 IDL4_PUBLISH_FILESERVER_GET_FILE_SIZE(fileserver_get_file_size_implementation);
@@ -211,8 +246,10 @@ IDL4_INLINE CORBA_boolean  fileserver_get_dir_entry_implementation(CORBA_Object 
 
 {
   CORBA_boolean  __retval = 0;
-
-  /* implementation of IF_FILE::get_dir_entry */
+  L4_BootInfo_t* bootinfo = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
+  if (entry > L4_BootInfo_Entries (bootinfo)) {
+	  
+  }
   
   return __retval;
 }
