@@ -38,11 +38,11 @@ IDL4_PUBLISH_MEMORYSERVER_MAP_ANON_PAGES(memoryserver_map_anon_pages_implementat
 IDL4_INLINE L4_Word_t  memoryserver_map_file_pages_implementation(CORBA_Object  _caller, const L4_ThreadId_t * threadid, const L4_Word_t  type, const path_t  path, const L4_Word_t  offset, const L4_Word_t  virt_start_address, const L4_Word_t  size, const L4_Word_t  realsize, idl4_server_environment * _env)
 
 {
-  L4_Word_t  __retval = 0;
-
   /* implementation of IF_MEMORYSERVER::map_file_pages */
   
-  return __retval;
+  return memoryserver_map_file_pages_real(_caller, threadid, type, path, offset, virt_start_address, size, realsize, _env);
+
+
 }
 
 IDL4_PUBLISH_MEMORYSERVER_MAP_FILE_PAGES(memoryserver_map_file_pages_implementation);

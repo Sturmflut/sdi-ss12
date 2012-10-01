@@ -9,18 +9,18 @@
 // it.
 
 L4_Word_t get_task_id(L4_ThreadId_t threadid) {
-    // get first 9 bit of thread no
-    return (L4_ThreadNo(threadid) >> 9);
+    // get first 10 bit of thread no
+    return (L4_ThreadNo(threadid) >> 10);
 }
 
 
 L4_Word_t get_thread_count(L4_ThreadId_t threadid) {
-    // get last 9 bit of thread no
-    return (L4_ThreadNo(threadid) & (0xffffffff >> (32 - 9))); 
+    // get last 8 bit of thread no
+    return (L4_ThreadNo(threadid) & (0xffffffff >> (32 - 8))); 
 }
 
 L4_ThreadId_t create_thread_id(L4_Word_t task_id, L4_Word_t thread_count) {
-    return (L4_GlobalId(task_id << 9 | thread_count, 1));
+    return (L4_GlobalId(task_id << 10 | thread_count, 1));
 }
 
 
