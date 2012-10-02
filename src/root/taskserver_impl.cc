@@ -13,21 +13,26 @@ L4_ThreadId_t fileserverid = L4_nilthread;
 
 void taskserver_init() {
     /* Announce task service */
-    IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[TASK] Registering", &env);
-
+    log_printf("[TASK] Registering");
+    
     nameserver_register("/task");
-
-    IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[TASK] Registered...", &env);
+    
+    log_printf("blah 1");
+    log_printf("blah 2");
+    log_printf("blah 3");
+    log_printf("blah 4");
+    log_printf("blah 5");
     
     last_thread_id = pagerid;
-	memoryserverid = nameserver_lookup("/server/memory");
-    fileserverid = nameserver_lookup("/file");
-    
-    char logbuf[80];
-    snprintf(logbuf, sizeof(logbuf), "[TASK] Found memoryserver = %x, fileserver = %x\n", memoryserverid.raw, fileserverid.raw);
-    IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuf, &env);
-	
 
+    while (L4_IsNilThread(memoryserverid)) {
+        memoryserverid = nameserver_lookup("/server/memory");
+    }
+    while (L4_IsNilThread(fileserverid)) {
+        fileserverid = nameserver_lookup("/file");
+    }
+    
+    log_printf("[TASK] Found memoryserver = %x, fileserver = %x\n", memoryserverid.raw, fileserverid.raw);
 }
 
 L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  path, const path_t  cmdline, idl4_server_environment * _env) {
