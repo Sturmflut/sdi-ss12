@@ -11,7 +11,27 @@
 #include <sdi/types.h>
 #include <sdi/sdi.h>
 
+#include <if/iflogging.h>
 
-void LogMessage (const char* message) {
-	printf("[LOG] %s\n", message);
+int log_printf(const char *format, ...)
+{
+	int retval=0;
+	va_list ap;
+	char buf[256];
+
+	L4_ThreadId_t logger_id;
+	CORBA_Environment env(idl4_default_environment);
+
+    while (L4_IsNilThread(logger_id))
+        logger_id = nameserver_lookup("/server/logger");
+
+	va_start(ap, format); /* Initialize the va_list */
+
+	retval = vsnprintf(buf, sizeof(buf), format, ap); /* Call vprintf */
+	IF_LOGGING_LogMessage((CORBA_Object)logger_id, buf, &env);
+
+	va_end(ap); /* Cleanup the va_list */
+
+	return retval;
 }
+
