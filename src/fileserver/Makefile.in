@@ -16,7 +16,8 @@ PROGRAM_DEPS=	$(top_builddir)/lib/sdi/libsdi.a \
 
 SRCS=		$(ARCH)-crt0.S \
 		main.cc \
-		fileserver_idl.cc
+		fileserver_idl.cc \
+		fileserver_impl.cc
 
 IDLS=		fileserver.idl
 

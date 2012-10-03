@@ -6,7 +6,7 @@
 #include <l4io.h>
 
 #include <if/iflogging.h>
-
+#include "fileserver-server.h"
 #include "fileserver.h"
 
 L4_ThreadId_t loggerid;
