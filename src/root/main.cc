@@ -168,7 +168,7 @@ L4_Word_t load_elfimage (L4_BootRec_t* mod) {
 	}
 
     Elf32_Ehdr* hdr = (Elf32_Ehdr*)L4_Module_Start (mod);
-    Elf32_Phdr* phdr = valid_elf_header(hdr);
+    Elf32_Phdr* phdr = get_elf_phdr(hdr);
     
     if (phdr == NULL) {
         return NULL;
