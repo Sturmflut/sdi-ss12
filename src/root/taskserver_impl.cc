@@ -61,6 +61,8 @@ L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  p
 	char tbuff[1024];
 	buff._buffer = (CORBA_char*)&tbuff;
 	buff._maximum = 1024;
+
+    log_printf(loggerid, "[TASK] Loading file: %s\n", path);
     
 
     L4_Word_t res_read = IF_FILESERVER_read(fileserverid, file_id, 0, sizeof(Elf32_Ehdr) + sizeof(Elf32_Phdr), &buff, &env);
@@ -91,12 +93,8 @@ L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  p
         }
     }
 
-    L4_Msg_t msg;
-    L4_Clear (&msg);
-    L4_Append (&msg, (L4_Word_t)hdr->e_entry);
-    L4_Append (&msg, (0)); // TODO: we have to define a stack (use anon mapping) instead of using the stack in ia32-crt.S
-    L4_Load (&msg);
-    L4_Send (threadid);
+    // TODO: we have to define a stack (use anon mapping) instead of using the stack in ia32-crt.S
+    IF_MEMORYSERVER_startup((CORBA_Object)memoryserverid, &threadid, (L4_Word_t)hdr->e_entry, 0, &env);
     
     return threadid;
 }
