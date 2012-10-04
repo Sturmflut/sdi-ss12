@@ -14,17 +14,13 @@
 #include <if/iflogging.h>
 
 
-int console_printf(const char *format, ...)
+int console_printf(L4_ThreadId_t consoleid, const char *format, ...)
 {
 	int retval=0;
 	va_list ap;
 	char buf[256];
 
-	L4_ThreadId_t consoleid;
 	CORBA_Environment env(idl4_default_environment);
-
-        while (L4_IsNilThread(consoleid))
-                consoleid = nameserver_lookup("/server/console");
 
 	va_start(ap, format); /* Initialize the va_list */
 

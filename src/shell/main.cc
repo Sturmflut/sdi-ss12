@@ -30,10 +30,11 @@ void animation_loop()
 	/** Print logo */
 	while(1)
 	{
-		snprintf(buf, sizeof(buf), "Line %i\n", x);
+		//snprintf(buf, sizeof(buf), "Line %i\n", x);
+		console_printf(consoleid, "Line %i\n", x);
 		x++;
 
-		IF_CONSOLESERVER_putstring((CORBA_Object)consoleid, buf, SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE, &env);
+		//IF_CONSOLESERVER_putstring((CORBA_Object)consoleid, buf, SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE, &env);
 		sleep(1000);
 	}
 }

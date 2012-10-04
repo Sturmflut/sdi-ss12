@@ -35,7 +35,7 @@ L4_ThreadId_t nameserver_lookup(path_t path);
 
 
 // Consoleserver convenience API
-int console_printf(const char *format, ...);
+int console_printf(L4_ThreadId_t consoleid, const char *format, ...);
 
 #define bailout(S) L4_KDB_Enter( S )
 #define assert(X) if (!(X)) bailout( #X )
