@@ -21,10 +21,12 @@ unsigned char findOrCreateTaskEntry(L4_Word_t taskid)
 	
 	if(taskheader_entry == -1)
 	{
-		taskheader_entry = Taskheader_index;
-		Taskheader_index = Taskheader_index + 1;
-		taskList[Taskheader_index].pages_index = 0;
-		taskList[Taskheader_index].filemaps_index = 0;
+        if(Taskheader_index < NUM_T_ENTRY-1){
+            taskheader_entry = ++Taskheader_index;
+            taskList[Taskheader_index].pages_index = 0;
+            taskList[Taskheader_index].filemaps_index = 0;
+            taskList[Taskheader_index].taskid = taskid;
+        }
 	}
 	
 	return taskheader_entry;
@@ -82,11 +84,17 @@ L4_Word_t memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_Threa
 	//find taskheader entry
 	taskheader_entry = findOrCreateTaskEntry(get_task_id(*threadid));
 
+    if(taskheader_entry == -1){
+        log_printf(loggerid, "[MEMORY] Find or create task entry failed.\n");
+        return -1;
+    }
+
 	L4_Word_t virt_end_address = virt_start_address + size;
 	Taskheader_t *myTaskheader = &taskList[taskheader_entry];	
 
 	//check address overlappings 
 	if(isAddressConflict(myTaskheader, virt_start_address, virt_end_address)) {
+        log_printf(loggerid, "[MEMORY] Address conflict.\n");
 		return -1; // TODO define proper return values
     }
 
@@ -94,8 +102,7 @@ L4_Word_t memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_Threa
 	Page_entry_t pe = {NOT_YET_MAPPED, virt_start_address, size};
 	myTaskheader->pages[++(myTaskheader->pages_index)] = pe;
 
-	snprintf(logbuf, sizeof(logbuf), "[MEMORY] Memory mapped for threadid %i at %x\n", *threadid, virt_start_address);
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuf, &env);
+	log_printf(loggerid, "[MEMORY] Memory mapped for threadid %i at %x\n", *threadid, virt_start_address);
 
 	return 0;
 }
@@ -110,20 +117,25 @@ L4_Word_t  memoryserver_map_file_pages_real(CORBA_Object  _caller, const L4_Thre
 	//find taskheader entry
 	taskheader_entry = findOrCreateTaskEntry(get_task_id(*threadid));
 
+    if(taskheader_entry == -1){
+        log_printf(loggerid, "[MEMORY] Find or create task entry failed.\n");
+        return -1;
+    }
+
 	L4_Word_t virt_end_address = virt_start_address + size;
 	Taskheader_t *myTaskheader = &taskList[taskheader_entry];	
 
-	//check address overlappings 
-	if(isAddressConflict(myTaskheader, virt_start_address, virt_end_address)) {
-		return -1; // TODO define proper return values
-    	}
+    //check address overlappings 
+    if(isAddressConflict(myTaskheader, virt_start_address, virt_end_address)) {
+        log_printf(loggerid, "[MEMORY] Address conflict.\n");
+        return -1; // TODO define proper return values
+    }
 
 	//create new file entry for thread
 	File_entry_t fe = {virt_start_address, path, offset, size, realsize, L4_Nilpage};
 	myTaskheader->filemaps[++(myTaskheader->filemaps_index)] = fe;
 
-	snprintf(logbuf, sizeof(logbuf), "[MEMORY] Memory mapped for threadid %i at %x\n", *threadid, virt_start_address);
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuf, &env);
+	log_printf(loggerid, "[MEMORY] Memory mapped for threadid %i at %x\n", *threadid, virt_start_address);
 
 	return 0;
 
@@ -194,8 +206,15 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 		virt_address = pe->virt_address;
 	}
 	
-	//TODO:Do we have to ensure that the newpage is aligned?
-	L4_Fpage_t newpage = L4_Fpage(-1, size); 
+    //We consider alignment and adjust the size of requested page
+    //Filemappings: size * 2, anon pages: divide to 4k pages
+	L4_Fpage_t newpage;
+    if(pe == NULL){
+        newpage = L4_Fpage(-1, size*2);
+    }
+    else {
+        newpage = L4_Fpage(-1, size);
+    }
 	
 	/* Send mapitem, unless the recipient resides the same address space */
 	if (!L4_IsLocalId(_caller))
@@ -213,26 +232,26 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 			fe->page = newpage;
 
 			buf_t buff;
-			char tbuff[8];
+			char tbuff[FILE_READ_BUFFER];
 			buff._buffer = (CORBA_char*)&tbuff;
-			buff._maximum = 8;
+			buff._maximum = FILE_READ_BUFFER;
 			
 			L4_Word_t fileid = IF_FILESERVER_get_file_id(fileserverid, fe->path, &env);
 
-			int cnt = fe->realsize / 8;
+			int cnt = fe->realsize / FILE_READ_BUFFER;
 			for(int i=0; i<=cnt; i++)
 			{
-				L4_Word_t inMax = 8;
+				L4_Word_t inMax = FILE_READ_BUFFER;
 
-			 	if(8*i > fe->realsize)
+			 	if(FILE_READ_BUFFER*i > fe->realsize)
 				{
-					inMax = fe->realsize - 8*i;
+					inMax = fe->realsize - FILE_READ_BUFFER*i;
 				}
 					
-				L4_Word_t res_read = IF_FILESERVER_read(fileserverid, fileid, fe->offset + i*8, 8, &buff, &env);
+				L4_Word_t res_read = IF_FILESERVER_read(fileserverid, fileid, fe->offset + i*FILE_READ_BUFFER, FILE_READ_BUFFER, &buff, &env);
 				
 				//fill page	
-	    		memcpy((void*)(virt_address+ i*8), buff._buffer, inMax);
+	    		memcpy((void*)(virt_address+ i*FILE_READ_BUFFER), buff._buffer, inMax);
 			}
 			//fill out the rest with zero
 	    	memset((void*)(virt_address + fe->realsize),0 ,fe->size - fe->realsize);
@@ -241,9 +260,7 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 		{
 			pe->base_address = L4_Address(newpage);	
 		}
-		snprintf(logbuf, sizeof(logbuf), "[MEMORY] Handled page fault for threadid %i at %x\n", _caller, address);
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuf, &env);
-
+		log_printf(loggerid, "[MEMORY] Handled page fault for threadid %i at %x\n", _caller, address);
 
 	}
 
@@ -252,8 +269,7 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 
 void  memoryserver_startup_real(CORBA_Object  _caller, const L4_ThreadId_t * threadid, const L4_Word_t  ip, const L4_Word_t  sp, idl4_server_environment * _env)
 {
-	snprintf(logbuf, sizeof(logbuf), "[MEMORY] Starting thread %i ip %x sp %x\n", *threadid, ip, sp);
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuf, &env);
+	log_printf(loggerid, "[MEMORY] Starting thread %i ip %x sp %x\n", *threadid, ip, sp);
 
     	/* send startup IPC */
     	L4_Msg_t msg;
@@ -263,7 +279,7 @@ void  memoryserver_startup_real(CORBA_Object  _caller, const L4_ThreadId_t * thr
     	L4_Load (&msg);
     	L4_Send (*threadid);
 
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[MEMORY] Thread started", &env);
+	log_printf(loggerid, "[MEMORY] Thread started");
 }
 
 
