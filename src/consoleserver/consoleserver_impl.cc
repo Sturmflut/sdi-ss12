@@ -132,6 +132,13 @@ void putchar(int consolenum, char character, char attribute)
                                         backbuffer[consolenum][i] = backbuffer[consolenum][i + 80];
                         }
 
+			// Clear last line
+			for(int i = 0; i < 80; i++)
+			{
+				backbuffer[consolenum][(80*24) + i].character = ' ';
+				backbuffer[consolenum][(80*24) + i].attribute = 0;
+			}
+
                         if(consolenum == active_console)
                                 blit_backbuffer(active_console);
                 }
