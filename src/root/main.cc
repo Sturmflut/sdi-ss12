@@ -155,17 +155,40 @@ L4_BootRec_t* find_module_byname (char* name, const L4_BootInfo_t* bootinfo) {
   panic ("Modules not found");
 }
 
+
+
+/**
+  Bring in all module memory from sigma0
+*/
+void load_all_modules (const L4_BootInfo_t* bootinfo)
+{
+    L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
+
+    for (unsigned int i=0; i < L4_BootInfo_Entries (bootinfo); i++)
+    {
+	if((int)L4_Type (bootrec) == 1)
+        {
+                printf("Load %s\n", L4_Module_Cmdline (bootrec));
+            for (L4_Word_t addr = L4_Module_Start (bootrec);
+            addr < L4_Module_Start (bootrec) + L4_Module_Size (bootrec);
+            addr += pagesize)
+                if (!request_page (addr))
+                {
+                    panic ("could not get module pages from sigma0");
+                }
+        }
+
+
+	bootrec = L4_Next (bootrec);
+    }
+    
+}
+
+
 L4_Word_t load_elfimage (L4_BootRec_t* mod) {
     /* Check type of module */
     if (L4_Type (mod) != L4_BootInfo_Module)
 	panic ("Wrong module type");
-    /* Bring in the memory from sigma0 */
-    for (L4_Word_t addr = L4_Module_Start (mod); 
-	 addr < L4_Module_Start (mod) + L4_Module_Size (mod); 
-	 addr += pagesize) 
-	if (!request_page (addr)) {
-	    panic ("could not get module pages from sigma0");
-	}
 
     Elf32_Ehdr* hdr = (Elf32_Ehdr*)L4_Module_Start (mod);
     Elf32_Phdr* phdr = get_elf_phdr(hdr);
@@ -269,12 +292,14 @@ int main(void) {
 	// no bootinfo, no chance, no future. Break up
     	panic ("Was not able to get bootinfo");
     }
+
  
    /* Quick check */
     if (!L4_BootInfo_Valid ((void*)L4_BootInfo (L4_KernelInterface ()))) 
 	panic ("Bootinfo not found");
     list_modules ((L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
 
+    load_all_modules((L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
 
     /* Nameserver */
     start_task_byname("(cd)/sdios/nameserver",
