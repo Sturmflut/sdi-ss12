@@ -19,8 +19,9 @@
 #include "shell.h"
 
 
-L4_ThreadId_t loggerid;
-L4_ThreadId_t consoleid;
+L4_ThreadId_t loggerid = L4_nilthread;
+L4_ThreadId_t consoleid = L4_nilthread;
+L4_ThreadId_t fileid = L4_nilthread;
 CORBA_Environment env(idl4_default_environment);
 
 
@@ -28,8 +29,9 @@ char cmdbuf[256];
 
 
 builtin_cmd_t builtins[] = {
-	{ "uname", builtin_uname },
+	{ "cat", builtin_cat },
 	{ "ls", builtin_ls },
+	{ "uname", builtin_uname },
 	{ "\0", NULL }
 };
 
@@ -106,15 +108,17 @@ int main()
 {
 	CORBA_Environment env(idl4_default_environment);
 
-	loggerid = L4_nilthread;
-
+	// Resolve logger
 	while (L4_IsNilThread(loggerid))
 		loggerid = nameserver_lookup("/server/logger");
 
-
-	/* Print some stuff on the console */
+	// Resolve console
 	while (L4_IsNilThread(consoleid))
 		consoleid = nameserver_lookup("/server/console");
+
+	// Resolve fileserver
+	while (L4_IsNilThread(fileid))
+		fileid = nameserver_lookup("/file");
 
 	L4_ThreadId_t myself = L4_Myself();
 	IF_CONSOLESERVER_setactivethread((CORBA_Object)consoleid, 0, &myself, &env);

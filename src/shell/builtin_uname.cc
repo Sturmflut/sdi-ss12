@@ -1,10 +1,11 @@
 #include "shell.h"
 
-void print_usage()
+static void print_usage()
 {
-	console_printf(consoleid, "Usage: uname <options>\n");
-	console_printf(consoleid, "  -a  All\n");
-	console_printf(consoleid, "  -s  Kernel\n");
+	console_printf(consoleid, "  Kernel/OS info\n");
+	console_printf(consoleid, "  Usage: uname <options>\n");
+	console_printf(consoleid, "    -a  All\n");
+	console_printf(consoleid, "    -s  Kernel\n");
 }
 
 

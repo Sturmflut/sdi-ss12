@@ -54,12 +54,6 @@ int main()
 	while (L4_IsNilThread(fileid))
 		fileid = nameserver_lookup("/file");
 
-	/* Call fileserver */
-	IF_FILE_read((CORBA_Object) fileid, 0, 0, 0, &buf, &env);
-
-	snprintf(logbuf, sizeof(logbuf), "[TEST] %s Len %i\n", buf._buffer, buf._length);
-	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuf, &env);
-
 	/* testing get_file_id */
 	char *path = "/nameserver";
 	L4_Word_t res = IF_FILESERVER_get_file_id(fileid, path, &env);

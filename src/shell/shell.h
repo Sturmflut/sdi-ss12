@@ -9,10 +9,14 @@ typedef struct {
 } builtin_cmd_t;
 
 
+// Server Ids
 extern L4_ThreadId_t loggerid;
 extern L4_ThreadId_t consoleid;
+extern L4_ThreadId_t fileid;
 
 
+// Builtin commands
+void builtin_cat(char* cmdline);
 void builtin_ls(char* cmdline);
 void builtin_uname(char* cmdline);
 
