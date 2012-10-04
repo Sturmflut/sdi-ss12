@@ -16,7 +16,9 @@ PROGRAM_DEPS=	$(top_builddir)/lib/sdi/libsdi.a \
 		$(top_srcdir)/include/$(ARCH)/sdi.ld
 
 SRCS=		$(ARCH)-crt0.S \
-		main.cc
+		main.cc \
+		builtin_ls.cc \
+		builtin_uname.cc
 
 IDLS=           
 
