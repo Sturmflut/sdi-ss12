@@ -82,7 +82,7 @@ L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  p
     for (int i = 0; i < hdr->e_phnum; i++) {
         if (phdr[i].p_type == PT_LOAD) {
             log_printf(loggerid, "[TASK] Sending section: path = %s, offset = %p\nvaddr = %p, size = %d, realsize = %d",
-                    path, phdr[i].p_offset, phdr[i].p_vaddr, phdr[i].p_filesz + phdr[i].p_memsz, phdr[i].p_filesz);
+                    path, phdr[i].p_offset, phdr[i].p_vaddr, phdr[i].p_memsz, phdr[i].p_filesz);
 
             IF_MEMORYSERVER_map_file_pages(
                     (CORBA_Object)memoryserverid,
@@ -91,7 +91,7 @@ L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  p
                     path,
                     phdr[i].p_offset,
                     phdr[i].p_vaddr,
-                    phdr[i].p_filesz + phdr[i].p_memsz,
+                    phdr[i].p_memsz,
                     phdr[i].p_filesz,
                     &env);
         }

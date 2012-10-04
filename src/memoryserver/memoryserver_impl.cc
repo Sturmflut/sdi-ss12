@@ -151,12 +151,13 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 	File_entry_t *tmp_fe = NULL;
 	int taskListIndex = -1;
 
+
     log_printf(loggerid, "[MEMORY] Pagefault occured at %p. task_id=%d, thread_count=%d", 
             address,
             get_task_id(_caller),
             get_thread_count(_caller));
 
-	//search mapping
+    //search mapping
 	for(int i=0; i<Taskheader_index; i = i+1)
 	{
 		if(taskList[i].taskid == get_task_id(_caller))
@@ -226,10 +227,11 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 	if (!L4_IsLocalId(_caller))
 	{
         newpage = L4_Sigma0_GetPage(sigma0id, newpage);
-		
+
         idl4_fpage_set_base(page, virt_address + page_nr * 4096);
 		idl4_fpage_set_mode(page, IDL4_MODE_MAP);
-		idl4_fpage_set_page(page, newpage); idl4_fpage_set_permissions(page, IDL4_PERM_READ|IDL4_PERM_WRITE|IDL4_PERM_EXECUTE); }   
+		idl4_fpage_set_page(page, newpage); idl4_fpage_set_permissions(page, IDL4_PERM_READ|IDL4_PERM_WRITE|IDL4_PERM_EXECUTE); 
+    }   
     
 	if(!L4_IsNilFpage(newpage))
 	{	
@@ -242,17 +244,18 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
                 // region where we have to load file from file server
                 buf_t buff;
                 char tbuff[4096];
-                buff._buffer = (CORBA_char*)&tbuff;
+                buff._buffer = (CORBA_char*)tbuff;
                 buff._maximum = 4096;
 
                 L4_Word_t fileid = IF_FILESERVER_get_file_id(fileserverid, fe->path, &env);
 
                 L4_Word_t in_max = 4096;
 
-                if (address + 4096 >= virt_address + fe->realsize) {
+                if ((virt_address + page_nr * 4096) + 4096 >= virt_address + fe->realsize) {
                     // we are in the last block, so in_max has to be
                     // adjusted
-                    in_max = virt_address + fe->realsize - address;
+                    
+                    in_max = (virt_address + fe->realsize) - (virt_address + page_nr * 4096);
                 }
 
                 L4_Word_t res_read = IF_FILESERVER_read(
@@ -265,7 +268,7 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 
             } else if (address >= virt_address + fe->realsize && address < virt_address + fe->size) {
                 // region where we have to fill with zeros
-                memset((void *)L4_Address(newpage), 0, 4096);
+                memset((void *)L4_Address(newpage), 0, 4096); 
             }
 		} else {
             // TODO: now wrong, multiple pages per pe-mapping
