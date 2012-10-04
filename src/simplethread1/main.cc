@@ -97,7 +97,7 @@ int main()
 		consoleid = nameserver_lookup("/server/console");
 
 	L4_ThreadId_t myself = L4_Myself();
-	IF_CONSOLESERVER_setactivethread((CORBA_Object)consoleid, 0, &myself, &env);
+	IF_CONSOLESERVER_setactivethread((CORBA_Object)consoleid, 1, &myself, &env);
 
 
 	/* And now.... action! */
