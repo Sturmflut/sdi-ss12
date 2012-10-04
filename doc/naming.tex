@@ -4,4 +4,4 @@
 
 \lstinputlisting{../if/ifnameserver.idl}
 
-Verteilter Namensdienst, rekursive Auflösung durch den Client. Lookup() liefert bei Erfolg die Thread-ID des nächsten Servers in der Kette zurück, und \textit{remaining} enthält den Teil von \textit{path}, der vom aktuellen Server nicht aufgelöst werden konnte. Der Vorgang ist dann beendet, wenn Lookup \textit{L4\_nilthread} zurückliefert, oder wenn remaining \textit{leer} wird.
+Verteilter Namensdienst, rekursive Auflösung durch den Client. Lookup() liefert bei Erfolg die Thread-ID des nächsten Servers in der Kette zurück, und \textit{remaining} enthält den Teil von \textit{path}, der vom aktuellen Server nicht aufgelöst werden konnte. Der Vorgang ist dann beendet, wenn Lookup \textit{L4\_nilthread} zurückliefert, wenn Lookup die Id des aktuell befragten Servers zurückliefert, oder wenn remaining \textit{leer} wird.
