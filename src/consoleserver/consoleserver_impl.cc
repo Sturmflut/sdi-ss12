@@ -248,10 +248,6 @@ void  consoleserver_interrupt_impl()
 				keybuffers[active_console].keys[keybuffers[active_console].count].key = key;
 				keybuffers[active_console].keys[keybuffers[active_console].count].modifier = modifier_status;
 				keybuffers[active_console].count++;
-
-				// Debugging output
-			        snprintf(logbuf, sizeof(logbuf), "[KEYBOARD] Interrupt! %s + %c (%2x)", modstring, key, key);
-			        IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuf, &env);
 			}
 		}
 	}
@@ -385,7 +381,5 @@ void consoleserver_init()
 
         // Attach keyboard interrupt
         IF_TASKSERVER_attach_interrupt((CORBA_Object)taskserverid, 0x01, &env);
-
-        IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[KEYBOARDDRIVER] Registered Interrupt...", &env);
 }
 
