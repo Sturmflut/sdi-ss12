@@ -20,31 +20,28 @@
 L4_ThreadId_t consoleid = L4_nilthread;
 CORBA_Environment env(idl4_default_environment);
 
+char cmdbuf[256];
 
 
-void animation_loop()
+void print_banner()
 {
-	int x = 1;
-	char buf[30];
+	console_printf(consoleid, "SDI-Shell 0.1 beta\n\n");
+}
 
-	/** Print logo */
+
+void command_loop()
+{
 	while(1)
 	{
-		//snprintf(buf, sizeof(buf), "Line %i\n", x);
-		console_printf(consoleid, "Line %i\n", x);
-		x++;
-
-		//IF_CONSOLESERVER_putstring((CORBA_Object)consoleid, buf, SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE, &env);
-		sleep(1000);
+		console_printf(consoleid, "shell$ ");
+		console_readline(consoleid, cmdbuf, sizeof(cmdbuf)-1);
+		console_printf(consoleid, "\nCommand: '%s'\n\n", cmdbuf);
 	}
 }
 
 
 int main()
 {
-	L4_Msg_t msg;
-	L4_MsgTag_t tag;
-
 	char buf[256];
 
 	CORBA_Environment env(idl4_default_environment);
@@ -63,8 +60,10 @@ int main()
 	IF_CONSOLESERVER_setactivethread((CORBA_Object)consoleid, 1, &myself, &env);
 
 
+	print_banner();
+
 	/* And now.... action! */
-	animation_loop();
+	command_loop();
 
 	/* Spin forever */
 	while (42) ;
