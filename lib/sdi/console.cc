@@ -14,24 +14,67 @@
 #include <if/iflogging.h>
 
 
-int console_printf(const char *format, ...)
+static char current_color = SDI_CONSOLE_ATTRIBUTE_FGLIGHTGREY | SDI_CONSOLE_ATTRIBUTE_BGBLACK;
+
+
+int console_printf(L4_ThreadId_t consoleid, const char *format, ...)
 {
 	int retval=0;
 	va_list ap;
 	char buf[256];
 
-	L4_ThreadId_t consoleid;
 	CORBA_Environment env(idl4_default_environment);
-
-        while (L4_IsNilThread(consoleid))
-                consoleid = nameserver_lookup("/server/console");
 
 	va_start(ap, format); /* Initialize the va_list */
 
 	retval = vsnprintf(buf, sizeof(buf), format, ap); /* Call vprintf */
-	IF_CONSOLESERVER_putstring((CORBA_Object)consoleid, buf, SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE, &env);
+	IF_CONSOLESERVER_putstring((CORBA_Object)consoleid, buf, current_color, &env);
 
 	va_end(ap); /* Cleanup the va_list */
 
 	return retval;
+}
+
+
+char console_readchar(L4_ThreadId_t consoleid, char* modifier)
+{
+	char key;
+	CORBA_Environment env(idl4_default_environment);
+
+	IF_CONSOLESERVER_getKey((CORBA_Object)consoleid, &key, modifier, &env);
+}
+
+
+int console_readline(L4_ThreadId_t consoleid, char* buffer, L4_Word_t maxlen)
+{
+	L4_Word_t inlen = 0;
+	char key;
+	char modifier;
+	bool ret;
+	CORBA_Environment env(idl4_default_environment);
+
+	memset(buffer, 0, maxlen);
+
+	while(key != '\n' && key != 0x0d && inlen < maxlen)
+	{
+		ret = IF_CONSOLESERVER_getKey((CORBA_Object)consoleid, &key, &modifier, &env);
+
+		// Only accept valid keys
+		if(ret && key != '\t' && key != '\0' && key != '\r' && key != '\n')
+		{
+			buffer[inlen] = key;
+			inlen++;
+			IF_CONSOLESERVER_putchar((CORBA_Object)consoleid, key, current_color, &env);
+		}
+
+		sleep(100);
+	}
+
+	return inlen;
+}
+
+
+void console_setcolor(char color)
+{
+	current_color = color;
 }
