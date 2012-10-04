@@ -3,6 +3,9 @@ import "sdi/types.h";
 
 [uuid(IF_FILE_ID)]
 interface IF_FILE {
+	const L4_Word_t TYPE_FILE = 1;
+	const L4_Word_t TYPE_DIRECTORY = 2;
+
 	/**
 	  Resolve the file id for a given path
 

@@ -159,11 +159,16 @@ L4_Word_t  fileserver_get_file_size_impl(CORBA_Object  _caller, const path_t  pa
 
 L4_Word_t  fileserver_get_file_type_impl(CORBA_Object  _caller, const path_t  path, idl4_server_environment * _env)
 {
-  L4_Word_t  __retval = 0;
+	if(strlen(path) == 0)
+		return -1;
 
-  /* implementation of IF_FILE::get_file_type */
+	if(strncmp("/", path, strlen(path)) == 0)
+		return IF_FILE_TYPE_DIRECTORY;
 
-  return __retval;
+	if(fileserver_get_file_id_impl(_caller, path, _env) >= 0)
+		return IF_FILE_TYPE_FILE;
+
+	return -1;
 }
 
 
@@ -206,7 +211,7 @@ L4_Word_t fileserver_get_dir_size_impl(CORBA_Object  _caller, const path_t  path
 //  unsigned int type2_cnt = 0;
   unsigned int i;
   for (i=0; i < L4_BootInfo_Entries (bootinfo); i++) {
-	  if((int)L4_Type (bootrec) == 2) { //only records of type 2 are relevant
+	  if((int)L4_Type (bootrec) == 1) { //only records of type 2 are relevant
 		  ++__retval;
   	  }
       bootrec = L4_Next (bootrec);
