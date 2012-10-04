@@ -2,6 +2,7 @@
 #include <elf.h>
 #include <sdi/sdi.h>
 #include <if/iffileserver.h>
+#include <if/ifmemoryserver.h>
 
 #include "taskserver.h" 
 #include "root.h"
@@ -13,15 +14,9 @@ L4_ThreadId_t fileserverid = L4_nilthread;
 
 void taskserver_init() {
     /* Announce task service */
-    log_printf(loggerid,"[TASK] Registering");
-    
+    log_printf(loggerid, "[TASK] Registering");
     nameserver_register("/task");
-    
-    log_printf(loggerid,"blah 1");
-    log_printf(loggerid,"blah 2");
-    log_printf(loggerid,"blah 3");
-    log_printf(loggerid,"blah 4");
-    log_printf(loggerid,"blah 5");
+    log_printf(loggerid, "[TASK] Registered...");
     
     last_thread_id = pagerid;
 
@@ -32,23 +27,19 @@ void taskserver_init() {
         fileserverid = nameserver_lookup("/file");
     }
     
-    log_printf(loggerid,"[TASK] Found memoryserver = %x, fileserver = %x\n", memoryserverid.raw, fileserverid.raw);
+    log_printf(loggerid,"[TASK] Found memoryserver = %x, fileserver = %x", memoryserverid.raw, fileserverid.raw);
 }
 
 L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  path, const path_t  cmdline, idl4_server_environment * _env) {
     L4_ThreadId_t threadid = L4_GlobalId(L4_ThreadNo(last_thread_id) + 1, 1);
     last_thread_id = threadid;
     
-    // 1. Task erstellen (ThreadControl, SpaceControl)
-	//printf ("New task: %x\n", threadid.raw);
-
     /* First ThreadControl to setup initial thread */
     if (!L4_ThreadControl (threadid, threadid, L4_Myself (), L4_nilthread, (void*)-1UL)) {
         panic ("ThreadControl failed\n");
     }
 
     L4_Word_t dummy;
-
     if (!L4_SpaceControl (threadid, 0, L4_FpageLog2 (0xB0000000,14), 
                 utcbarea, L4_anythread, &dummy)) {
         panic ("SpaceControl failed\n");
@@ -60,40 +51,50 @@ L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  p
         panic ("ThreadControl failed\n");
     }
 
-     
-    // 2. Taskserver -> Fileserver: Datei laden und zwischspeichern
-    // (Fileserver gibt komplette ELF-Datei zurück)
+    // TODO: proper exception handling! (file not found, file invalid)
     L4_Word_t file_id = IF_FILESERVER_get_file_id(fileserverid, path, &env);
+    if (file_id == -1) {
+        panic("ELF file does not exist");
+    }
     
 	buf_t buff;
 	char tbuff[1024];
 	buff._buffer = (CORBA_char*)&tbuff;
 	buff._maximum = 1024;
+
+    log_printf(loggerid, "[TASK] Loading file: %s\n", path);
     
-    // TODO: check if phdr always lies directly behind ehdr
-    // TODO: proper exception handling! (file not found, file invalid)
 
     L4_Word_t res_read = IF_FILESERVER_read(fileserverid, file_id, 0, sizeof(Elf32_Ehdr) + sizeof(Elf32_Phdr), &buff, &env);
-
-    if (valid_elf_header((Elf32_Ehdr *)tbuff) == NULL) {
+    
+    Elf32_Ehdr *hdr = (Elf32_Ehdr *)tbuff;
+    Elf32_Phdr *phdr = get_elf_phdr(hdr);
+    if (phdr == NULL) {
         panic("Invalid ELF file");
-    } else {
-        printf("SUCCESS! ELF-File fine!\n");
     }
 
-    // 3. ELF-Datei dekodieren (siehe load_elfimage im Rootserver) =>
-    // man erhält eine Liste ("Sections") von (path, offset, size, realsize), "path"
-    // ist bei allen Elementen gleich.
-    
-    // 4. Für jedes Element der Sections-Liste einen
-    // map_file_pages-Aufruf an den Memory-Server senden => Sections
-    // sind im Task eingeblendet
-    
-    // 5. Eintrag in Task-Liste erstellen für neu erstellen Thread
-    
-    // 6. MemoryServer: StartupIPC senden
+    log_printf(loggerid, "[TASK] ELF decoded. Number of PHs: %d", hdr->e_phnum);
 
-    L4_ThreadId_t t;
-    return t;
+    for (int i = 0; i < hdr->e_phnum; i++) {
+        if (phdr[i].p_type == PT_LOAD) {
+            log_printf(loggerid, "[TASK] Sending section: path = %s, offset = %p\nvaddr = %p, size = %d, realsize = %d",
+                    path, phdr[i].p_offset, phdr[i].p_vaddr, phdr[i].p_filesz + phdr[i].p_memsz, phdr[i].p_filesz);
 
+            IF_MEMORYSERVER_map_file_pages(
+                    (CORBA_Object)memoryserverid,
+                    &threadid,
+                    0,
+                    path,
+                    phdr[i].p_offset,
+                    phdr[i].p_vaddr,
+                    phdr[i].p_filesz + phdr[i].p_memsz,
+                    phdr[i].p_filesz,
+                    &env);
+        }
+    }
+
+    // TODO: we have to define a stack (use anon mapping) instead of using the stack in ia32-crt.S
+    IF_MEMORYSERVER_startup((CORBA_Object)memoryserverid, &threadid, (L4_Word_t)hdr->e_entry, 0, &env);
+    
+    return threadid;
 }

@@ -24,19 +24,23 @@ char logbuf[80];
 
 int main(void)
 {
-         while (L4_IsNilThread(loggerid))
-                loggerid = nameserver_lookup("/server/logger");
+    while (L4_IsNilThread(loggerid)){
+        loggerid = nameserver_lookup("/server/logger");
+    }
 
-        IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[MEMORY] Registering", &env);
+    log_printf(loggerid, "[MEMORY] Registering");
 
-        nameserver_register("/server/memory");
+    nameserver_register("/server/memory");
 
-        IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[MEMORY] Registered...", &env);
+    log_printf(loggerid, "[MEMORY] Registered...");
 
-//initialize data
-Taskheader_index = 0;
-sigma0id = L4_Pager();
-fileserverid = nameserver_lookup("/file");
+    //initialize data
+    Taskheader_index = 0;
+    sigma0id = L4_Pager();
 
-	memoryserver_server();	
+    while (L4_IsNilThread(fileserverid)){
+        fileserverid = nameserver_lookup("/file");
+    }
+
+    memoryserver_server();	
 }

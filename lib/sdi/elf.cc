@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <elf.h>
 
-Elf32_Phdr* valid_elf_header(Elf32_Ehdr *hdr) {
+Elf32_Phdr* get_elf_phdr(Elf32_Ehdr *hdr) {
     Elf32_Phdr* phdr;
     if ((hdr->e_ident[EI_MAG0] !=  ELFMAG0) || 
             (hdr->e_ident[EI_MAG1] !=  ELFMAG1) || 
