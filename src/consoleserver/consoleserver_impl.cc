@@ -100,8 +100,19 @@ void putchar(int consolenum, char character, char attribute)
         if(consolenum < 0 || consolenum >= SDI_CONSOLESERVER_NUM_CONSOLES || character == '\0' || character == '\t')
                 return;
 
+	// Handle backspace
+	if(character == 0x7f)
+	{
+		cursors[consolenum].x--;
+		if(cursors[consolenum].x < 0)
+			cursors[consolenum].x = 0;
+		putcharat(consolenum, cursors[consolenum].x, cursors[consolenum].y, ' ', attribute);
+
+		return;
+	}
+
 	if(character != '\n')
-        putcharat(consolenum, cursors[consolenum].x, cursors[consolenum].y, character, attribute);
+	        putcharat(consolenum, cursors[consolenum].x, cursors[consolenum].y, character, attribute);
 
         cursors[consolenum].x++;
 
