@@ -11,3 +11,23 @@
 
 \end{itemize}
 
+\subsubsection{Directory listings}
+
+Code für die Auflistung des Inhalts von "/":
+
+\begin{lstlisting}
+path_t outbuf[];
+
+int entries = get_dir_size("/");
+
+for(int i = 0; i < entries; i++)
+{
+  get_dir_entry("/", i, outbuf);
+  
+  int type = get_file_type(outbuf);
+  int size = get_file_size(outbuf);
+  
+  printf("Entry: %s Type: %i size: %i\n", outbuf, size, type);
+}
+\end{lstlisting}
+

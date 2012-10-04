@@ -59,8 +59,21 @@ int console_readline(L4_ThreadId_t consoleid, char* buffer, L4_Word_t maxlen)
 	{
 		ret = IF_CONSOLESERVER_getKey((CORBA_Object)consoleid, &key, &modifier, &env);
 
+		// Handle backspace
+		if(key == 0x7f && modifier == 0)
+		{
+			if(inlen > 0)
+			{
+				buffer[inlen-1] = '\0';
+				inlen--;
+				IF_CONSOLESERVER_putchar((CORBA_Object)consoleid, 0x7f, current_color, &env);
+			}
+
+			continue;
+		}
+	
 		// Only accept valid keys
-		if(ret && key != '\t' && key != '\0' && key != '\r' && key != '\n')
+		if(ret && key != '\t' && key != '\0' && key != '\r' && key != '\n' && key != 0x7f)
 		{
 			buffer[inlen] = key;
 			inlen++;

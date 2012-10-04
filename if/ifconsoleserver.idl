@@ -3,14 +3,65 @@ import "sdi/types.h";
 
 [uuid(IF_CONSOLESERVER_ID)]
 interface IF_CONSOLESERVER {
+	/*
+	  Write the given character to the current cursor position, with automatic
+	  line break
+
+	  @param character Character
+	  @param attrib Color/Style attributes
+	 */
 	void putchar(in char character, in char attrib);
+
+	/*
+	  Write the given character to the given position, without automatic line break
+
+	  @param x X coordinate (< 80)
+	  @param y Y coordinate (<25)
+	  @param character Character
+	  @param attrib Color/Style attributes
+	 */
 	void putcharat(in int x, in int y, in char character, in char attrib);
 
+	/*
+	  Write the given string to the current cursor position, with automatic
+	  line break
+
+	  @param character Character
+	  @param attrib Color/Style attributes
+	 */
 	void putstring(in consolestring_t text, in char attrib);
+
+	/*
+	  Write the given string to the given position, without automatic line break
+
+	  @param x X coordinate (< 80)
+	  @param y Y coordinate (<25)
+	  @param character Character
+	  @param attrib Color/Style attributes
+	 */
 	void putstringat(in int x, in int y, in consolestring_t text, in char attrib);
 
+	/**
+	  Set the active thread for a given console
+
+	  @param console Console Id (< SDI_CONSOLESERVER_NUM_CONSOLES)
+	  @param thread Thread Id
+	*/
 	void setactivethread(in int console, in L4_ThreadId_t thread);
+
+	/**
+	  Get the number of the currently active id
+
+	  @return Console Id
+	*/
 	int getconsolenum();
 
+	/**
+	  Read a key from the keyboard buffer associated to the calling thread
+
+	  @param key Character
+	  @param modifier Modifiers
+	  @return True if there was a key in the keyboard buffer, false if not
+	*/
 	boolean getKey(out char key, out char modifier);
 };
