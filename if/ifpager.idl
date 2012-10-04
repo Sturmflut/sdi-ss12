@@ -3,6 +3,14 @@ import "sdi/types.h";
 
 [uuid(IF_PAGER_ID)]
 interface IF_PAGER {
+        /**
+          Page fault handler
+
+          @param address Address space Id
+          @param ip Faulting instruction pointer
+          @param privileges faulting privileges
+          @param page Returned Fpage
+        */
 	[kernelmsg(idl4::pagefault)]
 	void    pagefault(in L4_Word_t address,
                       in L4_Word_t ip,

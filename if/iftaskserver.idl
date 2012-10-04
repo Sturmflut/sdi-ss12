@@ -6,15 +6,55 @@ import "sdi/types.h";
 
 [uuid(IF_TASKSERVER_ID)]
 interface IF_TASKSERVER : IF_NAMING, IF_FILE {
-    L4_ThreadId_t create_task(in path_t path, in path_t cmdline);
-    L4_ThreadId_t create_thread(in L4_Word_t ip, in L4_Word_t sp);
+	/**
+	  Start the binary at the given path as a new task
+
+	  @param path Binary path
+	  @param cmdline Command line
+	*/
+	L4_ThreadId_t create_task(in path_t path, in path_t cmdline);
+
+	/**
+	  Create a new thread inside the address space of the caller
+		
+	  @param ip Instruction Pointer
+	  @param sp Stack Pointer
+	*/
+	L4_ThreadId_t create_thread(in L4_Word_t ip, in L4_Word_t sp);
         
-    void kill_task(in L4_ThreadId_t task_id);
-    void kill_thread(in L4_ThreadId_t thread_id);
+	/**
+	  Kill the given task
+
+	  @param task_id Task Id
+	*/
+	void kill_task(in L4_ThreadId_t task_id);
+
+	/**
+	  Kill the given thread
+
+	  @param thread_id Thread Id
+	*/
+	void kill_thread(in L4_ThreadId_t thread_id);
     
-    void set_priority(in L4_ThreadId_t thread_id, in L4_Word_t prio);
+	/**
+	  Set the priority of the given thread
 
-    void destroyed(in L4_ThreadId_t thread_id);
+	  @param thread_id Thread id
+	  @param New priority
+	*/
+	void set_priority(in L4_ThreadId_t thread_id, in L4_Word_t prio);
 
-    void attach_interrupt(in L4_Word_t int_num);
+	/**
+	  Called by other servers if the given thread id generated a non-
+	  recoverable fault
+
+	  @param thread_id Thread id
+	*/
+	void destroyed(in L4_ThreadId_t thread_id);
+
+	/**
+	  Register the calling thread as the handler for the given hardware
+	   interrupt
+	*/
+	void attach_interrupt(in L4_Word_t int_num);
 };
