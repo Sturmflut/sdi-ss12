@@ -13,19 +13,19 @@ unsigned char findOrCreateTaskEntry(L4_Word_t taskid)
 {
 	char taskheader_entry = -1;
 
-	for(int i = 0; i < NUM_T_ENTRY; i = i+1)
+	for(int i = 0; i < Taskheader_index; i = i+1)
 	{
 		if(taskList[i].taskid == taskid)
 			taskheader_entry = i;
-	}	
+	}
 	
 	if(taskheader_entry == -1)
 	{
-        if(Taskheader_index < NUM_T_ENTRY-1){
-            taskheader_entry = ++Taskheader_index;
-            taskList[Taskheader_index].pages_index = 0;
-            taskList[Taskheader_index].filemaps_index = 0;
-            taskList[Taskheader_index].taskid = taskid;
+        if(Taskheader_index < NUM_T_ENTRY) {
+            taskheader_entry = Taskheader_index++;
+            taskList[taskheader_entry].pages_index = 0;
+            taskList[taskheader_entry].filemaps_index = 0;
+            taskList[taskheader_entry].taskid = taskid;
         }
 	}
 	
@@ -100,7 +100,7 @@ L4_Word_t memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_Threa
 
 	//create new page entry for thread
 	Page_entry_t pe = {NOT_YET_MAPPED, virt_start_address, size};
-	myTaskheader->pages[++(myTaskheader->pages_index)] = pe;
+	myTaskheader->pages[(myTaskheader->pages_index)++] = pe;
 
 	log_printf(loggerid, "[MEMORY] Memory mapped for threadid %i at %x\n", *threadid, virt_start_address);
 
@@ -116,6 +116,8 @@ L4_Word_t  memoryserver_map_file_pages_real(CORBA_Object  _caller, const L4_Thre
 
 	//find taskheader entry
 	taskheader_entry = findOrCreateTaskEntry(get_task_id(*threadid));
+
+    log_printf(loggerid, "Creating mapping for task_id=%d,thread_count=%d", get_task_id(*threadid), get_thread_count(*threadid));
 
     if(taskheader_entry == -1){
         log_printf(loggerid, "[MEMORY] Find or create task entry failed.\n");
@@ -133,7 +135,7 @@ L4_Word_t  memoryserver_map_file_pages_real(CORBA_Object  _caller, const L4_Thre
 
 	//create new file entry for thread
 	File_entry_t fe = {virt_start_address, path, offset, size, realsize, L4_Nilpage};
-	myTaskheader->filemaps[++(myTaskheader->filemaps_index)] = fe;
+	myTaskheader->filemaps[(myTaskheader->filemaps_index)++] = fe;
 
 	log_printf(loggerid, "[MEMORY] Memory mapped for threadid %i at %x\n", *threadid, virt_start_address);
 
@@ -149,6 +151,9 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 	File_entry_t *tmp_fe = NULL;
 	int taskListIndex = -1;
 
+    log_printf(loggerid, "[MEMORY] Pagefault occured at %p", address);
+    log_printf(loggerid, "PF handler: task_id=%d,thread_count=%d", get_task_id(_caller), get_thread_count(_caller));
+
 	//search mapping
 	for(int i=0; i<Taskheader_index; i = i+1)
 	{
@@ -159,15 +164,17 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 		}
 	}
 
-	if(taskListIndex == -1)
+	if(taskListIndex == -1) {
+        panic("PF: task not found");        
 		return;
+    }
 
 	for(int i=0; i<taskList[taskListIndex].pages_index; i = i+1)
 	{
 		tmp_pe = &(taskList[taskListIndex].pages[i]);
 
-		if(address >= pe->virt_address &&
-			address <= (pe->virt_address + pe->size))
+		if(address >= tmp_pe->virt_address &&
+			address <= (tmp_pe->virt_address + tmp_pe->size))
 		{
 			pe = tmp_pe;
 			break;
@@ -180,17 +187,21 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 		{
 			tmp_fe = &(taskList[taskListIndex].filemaps[i]);
 
-			if(address >= fe->virt_address &&
-				address <= (fe->virt_address + fe->size))
+			if(address >= tmp_fe->virt_address &&
+				address <= (tmp_fe->virt_address + tmp_fe->size))
 			{
+                log_printf(loggerid, ">>>>>> PF handler: found %x", tmp_fe->virt_address);
 				fe = tmp_fe;
 				break;
 			}
 		}
 	}
 
-	if(pe == NULL && fe == NULL)
-		return;
+	if(pe == NULL && fe == NULL) {
+        /// TODO: kill thread instead
+		panic("PF: Couldn't find mapping");
+        return;
+    }
 
 	L4_Word_t size;
 	L4_Word_t virt_address;
@@ -205,7 +216,9 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 		size = pe->size;
 		virt_address = pe->virt_address;
 	}
-	
+    
+
+    log_printf(loggerid, "before newpage");
     //We consider alignment and adjust the size of requested page
     //Filemappings: size * 2, anon pages: divide to 4k pages
 	L4_Fpage_t newpage;
@@ -216,15 +229,22 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
         newpage = L4_Fpage(-1, size);
     }
 	
+    log_printf(loggerid, "after newpage");
+
 	/* Send mapitem, unless the recipient resides the same address space */
 	if (!L4_IsLocalId(_caller))
 	{
+        log_printf(loggerid, "before set_base");
 		idl4_fpage_set_base(page, virt_address);
 		idl4_fpage_set_mode(page, IDL4_MODE_MAP);
-		idl4_fpage_set_page(page, L4_Sigma0_GetPage(sigma0id, newpage)); 
-		idl4_fpage_set_permissions(page, privileges); // or IDL4_PERM_READ|IDL4_PERM_WRITE|IDL4_PERM_EXECUTE
-	}
+        log_printf(loggerid, "before sigma0 get, %x", sigma0id);
+        newpage = L4_Sigma0_GetPage(sigma0id, newpage);
+		idl4_fpage_set_page(page, newpage); 
+        log_printf(loggerid, "after sigma0 get");
 
+		idl4_fpage_set_permissions(page, privileges); // or IDL4_PERM_READ|IDL4_PERM_WRITE|IDL4_PERM_EXECUTE
+	}   
+    
 	if(!L4_IsNilFpage(newpage))
 	{	
 		if(pe == NULL)
@@ -237,32 +257,49 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 			buff._maximum = FILE_READ_BUFFER;
 			
 			L4_Word_t fileid = IF_FILESERVER_get_file_id(fileserverid, fe->path, &env);
+            // TODO: on memcpy/memset: new page is aligned,
+            // virt_start_address not. so the program data might land
+            // before the virt_start_address in the task adress space.
+            
+            // TODO: we also do not know whether the new page will be
+            // aligned to the upper or lower boundary.
+            
+            log_printf(loggerid, "MEMORY: starting reading file");
 
 			int cnt = fe->realsize / FILE_READ_BUFFER;
 			for(int i=0; i<=cnt; i++)
 			{
 				L4_Word_t inMax = FILE_READ_BUFFER;
-
-			 	if(FILE_READ_BUFFER*i > fe->realsize)
+                
+                // the last chunk is only partially filled with data
+			 	if (i == cnt)
 				{
 					inMax = fe->realsize - FILE_READ_BUFFER*i;
 				}
 					
-				L4_Word_t res_read = IF_FILESERVER_read(fileserverid, fileid, fe->offset + i*FILE_READ_BUFFER, FILE_READ_BUFFER, &buff, &env);
+				L4_Word_t res_read = IF_FILESERVER_read(fileserverid, fileid, fe->offset + i*FILE_READ_BUFFER, inMax, &buff, &env);
 				
+                log_printf(loggerid, "MEMORY: memcpy: dest=%p", L4_Address(newpage));
 				//fill page	
-	    		memcpy((void*)(virt_address+ i*FILE_READ_BUFFER), buff._buffer, inMax);
+	    		memcpy((void*)(L4_Address(newpage) + i*FILE_READ_BUFFER), buff._buffer, inMax);
 			}
+
+
+            log_printf(loggerid, "MEMORY: memset");
 			//fill out the rest with zero
-	    	memset((void*)(virt_address + fe->realsize),0 ,fe->size - fe->realsize);
+	    	memset((void*)(L4_Address(newpage) + fe->realsize), 0, fe->size - fe->realsize);
 		}
 		else
 		{
 			pe->base_address = L4_Address(newpage);	
 		}
 		log_printf(loggerid, "[MEMORY] Handled page fault for threadid %i at %x\n", _caller, address);
+	} else {
+        // TODO: kill task instead
+        panic("PF handler: new page is a nil page!");
+        return;
+    }
 
-	}
 
 	return;
 }

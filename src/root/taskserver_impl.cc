@@ -8,7 +8,11 @@
 #include "root.h"
 
 
+L4_Word_t last_task_id;
+
 L4_ThreadId_t last_thread_id = L4_nilthread;
+
+
 L4_ThreadId_t memoryserverid = L4_nilthread;
 L4_ThreadId_t fileserverid = L4_nilthread;
 
@@ -18,8 +22,9 @@ void taskserver_init() {
     nameserver_register("/task");
     log_printf(loggerid, "[TASK] Registered...");
     
-    last_thread_id = pagerid;
-
+    // arbitrary first task_id (should be high enough to not collide)
+    last_task_id = 1;
+    
     while (L4_IsNilThread(memoryserverid)) {
         memoryserverid = nameserver_lookup("/server/memory");
     }
@@ -31,8 +36,7 @@ void taskserver_init() {
 }
 
 L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  path, const path_t  cmdline, idl4_server_environment * _env) {
-    L4_ThreadId_t threadid = L4_GlobalId(L4_ThreadNo(last_thread_id) + 1, 1);
-    last_thread_id = threadid;
+    L4_ThreadId_t threadid = (create_thread_id(last_task_id++, 0));
     
     /* First ThreadControl to setup initial thread */
     if (!L4_ThreadControl (threadid, threadid, L4_Myself (), L4_nilthread, (void*)-1UL)) {

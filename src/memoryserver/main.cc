@@ -36,7 +36,9 @@ int main(void)
 
     //initialize data
     Taskheader_index = 0;
-    sigma0id = L4_Pager();
+    sigma0id = L4_GlobalId(48, 1); // TODO: hard coded for now
+
+    log_printf(loggerid, "[MEMORY] sigma0id = %x", sigma0id);
 
     while (L4_IsNilThread(fileserverid)){
         fileserverid = nameserver_lookup("/file");

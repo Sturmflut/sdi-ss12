@@ -5,7 +5,7 @@
 
 #define NUM_T_ENTRY 30
 #define NOT_YET_MAPPED -1
-#define FILE_READ_BUFFER 8
+#define FILE_READ_BUFFER 1024
 
 /*Data structures for memory server */
 
@@ -34,6 +34,7 @@ typedef struct{
 
 extern Taskheader_t taskList[NUM_T_ENTRY];
 
+// points to the first free entry in taskList
 extern unsigned char Taskheader_index;
 
 extern L4_ThreadId_t loggerid;
