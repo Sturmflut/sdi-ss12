@@ -360,6 +360,8 @@ CORBA_boolean consoleserver_getKey_impl(CORBA_Object  _caller, CORBA_char * key,
 		return true;
 	}
 
+	*key ='\0';
+	*modifier = 0;
 	return false;
 }
 

@@ -8,8 +8,11 @@ interface IF_MEMORYSERVER {
 
 	L4_Word_t map_anon_pages(in L4_ThreadId_t threadid, in L4_Word_t type,
 		in L4_Word_t virt_start_address, in L4_Word_t size);
-    
-    // use type=0 for now
+
+    // type: use type=0 for now
+    // size: size of whole section
+    // realsize: size of file content
+    // Thus: size >= realsize
 	L4_Word_t map_file_pages(in L4_ThreadId_t threadid, in L4_Word_t type,
 		 in path_t path, in L4_Word_t offset, in L4_Word_t virt_start_address,
 		 in L4_Word_t size, in L4_Word_t realsize);
