@@ -22,7 +22,7 @@ IDL4_INLINE void  logger_LogMessage_implementation(CORBA_Object  _caller, const 
 
 {
   /* implementation of IF_LOGGING::LogMessage */
-  printf("[LOGGER] %s\n", message);
+  printf("[LOG] [%x] %s\n", _caller.raw, message);
   
   return;
 }
