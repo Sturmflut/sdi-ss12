@@ -233,7 +233,7 @@ L4_Word_t fileserver_get_dir_size_impl(CORBA_Object  _caller, const path_t  path
 
 CORBA_boolean  fileserver_get_dir_entry_impl(CORBA_Object  _caller, const path_t  path, const L4_Word_t  entry, buf_t * buf, idl4_server_environment * _env)
 {
-  CORBA_boolean  __retval = false;
+  buf->_length = 0;
   L4_BootInfo_t* bootinfo = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
   L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
   unsigned int valid_entries = fileserver_get_dir_size_impl(_caller, path, _env);
@@ -250,13 +250,12 @@ CORBA_boolean  fileserver_get_dir_entry_impl(CORBA_Object  _caller, const path_t
 //				  strncpy(*buf, cmdline, strlen(cmdline));
 				  buf->_length = strlen(cmdline);
 				  memcpy( buf->_buffer, cmdline, buf->_length);
-				  __retval = true;
-				  break;
+				  return 1;
 			  }
 			  ++type1_cnt;
 		  }
 		  bootrec = L4_Next (bootrec);
 	  }
   }
-  return __retval;
+  return 0;
 }

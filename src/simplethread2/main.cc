@@ -109,12 +109,23 @@ int main()
 
 	/* get_dir_entry */
 	buf_t dir_entry_buffer;
+	strncpy(tbuff, "", 50);
 	dir_entry_buffer._buffer = (CORBA_char*)&tbuff;
 	dir_entry_buffer._maximum = 50;
 
-	bool result = IF_FILE_get_dir_entry(fileid, "/", 3, &dir_entry_buffer, &env);
-	snprintf(logbuff, sizeof(logbuff), "[TEST FILESERVER get_dir_entry nmb '3' of '/'] = (result: '%d') : \n", result, dir_entry_buffer._buffer);
+	L4_Word_t result = IF_FILE_get_dir_entry(fileid, "/", 1, &dir_entry_buffer, &env);
+	snprintf(logbuff, sizeof(logbuff), "[TEST FILESERVER get_dir_entry nmb '1' of '/'] = '%s'\n (result: '%i')", dir_entry_buffer._buffer, result);
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuff, &env);
+
+	buf_t dir_entry_buffer2;
+	strncpy(tbuff, "", 50);
+	dir_entry_buffer2._buffer = (CORBA_char*)&tbuff;
+	dir_entry_buffer2._maximum = 50;
+
+	result = IF_FILE_get_dir_entry(fileid, "/", 9, &dir_entry_buffer2, &env);
+	snprintf(logbuff, sizeof(logbuff), "[TEST FILESERVER get_dir_entry nmb '9' of '/'] = '%s'\n (result: '%i')", dir_entry_buffer2._buffer, result);
+	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuff, &env);
+
 	/* Spin forever */
 	while (42) ;
 
