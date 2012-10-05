@@ -25,7 +25,7 @@ L4_ThreadId_t  fileserver_Lookup_impl(CORBA_Object  _caller, const path_t  path,
 /**
  * Find last_occurrence of chr from given str - e.g. '/'
  */
-unsigned int find_last_occurrence_of_chr(char* str, const char ch)
+unsigned int find_last_of(char* str, const char ch)
 {
     unsigned int last_occurrence = 0;
     char *pch;
@@ -55,7 +55,7 @@ L4_Word_t  fileserver_get_file_id_impl(CORBA_Object  _caller, const path_t  path
 		if (strncmp(path, "/", 1) == 0)
 			mpath = path+1;
 
-		unsigned int last_occurrence = find_last_occurrence_of_chr(cmdline, '/');
+		unsigned int last_occurrence = find_last_of(cmdline, '/');
 		if (last_occurrence != 0)		//'/' found; now cut string
 			cmdline+=last_occurrence;
 
@@ -233,7 +233,7 @@ L4_Word_t fileserver_get_dir_size_impl(CORBA_Object  _caller, const path_t  path
 
 CORBA_boolean  fileserver_get_dir_entry_impl(CORBA_Object  _caller, const path_t  path, const L4_Word_t  entry, buf_t * buf, idl4_server_environment * _env)
 {
-  CORBA_boolean  __retval = 0;
+  CORBA_boolean  __retval = false;
   L4_BootInfo_t* bootinfo = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
   L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
   unsigned int valid_entries = fileserver_get_dir_size_impl(_caller, path, _env);
@@ -243,20 +243,15 @@ CORBA_boolean  fileserver_get_dir_entry_impl(CORBA_Object  _caller, const path_t
 		  if((int)L4_Type (bootrec) == 1) {
 			  if (entry == type1_cnt) {
 				  char *cmdline = L4_Module_Cmdline(bootrec);
-				  unsigned int found_at = find_last_occurrence_of_chr(cmdline, '/');
+				  unsigned int found_at = find_last_of(cmdline, '/');
 				  if (found_at != 0) {		//'/' found; now cut string
 				      cmdline+=found_at;
 				  }
-//				  buf->_length = strlen(cmdline);
-//				  memcpy( buf->_buffer, cmdline, buf->_length);
-				  printf("Before strncpy %s\n", buf->_buffer);
 //				  strncpy(*buf, cmdline, strlen(cmdline));
 				  buf->_length = strlen(cmdline);
 				  memcpy( buf->_buffer, cmdline, buf->_length);
-				  printf("After strncpy %s\n", buf->_buffer);
-
-
-				  return 1;
+				  __retval = true;
+				  break;
 			  }
 			  ++type1_cnt;
 		  }
