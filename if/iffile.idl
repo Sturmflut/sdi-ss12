@@ -93,5 +93,5 @@ interface IF_FILE {
 	  @param entry Entry id (< get_dir_size)
 	  @param buf Entry name buffer
 	*/
-	boolean get_dir_entry(in path_t path, in L4_Word_t entry, [prealloc] out path_t buf);
+	boolean get_dir_entry(in path_t path, in L4_Word_t entry, [prealloc] out buf_t buf);
 };
