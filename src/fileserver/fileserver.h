@@ -41,7 +41,7 @@ extern CORBA_boolean  fileserver_rmdir_impl(CORBA_Object  _caller, const path_t 
 
 extern L4_Word_t  fileserver_get_dir_size_impl(CORBA_Object  _caller, const path_t  path, idl4_server_environment * _env);
 
-extern CORBA_boolean fileserver_get_dir_entry_impl(CORBA_Object  _caller, const path_t  path, const L4_Word_t  entry, path_t * buf, idl4_server_environment * _env);
+extern CORBA_boolean fileserver_get_dir_entry_impl(CORBA_Object  _caller, const path_t  path, const L4_Word_t  entry, buf_t * buf, idl4_server_environment * _env);
 
 
 void  fileserver_server(void);

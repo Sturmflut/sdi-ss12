@@ -106,7 +106,7 @@ IDL4_INLINE L4_Word_t  fileserver_get_dir_size_implementation(CORBA_Object  _cal
 IDL4_PUBLISH_FILESERVER_GET_DIR_SIZE(fileserver_get_dir_size_implementation);
 
 
-IDL4_INLINE CORBA_boolean  fileserver_get_dir_entry_implementation(CORBA_Object  _caller, const path_t  path, const L4_Word_t  entry, path_t * buf, idl4_server_environment * _env)
+IDL4_INLINE CORBA_boolean  fileserver_get_dir_entry_implementation(CORBA_Object  _caller, const path_t  path, const L4_Word_t  entry, buf_t * buf, idl4_server_environment * _env)
 
 {
     return fileserver_get_dir_entry_impl(_caller, path, entry, buf, _env);

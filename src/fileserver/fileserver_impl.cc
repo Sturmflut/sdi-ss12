@@ -14,8 +14,30 @@ L4_ThreadId_t  fileserver_Lookup_impl(CORBA_Object  _caller, const path_t  path,
   /* implementation of IF_NAMING::Lookup */
 
   return __retval;
+
+//	L4_ThreadId_t res = L4_GlobalId ( L4_ThreadNo (L4_Myself ()), 1);
+//		printf("[TEST FILESERVER lookup of '%s'] = %lx ", path, res);
+//
+//		return  res;
 }
 
+
+/**
+ * Find last_occurrence of chr from given str - e.g. '/'
+ */
+unsigned int find_last_occurrence_of_chr(char* str, const char ch)
+{
+    unsigned int last_occurrence = 0;
+    char *pch;
+    pch=strchr(str,ch);
+
+    while (pch!=NULL)
+    {
+        last_occurrence = pch-str+1;
+        pch=strchr(pch+1,ch);
+    }
+    return last_occurrence;
+}
 
 
 L4_Word_t  fileserver_get_file_id_impl(CORBA_Object  _caller, const path_t  path, idl4_server_environment * _env)
@@ -33,18 +55,7 @@ L4_Word_t  fileserver_get_file_id_impl(CORBA_Object  _caller, const path_t  path
 		if (strncmp(path, "/", 1) == 0)
 			mpath = path+1;
 
-		/**
-		 * Find last_occurrence of '/' - character
-		 */
-		char *pch;
-		pch=strchr(cmdline,'/');
-		unsigned int last_occurrence = 0;
-		while (pch!=NULL)
-		{
-			last_occurrence = pch-cmdline+1;
-//    			printf ("found at %d\n",last_occurrence);
-			pch=strchr(pch+1,'/');
-		}
+		unsigned int last_occurrence = find_last_occurrence_of_chr(cmdline, '/');
 		if (last_occurrence != 0)		//'/' found; now cut string
 			cmdline+=last_occurrence;
 
@@ -208,10 +219,10 @@ L4_Word_t fileserver_get_dir_size_impl(CORBA_Object  _caller, const path_t  path
 
   L4_BootInfo_t* bootinfo = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
   L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
-//  unsigned int type2_cnt = 0;
+
   unsigned int i;
   for (i=0; i < L4_BootInfo_Entries (bootinfo); i++) {
-	  if((int)L4_Type (bootrec) == 1) { //only records of type 2 are relevant
+	  if((int)L4_Type (bootrec) == 1) { //only records of type 1 are relevant
 		  ++__retval;
   	  }
       bootrec = L4_Next (bootrec);
@@ -220,13 +231,37 @@ L4_Word_t fileserver_get_dir_size_impl(CORBA_Object  _caller, const path_t  path
 }
 
 
-CORBA_boolean  fileserver_get_dir_entry_impl(CORBA_Object  _caller, const path_t  path, const L4_Word_t  entry, path_t * buf, idl4_server_environment * _env)
+CORBA_boolean  fileserver_get_dir_entry_impl(CORBA_Object  _caller, const path_t  path, const L4_Word_t  entry, buf_t * buf, idl4_server_environment * _env)
 {
   CORBA_boolean  __retval = 0;
   L4_BootInfo_t* bootinfo = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
-  if (entry > L4_BootInfo_Entries (bootinfo)) {
+  L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
+  unsigned int valid_entries = fileserver_get_dir_size_impl(_caller, path, _env);
+  if (entry >= 0 && entry < valid_entries) {	//check range
+	  unsigned int type1_cnt = 0;
+	  for (unsigned int i=0; i < valid_entries; i++) {
+		  if((int)L4_Type (bootrec) == 1) {
+			  if (entry == type1_cnt) {
+				  char *cmdline = L4_Module_Cmdline(bootrec);
+				  unsigned int found_at = find_last_occurrence_of_chr(cmdline, '/');
+				  if (found_at != 0) {		//'/' found; now cut string
+				      cmdline+=found_at;
+				  }
+//				  buf->_length = strlen(cmdline);
+//				  memcpy( buf->_buffer, cmdline, buf->_length);
+				  printf("Before strncpy %s\n", buf->_buffer);
+//				  strncpy(*buf, cmdline, strlen(cmdline));
+				  buf->_length = strlen(cmdline);
+				  memcpy( buf->_buffer, cmdline, buf->_length);
+				  printf("After strncpy %s\n", buf->_buffer);
 
+
+				  return 1;
+			  }
+			  ++type1_cnt;
+		  }
+		  bootrec = L4_Next (bootrec);
+	  }
   }
-
   return __retval;
 }
