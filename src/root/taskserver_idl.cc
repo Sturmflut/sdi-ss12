@@ -210,7 +210,7 @@ IDL4_INLINE L4_Word_t  taskserver_get_dir_size_implementation(CORBA_Object  _cal
 
 IDL4_PUBLISH_TASKSERVER_GET_DIR_SIZE(taskserver_get_dir_size_implementation);
 
-IDL4_INLINE CORBA_boolean  taskserver_get_dir_entry_implementation(CORBA_Object  _caller, const path_t  path, const L4_Word_t  entry, path_t * buf, idl4_server_environment * _env)
+IDL4_INLINE CORBA_boolean  taskserver_get_dir_entry_implementation(CORBA_Object  _caller, const path_t  path, const L4_Word_t  entry, buf_t * buf, idl4_server_environment * _env)
 
 {
   CORBA_boolean  __retval = 0;
