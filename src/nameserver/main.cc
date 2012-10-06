@@ -82,7 +82,7 @@ IDL4_INLINE L4_ThreadId_t  nameserver_Lookup_implementation(CORBA_Object  _calle
         /* Is someone looking for me? */
         if(strlen(path) == 0 || (strlen(path) == 1 && path[0] == '/'))
         {
-                *remaining = '\0';
+//                *remaining = '\0';
                 return L4_Myself();
         }
 

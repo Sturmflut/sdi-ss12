@@ -30,6 +30,7 @@ char cmdbuf[256];
 
 builtin_cmd_t builtins[] = {
 	{ "cat", builtin_cat },
+	{ "lookup", builtin_lookup },
 	{ "ls", builtin_ls },
 	{ "uname", builtin_uname },
 	{ "\0", NULL }

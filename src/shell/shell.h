@@ -17,6 +17,7 @@ extern L4_ThreadId_t fileid;
 
 // Builtin commands
 void builtin_cat(char* cmdline);
+void builtin_lookup(char* cmdline);
 void builtin_ls(char* cmdline);
 void builtin_uname(char* cmdline);
 
