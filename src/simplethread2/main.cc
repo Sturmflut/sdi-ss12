@@ -122,8 +122,8 @@ int main()
 	dir_entry_buffer2._buffer = (CORBA_char*)&tbuff;
 	dir_entry_buffer2._maximum = 50;
 
-	result = IF_FILE_get_dir_entry(fileid, "/", 9, &dir_entry_buffer2, &env);
-	snprintf(logbuff, sizeof(logbuff), "[TEST FILESERVER get_dir_entry nmb '9' of '/'] = '%s'\n (result: '%i')", dir_entry_buffer2._buffer, result);
+	result = IF_FILE_get_dir_entry(fileid, "/", 7, &dir_entry_buffer2, &env);
+	snprintf(logbuff, sizeof(logbuff), "[TEST FILESERVER get_dir_entry nmb '7' of '/'] = '%s'\n (result: '%i')", dir_entry_buffer2._buffer, result);
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuff, &env);
 
 	/* Spin forever */

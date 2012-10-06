@@ -9,16 +9,16 @@
 
 L4_ThreadId_t  fileserver_Lookup_impl(CORBA_Object  _caller, const path_t  path, path_t * remaining, idl4_server_environment * _env)
 {
-  L4_ThreadId_t  __retval = { local: { X: { 0, 0 } } };
+	if(strlen(path) == 0 || (strlen(path) == 1 && path[0] == '/'))
+		return L4_Myself();
 
-  /* implementation of IF_NAMING::Lookup */
+	if(fileserver_get_file_id_impl(_caller, path, _env) >= 0)
+	{
+		strncpy(*remaining, path, strlen(path));
+		return L4_Myself();
+	}
 
-  return __retval;
-
-//	L4_ThreadId_t res = L4_GlobalId ( L4_ThreadNo (L4_Myself ()), 1);
-//		printf("[TEST FILESERVER lookup of '%s'] = %lx ", path, res);
-//
-//		return  res;
+	return L4_nilthread;
 }
 
 
@@ -114,11 +114,7 @@ L4_Word_t  fileserver_read_impl(CORBA_Object  _caller, const L4_Word_t  file_id,
 
 L4_Word_t  fileserver_write_impl(CORBA_Object  _caller, const L4_Word_t  file_id, const L4_Word_t  offset, const L4_Word_t  count, const buf_t * buf, idl4_server_environment * _env)
 {
-  L4_Word_t  __retval = 0;
-
-  /* implementation of IF_FILE::write */
-
-  return __retval;
+	return -1;
 }
 
 

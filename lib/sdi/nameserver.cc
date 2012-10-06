@@ -1,5 +1,6 @@
 #include <sdi/sdi.h>
 #include <idl4glue.h>
+#include <l4io.h>
 
 #include <sdi/constants.h>
 #include <stdlib.h>
@@ -50,13 +51,13 @@ L4_ThreadId_t nameserver_lookup(path_t path)
 	{
 		cur = next;
 		next = IF_NAMING_Lookup((CORBA_Object) next, in, &remp, &env);
-
-		if(next != L4_nilthread)
+		
+		if(!L4_IsNilThread(next))
 			strncpy(in, remp, SDI_NAMESERVER_MAX_ENTRY_LEN);
 
-        CORBA_free(remp);
+	        CORBA_free(remp);
 
-	} while(cur != next && next != L4_nilthread && strlen(in) > 0);
+	} while(cur != next && !L4_IsNilThread(next) && strlen(in) > 0);
 
 	return next;
 }
