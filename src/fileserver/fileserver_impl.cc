@@ -172,7 +172,7 @@ L4_Word_t  fileserver_get_file_type_impl(CORBA_Object  _caller, const path_t  pa
 	if(strncmp("/", path, strlen(path)) == 0)
 		return IF_FILE_TYPE_DIRECTORY;
 
-	if(fileserver_get_file_id_impl(_caller, path, _env) >= 0)
+	if(fileserver_get_file_id_impl(_caller, path, _env) != -1)
 		return IF_FILE_TYPE_FILE;
 
 	return -1;
