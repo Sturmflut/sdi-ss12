@@ -25,12 +25,24 @@ void builtin_ls(char* cmdline)
 
 	int type = IF_FILE_get_file_type((CORBA_Object)fileid, cmdline, &env);
 
-	if(type != IF_FILE_TYPE_DIRECTORY)
+
+	// Does it exist?
+	if(type != IF_FILE_TYPE_DIRECTORY && type != IF_FILE_TYPE_FILE)
 	{
-		console_printf((CORBA_Object)consoleid, "ls: %s is not a directory.\n", cmdline);
+		console_printf((CORBA_Object)consoleid, "ls: %s is neither a file nor a directory.\n", cmdline);
 		return;
 	}
 
+	// Handle file
+	if(type == IF_FILE_TYPE_FILE)
+	{
+		L4_Word_t size = IF_FILE_get_file_size((CORBA_Object)fileid, cmdline, &env);
+		
+		console_printf((CORBA_Object)consoleid, "%i  %s\n", size, cmdline);
+		return;
+	}
+
+	// Handle directory
 	// List entries
 	int entries = IF_FILE_get_dir_size((CORBA_Object)fileid, cmdline, &env);
 	console_printf((CORBA_Object)consoleid, "%s contains %i entries\n", cmdline, entries);
