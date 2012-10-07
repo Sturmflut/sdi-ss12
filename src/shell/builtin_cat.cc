@@ -32,7 +32,6 @@ void builtin_cat(char* cmdline)
 
 	// Read from file
 	L4_Word_t id = IF_FILE_get_file_id((CORBA_Object)fileid, cmdline, &env);
-	console_printf((CORBA_Object)consoleid, " %s is id %i\n", cmdline, id);
 
 	char buf[256];
 	buf_t readbuf;

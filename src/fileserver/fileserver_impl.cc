@@ -232,7 +232,7 @@ CORBA_boolean  fileserver_get_dir_entry_impl(CORBA_Object  _caller, const path_t
   buf->_length = 0;
   L4_BootInfo_t* bootinfo = (L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ());
   L4_BootRec_t* bootrec = L4_BootInfo_FirstEntry (bootinfo);
-  unsigned int valid_entries = fileserver_get_dir_size_impl(_caller, path, _env);
+  unsigned int valid_entries = L4_BootInfo_Entries(bootinfo);
   if (entry >= 0 && entry < valid_entries) {	//check range
 	  unsigned int type1_cnt = 0;
 	  for (unsigned int i=0; i < valid_entries; i++) {
@@ -245,7 +245,7 @@ CORBA_boolean  fileserver_get_dir_entry_impl(CORBA_Object  _caller, const path_t
 				  }
 //				  strncpy(*buf, cmdline, strlen(cmdline));
 				  buf->_length = strlen(cmdline);
-				  memcpy( buf->_buffer, cmdline, buf->_length);
+				  strcpy( buf->_buffer, cmdline);
 				  return 1;
 			  }
 			  ++type1_cnt;
