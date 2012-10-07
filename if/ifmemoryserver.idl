@@ -79,7 +79,7 @@ interface IF_MEMORYSERVER {
 
 	  @param address Address space Id
 	  @param ip Faulting instruction pointer
-	  @param privileges faulting privileges
+	  @param privileges Fault reason (r = read, w = write, x = execute)
 	  @param page Returned Fpage
 	*/
 	[kernelmsg(idl4::pagefault)]
