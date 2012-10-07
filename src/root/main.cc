@@ -359,10 +359,10 @@ int main(void) {
 	utcbarea);
     
 
-    /* Simplethread1 */
-    start_task_byname("(cd)/sdios/simplethread1",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 50, 1),
-	utcbarea);
+//    /* Simplethread1 */
+//    start_task_byname("(cd)/sdios/simplethread1",
+//	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 50, 1),
+//	utcbarea);
     
 
     /* Simplethread2 */

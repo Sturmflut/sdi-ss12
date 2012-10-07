@@ -40,9 +40,9 @@ int main()
     while (L4_IsNilThread(taskserverid)) {
         taskserverid = nameserver_lookup("/task");
     }
-
+    
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD2] Active", &env);
-    //IF_TASKSERVER_create_task((CORBA_Object)taskserverid, "simplethread1", "", &env);
+    IF_TASKSERVER_create_task((CORBA_Object)taskserverid, "simplethread1", "", &env);
     
 	char tbuf[10];
 	buf_t buf;
