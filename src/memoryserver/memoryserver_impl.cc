@@ -217,62 +217,58 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 		size = pe->size;
 		virt_address = pe->virt_address;
 	}
-    
 
-    // XXX TODO: this seems to be buggy. We always get a page fault at
-    // address 0x23 if the size is too big.
-    // One can reproduce this bug by simply making the image of the new
-    // thread too big (e.g. by putting 20k statements in there)
+    // 4k page
+    L4_Fpage_t newpage = L4_FpageLog2(-1, 12);
+    L4_Word_t page_nr = (address - virt_address) / 4096;
     
-	L4_Fpage_t newpage = L4_Fpage(-1, size);
-
 	/* Send mapitem, unless the recipient resides the same address space */
 	if (!L4_IsLocalId(_caller))
 	{
         newpage = L4_Sigma0_GetPage(sigma0id, newpage);
 		
-        idl4_fpage_set_base(page, virt_address);
+        idl4_fpage_set_base(page, virt_address + page_nr * 4096);
 		idl4_fpage_set_mode(page, IDL4_MODE_MAP);
-		idl4_fpage_set_page(page, newpage); 
-		idl4_fpage_set_permissions(page, IDL4_PERM_READ|IDL4_PERM_WRITE|IDL4_PERM_EXECUTE);
-	}   
+		idl4_fpage_set_page(page, newpage); idl4_fpage_set_permissions(page, IDL4_PERM_READ|IDL4_PERM_WRITE|IDL4_PERM_EXECUTE); }   
     
 	if(!L4_IsNilFpage(newpage))
 	{	
 		if(fe != NULL)
 		{
+            // TODO: no longer correct, now multiple fpages per file mapping 
 			fe->page = newpage;
 
-			buf_t buff;
-			char tbuff[FILE_READ_BUFFER];
-			buff._buffer = (CORBA_char*)&tbuff;
-			buff._maximum = FILE_READ_BUFFER;
-			
-			L4_Word_t fileid = IF_FILESERVER_get_file_id(fileserverid, fe->path, &env);
-            
-			int cnt = fe->realsize / FILE_READ_BUFFER;
-			for(int i=0; i<=cnt; i++)
-			{
-				L4_Word_t inMax = FILE_READ_BUFFER;
-                
-                // the last chunk is only partially filled with data
-			 	if (i == cnt)
-				{
-					inMax = fe->realsize - FILE_READ_BUFFER*i;
-				}
-					
-				L4_Word_t res_read = IF_FILESERVER_read(fileserverid, fileid, fe->offset + i*FILE_READ_BUFFER, inMax, &buff, &env);
-				
-				//fill page	
-	    		memcpy((void*)(L4_Address(newpage) + i*FILE_READ_BUFFER), buff._buffer, inMax);
-			}
+            if (address < virt_address + fe->realsize) {
+                // region where we have to load file from file server
+                buf_t buff;
+                char tbuff[4096];
+                buff._buffer = (CORBA_char*)&tbuff;
+                buff._maximum = 4096;
 
+                L4_Word_t fileid = IF_FILESERVER_get_file_id(fileserverid, fe->path, &env);
 
-			//fill out the rest with zero
-	    	memset((void*)(L4_Address(newpage) + fe->realsize), 0, fe->size - fe->realsize);
-		}
-		else
-		{
+                L4_Word_t in_max = 4096;
+
+                if (address + 4096 >= virt_address + fe->realsize) {
+                    // we are in the last block, so in_max has to be
+                    // adjusted
+                    in_max = virt_address + fe->realsize - address;
+                }
+
+                L4_Word_t res_read = IF_FILESERVER_read(
+                        fileserverid, 
+                        fileid, 
+                        fe->offset + page_nr * 4096,
+                        in_max, &buff, &env);
+
+                memcpy((void *)L4_Address(newpage), buff._buffer, in_max);
+
+            } else if (address >= virt_address + fe->realsize && address < virt_address + fe->size) {
+                // region where we have to fill with zeros
+                memset((void *)L4_Address(newpage), 0, 4096);
+            }
+		} else {
+            // TODO: now wrong, multiple pages per pe-mapping
 			pe->base_address = L4_Address(newpage);	
 		}
 

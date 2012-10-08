@@ -5,7 +5,6 @@
 
 #define NUM_T_ENTRY 30
 #define NOT_YET_MAPPED -1
-#define FILE_READ_BUFFER 1024
 
 /*Data structures for memory server */
 
