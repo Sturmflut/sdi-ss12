@@ -242,7 +242,7 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
         idl4_fpage_set_base(page, virt_address);
 		idl4_fpage_set_mode(page, IDL4_MODE_MAP);
 		idl4_fpage_set_page(page, newpage); 
-		idl4_fpage_set_permissions(page, privileges); // or IDL4_PERM_READ|IDL4_PERM_WRITE|IDL4_PERM_EXECUTE
+		idl4_fpage_set_permissions(page, IDL4_PERM_READ|IDL4_PERM_WRITE|IDL4_PERM_EXECUTE);
 	}   
     
 	if(!L4_IsNilFpage(newpage))
