@@ -224,15 +224,7 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
     // One can reproduce this bug by simply making the image of the new
     // thread too big (e.g. by putting 20k statements in there)
     
-    // TODO: check if we really need different sizes for fe/pe-mappings,
-    // as the virtual address should already be aligned
-	L4_Fpage_t newpage;
-    if(fe != NULL){
-        newpage = L4_Fpage(-1, size);
-    }
-    else {
-        newpage = L4_Fpage(-1, size);
-    }
+	L4_Fpage_t newpage = L4_Fpage(-1, size);
 
 	/* Send mapitem, unless the recipient resides the same address space */
 	if (!L4_IsLocalId(_caller))
