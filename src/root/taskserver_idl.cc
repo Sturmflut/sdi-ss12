@@ -32,11 +32,7 @@ IDL4_PUBLISH_TASKSERVER_CREATE_TASK(taskserver_create_task_implementation);
 IDL4_INLINE L4_ThreadId_t  taskserver_create_thread_implementation(CORBA_Object  _caller, const L4_Word_t  ip, const L4_Word_t  sp, idl4_server_environment * _env)
 
 {
-  L4_ThreadId_t  __retval = { local: { X: { 0, 0 } } };
-
-  /* implementation of IF_TASKSERVER::create_thread */
-  
-  return __retval;
+  return taskserver_create_thread_real(_caller, ip, sp, _env);
 }
 
 IDL4_PUBLISH_TASKSERVER_CREATE_THREAD(taskserver_create_thread_implementation);

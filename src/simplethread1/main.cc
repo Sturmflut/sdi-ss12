@@ -13,13 +13,18 @@
 #include <if/iflogging.h>
 #include <if/ifnaming.h>
 #include <if/ifconsoleserver.h>
+#include <if/iftaskserver.h>
 
 #include <sdi/console_attributes.h>
 
 
+L4_ThreadId_t loggerid = L4_nilthread;
 L4_ThreadId_t consoleid = L4_nilthread;
+L4_ThreadId_t taskserverid = L4_nilthread;
 CORBA_Environment env(idl4_default_environment);
 
+
+L4_Word_t second_thread_stack[1024];
 
 void print_charat(int x, int y, char character, char attrib)
 {
@@ -30,6 +35,18 @@ void print_charat(int x, int y, char character, char attrib)
 void print_stringat(int x, int y, char* text, char attrib)
 {
 	IF_CONSOLESERVER_putstringat((CORBA_Object)consoleid, x, y, text, attrib, &env); 
+}
+
+
+void thread_loop() {
+    while(42) {
+        panic("Thread in simplethread1 is running");
+        sleep(5000);
+
+        if( loggerid != L4_nilthread) {
+            log_printf(loggerid, "Thread is running...");
+        }
+    }
 }
 
 
@@ -86,7 +103,6 @@ int main()
 
 	CORBA_Environment env(idl4_default_environment);
 
-	L4_ThreadId_t loggerid = L4_nilthread;
 
 	while (L4_IsNilThread(loggerid))
 		loggerid = nameserver_lookup("/server/logger");
@@ -96,9 +112,18 @@ int main()
 	while (L4_IsNilThread(consoleid))
 		consoleid = nameserver_lookup("/server/console");
 
+    while (L4_IsNilThread(taskserverid))
+        taskserverid = nameserver_lookup("/task");
+
     L4_ThreadId_t myself = L4_Myself();
 	IF_CONSOLESERVER_setactivethread((CORBA_Object)consoleid, 1, &myself, &env);
 
+    /* Starting a second thread */
+    IF_TASKSERVER_create_thread(
+            (CORBA_Object) taskserverid, 
+            (L4_Word_t)&thread_loop, 
+            (L4_Word_t)&second_thread_stack[1023], 
+            &env);
 
 	/* And now.... action! */
 	animation_loop();
@@ -108,3 +133,4 @@ int main()
 
 	return 0;
 }
+

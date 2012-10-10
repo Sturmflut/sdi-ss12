@@ -16,6 +16,8 @@ L4_ThreadId_t last_thread_id = L4_nilthread;
 L4_ThreadId_t memoryserverid = L4_nilthread;
 L4_ThreadId_t fileserverid = L4_nilthread;
 
+Task_entry_t taskList[NUM_T_ENTRY];
+
 void taskserver_init() {
     /* Announce task service */
     log_printf(loggerid, "[TASK] Registering");
@@ -100,5 +102,47 @@ L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  p
     // TODO: we have to define a stack (use anon mapping) instead of using the stack in ia32-crt.S
     IF_MEMORYSERVER_startup((CORBA_Object)memoryserverid, &threadid, (L4_Word_t)hdr->e_entry, 0, &env);
     
+    //make an entry in task list
+    taskList[get_task_id(threadid)].has_thread[0] = true; 
+    for(int i=1; i<MAX_THREADS; i++) {
+        taskList[get_task_id(threadid)].has_thread[i] = false;
+    }
+
     return threadid;
 }
+
+L4_ThreadId_t  taskserver_create_thread_real(CORBA_Object  _caller, const L4_Word_t  ip, const L4_Word_t  sp, idl4_server_environment * _env)
+{
+    L4_Word_t threadNo = -1;
+
+    //find next empty thread slot in task list
+    for(int i=0; i<MAX_THREADS; i++) {
+        if(!taskList[get_task_id(_caller)].has_thread[i]) {
+            threadNo = i;
+            break;
+        }
+    }
+
+    if(threadNo == -1) {
+        panic("No free thread slot available");
+    }
+
+    L4_ThreadId_t threadid = create_thread_id(get_task_id(_caller), threadNo);
+
+    /* do the ThreadControl call */
+    if (!L4_ThreadControl (threadid, _caller, L4_Myself(), memoryserverid,
+		      (void*)((L4_Address (utcbarea) + utcbsize * threadNo)  & ~(utcbsize - 1)) )) {
+        panic ("ThreadControl failed");
+    }
+
+    //TODO: System freezes when startup ipc is sent
+    log_printf(loggerid, ">>>>BEFORE STARTUP");
+   // IF_MEMORYSERVER_startup((CORBA_Object) memoryserverid, &threadid, ip, sp, &env);
+    log_printf(loggerid, ">>>>AFTER STARTUP");
+
+    taskList[get_task_id(_caller)].has_thread[threadNo] = true;
+
+    return threadid;
+
+}
+

@@ -286,7 +286,9 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 
 void  memoryserver_startup_real(CORBA_Object  _caller, const L4_ThreadId_t * threadid, const L4_Word_t  ip, const L4_Word_t  sp, idl4_server_environment * _env)
 {
-	log_printf(loggerid, "[MEMORY] Starting thread %p ip %x sp %x\n", threadid->raw, ip, sp);
+	log_printf(loggerid, "[MEMORY] Starting thread(raw) %p taskid %d", threadid->raw, get_task_id(*threadid));
+
+    log_printf(loggerid, " threadcount %d ip %x sp %x", get_thread_count(*threadid), ip, sp);
 
     	/* send startup IPC */
     	L4_Msg_t msg;

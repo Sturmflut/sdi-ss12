@@ -22,6 +22,7 @@ extern L4_ThreadId_t taskserverid;   // driver server
 extern L4_ThreadId_t memoryserverid; //memory server
 
 extern L4_Fpage_t utcbarea;
+extern L4_Word_t utcbsize;
 
 extern void logger_server (void);
 extern void pager_server (void);
