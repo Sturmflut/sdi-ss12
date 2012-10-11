@@ -220,19 +220,15 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 	}
 
     // 4k page
-    L4_Fpage_t newpage = L4_FpageLog2(-1, 12);
+    L4_Fpage_t newpage = L4_Fpage(-1, PAGESIZE);
     L4_Word_t page_nr = (address - virt_address) / PAGESIZE;
     
-	/* Send mapitem, unless the recipient resides the same address space */
-	if (!L4_IsLocalId(_caller))
-	{
-        newpage = L4_Sigma0_GetPage(sigma0id, newpage);
+    newpage = L4_Sigma0_GetPage(sigma0id, newpage);
 
-        idl4_fpage_set_base(page, virt_address + page_nr * PAGESIZE);
-		idl4_fpage_set_mode(page, IDL4_MODE_MAP);
-		idl4_fpage_set_page(page, newpage); idl4_fpage_set_permissions(page, IDL4_PERM_READ|IDL4_PERM_WRITE|IDL4_PERM_EXECUTE); 
-    }   
-    
+    idl4_fpage_set_base(page, virt_address + page_nr * PAGESIZE);
+    idl4_fpage_set_mode(page, IDL4_MODE_MAP);
+    idl4_fpage_set_page(page, newpage); idl4_fpage_set_permissions(page, IDL4_PERM_READ|IDL4_PERM_WRITE|IDL4_PERM_EXECUTE); 
+
 	if(!L4_IsNilFpage(newpage))
 	{	
 		if(fe != NULL)
@@ -275,9 +271,7 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 
 		log_printf(loggerid, "[MEMORY] Handled page fault for threadid %p at %x", _caller.raw, address);
 	} else {
-        // TODO: kill task instead
         panic("PF handler: new page is a nil page!");
-        return;
     }
 
 
