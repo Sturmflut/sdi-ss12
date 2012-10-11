@@ -25,7 +25,7 @@ void taskserver_init() {
     log_printf(loggerid, "[TASK] Registered...");
     
     // arbitrary first task_id (should be high enough to not collide)
-    last_task_id = 1;
+    last_task_id = 0;
     
     while (L4_IsNilThread(memoryserverid)) {
         memoryserverid = nameserver_lookup("/server/memory");
