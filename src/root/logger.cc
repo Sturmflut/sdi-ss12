@@ -21,10 +21,11 @@
 IDL4_INLINE void  logger_LogMessage_implementation(CORBA_Object  _caller, const logmessage_t  message, idl4_server_environment * _env)
 
 {
-  /* implementation of IF_LOGGING::LogMessage */
-  printf("[LOG] [%x] %s\n", _caller.raw, message);
-  
-  return;
+    /* implementation of IF_LOGGING::LogMessage */
+    L4_ThreadId_t t = _caller;
+    printf("[LOG] [%x] %s\n", L4_IsLocalId(t) ? L4_GlobalId(t).raw : t.raw, message);
+
+    return;
 }
 
 IDL4_PUBLISH_LOGGER_LOGMESSAGE(logger_LogMessage_implementation);
