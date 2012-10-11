@@ -101,9 +101,7 @@ void start_init_tasks() {
                 log_printf(loggerid, "[TASKS.CONF] path=%s, console_nr=%d", task_path, console_nr);
                 
                 L4_ThreadId_t new_threadid = get_next_thread_id();
-                log_printf(loggerid, "BEFORE, %p", consoleserverid);
                 IF_CONSOLESERVER_setactivethread(consoleserverid, console_nr, &new_threadid, &env);
-                log_printf(loggerid, "AFTER");
 
                 // XXX: passing NULL might be a problem when we actually use "_env"
                 taskserver_create_task_real(L4_Myself(), task_path, "", NULL);
