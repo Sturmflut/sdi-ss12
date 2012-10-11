@@ -43,6 +43,8 @@ void console_setcolor(char color);
 #define bailout(S) L4_KDB_Enter( S )
 #define assert(X) if (!(X)) bailout( #X )
 
+#define ELEM_COUNT(x) (sizeof((x)) / sizeof((x[0])))
+
 // Taskserver
 L4_Word_t get_task_id(L4_ThreadId_t threadid);
 L4_Word_t get_thread_count(L4_ThreadId_t threadid);
