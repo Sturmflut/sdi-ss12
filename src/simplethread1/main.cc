@@ -40,7 +40,6 @@ void print_stringat(int x, int y, char* text, char attrib)
 
 void thread_loop() {
     while(42) {
-        panic("Thread in simplethread1 is running");
         sleep(5000);
 
         if( loggerid != L4_nilthread) {

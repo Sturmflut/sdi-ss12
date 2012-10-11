@@ -49,7 +49,7 @@ extern char __heap_end;
 
 
 L4_Word_t logger_stack[1024];
-L4_Word_t taskserver_stack[1024];
+L4_Word_t taskserver_stack[1024 * 30];
 
 
 L4_ThreadId_t start_thread (L4_ThreadId_t threadid, L4_Word_t ip, L4_Word_t sp, void* utcblocation) {
@@ -329,7 +329,7 @@ int main(void) {
     taskserverid = L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 3, 1);
     start_thread (taskserverid, 
 		  (L4_Word_t)&taskserver_server, 
-		  (L4_Word_t)&taskserver_stack[1023], 
+		  (L4_Word_t)&taskserver_stack[ELEM_COUNT(taskserver_stack) - 1], 
 		  UTCBaddress(3) ); 
     printf ("Started as id %lx\n", taskserverid.raw);
 

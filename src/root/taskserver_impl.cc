@@ -220,11 +220,7 @@ L4_ThreadId_t  taskserver_create_thread_real(CORBA_Object  _caller, const L4_Wor
         panic ("ThreadControl failed");
     }
 
-    //TODO: System freezes when startup ipc is sent
-    log_printf(loggerid, ">>>>BEFORE STARTUP");
-   // IF_MEMORYSERVER_startup((CORBA_Object) memoryserverid, &threadid, ip, sp, &env);
-    log_printf(loggerid, ">>>>AFTER STARTUP");
-
+    IF_MEMORYSERVER_startup((CORBA_Object) memoryserverid, &threadid, ip, sp, &env);
     taskList[get_task_id(_caller)].has_thread[threadNo] = true;
 
     return threadid;
