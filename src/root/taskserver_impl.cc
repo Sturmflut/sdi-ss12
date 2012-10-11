@@ -1,8 +1,10 @@
 #include <l4io.h>
 #include <elf.h>
 #include <sdi/sdi.h>
+
 #include <if/iffileserver.h>
 #include <if/ifmemoryserver.h>
+#include <if/ifconsoleserver.h>
 
 #include "taskserver.h" 
 #include "root.h"
@@ -10,11 +12,9 @@
 
 L4_Word_t last_task_id;
 
-L4_ThreadId_t last_thread_id = L4_nilthread;
-
-
 L4_ThreadId_t memoryserverid = L4_nilthread;
 L4_ThreadId_t fileserverid = L4_nilthread;
+L4_ThreadId_t consoleserverid = L4_nilthread;
 
 Task_entry_t taskList[NUM_T_ENTRY];
 
@@ -33,12 +33,97 @@ void taskserver_init() {
     while (L4_IsNilThread(fileserverid)) {
         fileserverid = nameserver_lookup("/file");
     }
+    while (L4_IsNilThread(consoleserverid)) {
+        consoleserverid = nameserver_lookup("/server/console");
+    }
+
+    log_printf(loggerid, "==============> Found consoleserverid: %p", consoleserverid.raw);
+
+    //start_init_tasks();
+}
+
+void start_init_tasks() {
+    L4_Word_t tasks_config_file_id = IF_FILESERVER_get_file_id(fileserverid, "tasks.conf", &env);
+    if (tasks_config_file_id == -1) {
+        log_printf(loggerid, "[TASK] Could not open tasks.conf. Not starting init tasks.");
+    }
+	
+    buf_t buff;
+	char tbuff[1024];
+	buff._buffer = (CORBA_char*)tbuff;
+	buff._maximum = 1024;
+
+    L4_Word_t res_read;
+    L4_Word_t read_bytes = 0;
+
+    char line[256];
     
-    log_printf(loggerid,"[TASK] Found memoryserver = %x, fileserver = %x", memoryserverid.raw, fileserverid.raw);
+    do {
+        res_read = IF_FILESERVER_read(fileserverid, tasks_config_file_id, read_bytes, buff._maximum, &buff, &env);
+        read_bytes += res_read;
+
+        int line_index = 0;
+        for (int i = 0; i < buff._maximum; i++) {
+            line[line_index++] = buff._buffer[i];
+            
+            if (buff._buffer[i] == '\n') {
+                line[line_index - 1] = '\0';
+                unsigned int line_length = line_index;
+                line_index = 0;
+
+                char task_path[64];
+                int task_path_index = 0;
+                bool task_found = false;
+                int console_nr;
+                
+                // line contains a full line now (without '\n')
+                for (int j = 0; j < line_length; j++) {
+
+                    if (line[j] == ' ' && !task_found) {
+                        task_found = true;
+                        task_path[task_path_index] = '\0';
+                        continue;
+                    }
+
+                    if (!task_found) {
+                        task_path[task_path_index++] = line[j];
+                    } else {
+                        console_nr = atoi(line + j);
+                        break;
+                    }
+                }
+                
+                // empty line
+                if (!task_found) {
+                    continue;
+                }
+                
+                log_printf(loggerid, "[TASKS.CONF] path=%s, console_nr=%d", task_path, console_nr);
+                
+                L4_ThreadId_t new_threadid = get_next_thread_id();
+                log_printf(loggerid, "BEFORE, %p", consoleserverid);
+                IF_CONSOLESERVER_setactivethread(consoleserverid, console_nr, &new_threadid, &env);
+                log_printf(loggerid, "AFTER");
+
+                // XXX: passing NULL might be a problem when we actually use "_env"
+                taskserver_create_task_real(L4_Myself(), task_path, "", NULL);
+            }
+
+            if (buff._buffer[i] == '\r') {
+                continue;
+            }
+        }
+    } while (res_read == buff._maximum);
+}
+
+// get thread id for the next task
+L4_ThreadId_t get_next_thread_id() {
+    return create_thread_id(last_task_id + 1, 0);
 }
 
 L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  path, const path_t  cmdline, idl4_server_environment * _env) {
-    L4_ThreadId_t threadid = (create_thread_id(last_task_id++, 0));
+    L4_ThreadId_t threadid = get_next_thread_id();
+    last_task_id++;
     
     /* First ThreadControl to setup initial thread */
     if (!L4_ThreadControl (threadid, threadid, L4_Myself (), L4_nilthread, (void*)-1UL)) {
@@ -65,7 +150,7 @@ L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  p
     
 	buf_t buff;
 	char tbuff[1024];
-	buff._buffer = (CORBA_char*)&tbuff;
+	buff._buffer = (CORBA_char*)tbuff;
 	buff._maximum = 1024;
 
     log_printf(loggerid, "[TASK] Loading file: %s\n", path);

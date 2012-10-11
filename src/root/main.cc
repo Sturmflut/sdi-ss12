@@ -24,17 +24,20 @@
 
 #include <sdi/constants.h>
 
+#include <if/iftaskserver.h>
+
 /* local threadids */
 L4_ThreadId_t sigma0id;
 L4_ThreadId_t pagerid;
 L4_ThreadId_t loggerid;
 L4_ThreadId_t taskserverid;
 
-
 L4_Word_t pagesize;
 L4_Word_t utcbsize;
 L4_Fpage_t kiparea;
 L4_Fpage_t utcbarea;
+
+CORBA_Environment env(idl4_default_environment);
 
 /* helperstuff */
 

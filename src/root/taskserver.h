@@ -17,6 +17,10 @@ extern Task_entry_t taskList[NUM_T_ENTRY]; //index is task number
 
 void taskserver_init();
 
+void start_init_tasks();
+
+L4_ThreadId_t get_next_thread_id();
+
 L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  path, const path_t  cmdline, idl4_server_environment * _env);
 
 L4_ThreadId_t  taskserver_create_thread_real(CORBA_Object  _caller, const L4_Word_t  ip, const L4_Word_t  sp, idl4_server_environment * _env);

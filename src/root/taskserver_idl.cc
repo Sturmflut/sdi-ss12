@@ -14,10 +14,7 @@
 
 #include "root.h"
 
-CORBA_Environment env(idl4_default_environment);
-
 char buf_msg[TASKSERVER_STRBUF_SIZE][512];
-
 
 /* Interface taskserver */
 
