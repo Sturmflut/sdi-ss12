@@ -397,7 +397,5 @@ void consoleserver_init()
         while (L4_IsNilThread(taskserverid))
                 taskserverid = nameserver_lookup("/task");
 
-        // Attach keyboard interrupt
-        IF_TASKSERVER_attach_interrupt((CORBA_Object)taskserverid, 0x01, &env);
 }
 

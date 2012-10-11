@@ -39,7 +39,7 @@ void taskserver_init() {
 
     log_printf(loggerid, "==============> Found consoleserverid: %p", consoleserverid.raw);
 
-    //start_init_tasks();
+    start_init_tasks();
 }
 
 void start_init_tasks() {

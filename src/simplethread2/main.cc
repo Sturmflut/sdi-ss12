@@ -42,7 +42,6 @@ int main()
     }
     
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, "[SIMPLETHREAD2] Active", &env);
-    IF_TASKSERVER_create_task((CORBA_Object)taskserverid, "simplethread1", "", &env);
     
 	char tbuf[10];
 	buf_t buf;

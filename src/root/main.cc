@@ -358,9 +358,16 @@ int main(void) {
     
     /* Console */
     start_task_byname("(cd)/sdios/consoleserver",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 40, 1),
-	utcbarea);
+            L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 40, 1),
+            utcbarea);
     
+    // Attach keyboard interrupt to console server.
+    // We can't do this inside the console server (this would result in
+    // a deadlock, as taskserver and consoleserver then wait for each
+    // other).
+    if (!L4_AssociateInterrupt(L4_GlobalId(0x01, 1), L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 40, 1))) {
+        panic("Couldn't attach keyboard interrupt to console server");
+    }
 
 //    /* Simplethread1 */
 //    start_task_byname("(cd)/sdios/simplethread1",
@@ -368,16 +375,16 @@ int main(void) {
 //	utcbarea);
     
 
-    /* Simplethread2 */
-    start_task_byname("(cd)/sdios/simplethread2",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 51, 1),
-	utcbarea);
+    ///* Simplethread2 */
+    //start_task_byname("(cd)/sdios/simplethread2",
+	//L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 51, 1),
+	//utcbarea);
     
 
-    /* Simplethread2 */
-    start_task_byname("(cd)/sdios/shell",
-	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 52, 1),
-	utcbarea);
+    ///* Simplethread2 */
+    //start_task_byname("(cd)/sdios/shell",
+	//L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 52, 1),
+	//utcbarea);
 
     /* now it is time to become the pager for all those threads we 
        created recently */
