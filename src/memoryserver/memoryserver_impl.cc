@@ -134,7 +134,15 @@ L4_Word_t  memoryserver_map_file_pages_real(CORBA_Object  _caller, const L4_Thre
     }
 
 	//create new file entry for thread
-	File_entry_t fe = {virt_start_address, path, offset, size, realsize, L4_Nilpage};
+	File_entry_t fe; 
+
+    fe.virt_address = virt_start_address;
+    fe.offset = offset;
+    fe.size = size;
+    fe.realsize = realsize;
+    fe.page = L4_Nilpage;
+    strncpy(fe.path, path, ELEM_COUNT(fe.path));
+    
 	myTaskheader->filemaps[(myTaskheader->filemaps_index)++] = fe;
 
 	log_printf(loggerid, "[MEMORY] Memory mapped for threadid %i at %x\n", *threadid, virt_start_address);
@@ -240,8 +248,11 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
                 // region where we have to load file from file server
                 buf_t buff;
                 char tbuff[PAGESIZE];
+                memset(tbuff, 0, PAGESIZE);
+
                 buff._buffer = (CORBA_char*)tbuff;
                 buff._maximum = PAGESIZE;
+
 
                 L4_Word_t fileid = IF_FILESERVER_get_file_id(fileserverid, fe->path, &env);
 

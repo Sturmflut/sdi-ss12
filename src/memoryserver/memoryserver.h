@@ -17,7 +17,7 @@ typedef struct{
 
 typedef struct{
       L4_Word_t virt_address;
-      path_t path;
+      char path[64]; // path_t has length 64 (see types.idl)
       L4_Word_t offset;
       L4_Word_t size; //size >= realsize
       L4_Word_t realsize;
