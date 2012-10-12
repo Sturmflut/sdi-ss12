@@ -122,8 +122,6 @@ int main()
 		fileid = nameserver_lookup("/file");
 
 	L4_ThreadId_t myself = L4_Myself();
-	IF_CONSOLESERVER_setactivethread((CORBA_Object)consoleid, 0, &myself, &env);
-
 
 	/* Startup shell */
 	print_banner();
