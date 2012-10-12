@@ -48,6 +48,26 @@
         gesendet.
 \end{itemize}
 
+\subsubsection{Speicherlayout}
+\begin{tabular}{|l|l|}
+\hline
+Adresse & Area \\
+\hline
+0xFFFFFFFF .. 0xC0000001 & Kernel \\
+\hline
+0xC0000000 .. 0xBF000001 & UTCB \\
+\hline
+0xBF000000 .. 0xB0000001 & KIP \\
+\hline
+0xB0000000 .. 0xA0000001 & empty \\
+\hline
+0xA0000000 ... & STACK \\
+\hline
+... 0x98000000 & HEAP \\
+\hline
+0x97FFFFFF .. 0x78000000 & APP (Text, BSS, Data) \\
+\hline
+\end{tabular}
 \subsubsection{Lokale Heap-Verwaltung}
 
 Vorhandene Heap-Bibliothek portieren, z.B. dietlibc oder dlmalloc. dietlibc malloc()/free() ist bereits portiert. dlmalloc wurde von Jens Kehne (Mitarbeiter von Herrn Dr. Stoess) empfohlen.
