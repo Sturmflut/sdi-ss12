@@ -1,4 +1,5 @@
 #include <sdi/sdi.h>
+#include <sdi/console_attributes.h>
 
 #include <if/iffile.h>
 
@@ -45,6 +46,7 @@ void builtin_ls(char* cmdline)
 	// Handle directory
 	// List entries
 	int entries = IF_FILE_get_dir_size((CORBA_Object)fileid, cmdline, &env);
+	console_setcolor(SDI_CONSOLE_ATTRIBUTE_FGLIGHTGREEN);
 	console_printf((CORBA_Object)consoleid, "%s contains %i entries\n", cmdline, entries);
 
 	buf_t pathbuf;
@@ -59,5 +61,7 @@ void builtin_ls(char* cmdline)
 		IF_FILE_get_dir_entry((CORBA_Object)fileid, cmdline, j, &pathbuf, &env);
 		console_printf((CORBA_Object)consoleid, "%s\n", pathbuf._buffer);
 	}
+
+	console_setcolor(SDI_CONSOLE_ATTRIBUTE_FGLIGHTGREY);
 }
 
