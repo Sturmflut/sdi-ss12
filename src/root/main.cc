@@ -268,20 +268,6 @@ int main(void) {
     printf ("ELFimage: from %p to %p\n", &__elf_start, &__elf_end);
     printf ("Heap: start: %p end: %p\n", &__heap_start, &__heap_end);
 
-    //int pagecount = 0;
-    //L4_Fpage_t page;
-
-    //do {
-        //page = L4_Sigma0_GetAny (sigma0id, pagesize, L4_Fpage (-1, pagesize));
-
-	//if(!L4_IsNilFpage (page))
-	//{
-            //pagecount++;
-	//}
-    //}while(!(L4_IsNilFpage (page)));
-
-    //printf("Got %i pages of size %i from sigma0\n", pagecount, pagesize);
-
     utcbsize = L4_UtcbSize (kip);
     printf("UTCB size: %d\n", utcbsize);
 
@@ -333,13 +319,6 @@ int main(void) {
 		  UTCBaddress(3) ); 
     printf ("Started as id %lx\n", taskserverid.raw);
 
-
-
-    /* Driverserver */
-//    start_task_byname("(cd)/sdios/driverserver",
-//	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 21, 1),
-//	utcbarea);
-
     /* FIleserver */
     start_task_byname("(cd)/sdios/fileserver",
 	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 22, 1),
@@ -349,12 +328,6 @@ int main(void) {
 	start_task_byname("(cd)/sdios/memoryserver",
 	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 23, 1),
 	utcbarea);
-
-   
-    /* Keyboarddriver */
-//    start_task_byname("(cd)/sdios/keyboarddriver",
-//	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 30, 1),
-//	utcbarea);
     
     /* Console */
     start_task_byname("(cd)/sdios/consoleserver",
@@ -368,23 +341,6 @@ int main(void) {
     if (!L4_AssociateInterrupt(L4_GlobalId(0x01, 1), L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 40, 1))) {
         panic("Couldn't attach keyboard interrupt to console server");
     }
-
-//    /* Simplethread1 */
-//    start_task_byname("(cd)/sdios/simplethread1",
-//	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 50, 1),
-//	utcbarea);
-    
-
-    ///* Simplethread2 */
-    //start_task_byname("(cd)/sdios/simplethread2",
-	//L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 51, 1),
-	//utcbarea);
-    
-
-    ///* Simplethread2 */
-    //start_task_byname("(cd)/sdios/shell",
-	//L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 52, 1),
-	//utcbarea);
 
     /* now it is time to become the pager for all those threads we 
        created recently */
