@@ -78,7 +78,6 @@ void start_init_tasks() {
                 
                 // line contains a full line now (without '\n')
                 for (int j = 0; j < line_length; j++) {
-
                     if (line[j] == ' ' && !task_found) {
                         task_found = true;
                         task_path[task_path_index] = '\0';
@@ -93,8 +92,8 @@ void start_init_tasks() {
                     }
                 }
                 
-                // empty line
-                if (!task_found) {
+                // empty line / comment
+                if (!task_found || line[0] == '#') {
                     continue;
                 }
                 
