@@ -151,7 +151,7 @@ L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  p
 	buff._buffer = (CORBA_char*)tbuff;
 	buff._maximum = 1024;
 
-    log_printf(loggerid, "[TASK] Loading file: %s\n", path);
+    log_printf(loggerid, "[TASK] Loading file: %s", path);
     
 
     L4_Word_t res_read = IF_FILESERVER_read(fileserverid, file_id, 0, sizeof(Elf32_Ehdr) + sizeof(Elf32_Phdr), &buff, &env);
@@ -166,9 +166,6 @@ L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  p
 
     for (int i = 0; i < hdr->e_phnum; i++) {
         if (phdr[i].p_type == PT_LOAD) {
-            log_printf(loggerid, "[TASK] Sending section: path = %s, offset = %p\nvaddr = %p, size = %d, realsize = %d",
-                    path, phdr[i].p_offset, phdr[i].p_vaddr, phdr[i].p_memsz, phdr[i].p_filesz);
-
             IF_MEMORYSERVER_map_file_pages(
                     (CORBA_Object)memoryserverid,
                     &threadid,

@@ -85,7 +85,7 @@ L4_Word_t memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_Threa
 	taskheader_entry = findOrCreateTaskEntry(get_task_id(*threadid));
 
     if(taskheader_entry == -1){
-        log_printf(loggerid, "[MEMORY] Find or create task entry failed.\n");
+        log_printf(loggerid, "[MEMORY] Find or create task entry failed.");
         return -1;
     }
 
@@ -94,7 +94,7 @@ L4_Word_t memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_Threa
 
 	//check address overlappings 
 	if(isAddressConflict(myTaskheader, virt_start_address, virt_end_address)) {
-        log_printf(loggerid, "[MEMORY] Address conflict.\n");
+        log_printf(loggerid, "[MEMORY] Address conflict.");
 		return -1; // TODO define proper return values
     }
 
@@ -102,7 +102,7 @@ L4_Word_t memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_Threa
 	Page_entry_t pe = {NOT_YET_MAPPED, virt_start_address, size};
 	myTaskheader->pages[(myTaskheader->pages_index)++] = pe;
 
-	log_printf(loggerid, "[MEMORY] Memory mapped for threadid %i at %x\n", *threadid, virt_start_address);
+	log_printf(loggerid, "[MEMORY] Memory mapped for threadid %i at %x", *threadid, virt_start_address);
 
 	return 0;
 }
@@ -117,7 +117,7 @@ L4_Word_t  memoryserver_map_file_pages_real(CORBA_Object  _caller, const L4_Thre
 	//find taskheader entry
 	taskheader_entry = findOrCreateTaskEntry(get_task_id(*threadid));
 
-    log_printf(loggerid, "Creating mapping for task_id=%d,thread_count=%d", get_task_id(*threadid), get_thread_count(*threadid));
+    log_printf(loggerid, "[MEMORY] Creating mapping for task_id=%d,thread_count=%d", get_task_id(*threadid), get_thread_count(*threadid));
 
     if(taskheader_entry == -1){
         log_printf(loggerid, "[MEMORY] Find or create task entry failed.\n");
@@ -145,7 +145,7 @@ L4_Word_t  memoryserver_map_file_pages_real(CORBA_Object  _caller, const L4_Thre
     
 	myTaskheader->filemaps[(myTaskheader->filemaps_index)++] = fe;
 
-	log_printf(loggerid, "[MEMORY] Memory mapped for threadid %i at %x\n", *threadid, virt_start_address);
+	log_printf(loggerid, "[MEMORY] Memory mapped for threadid %p at %x", threadid->raw, virt_start_address);
 
 	return 0;
 
@@ -160,10 +160,10 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 	int taskListIndex = -1;
 
 
-    log_printf(loggerid, "[MEMORY] Pagefault occured at %p. task_id=%d, thread_count=%d", 
-            address,
-            get_task_id(_caller),
-            get_thread_count(_caller));
+//    log_printf(loggerid, "[MEMORY] Pagefault occured at %p. task_id=%d, thread_count=%d", 
+//            address,
+//            get_task_id(_caller),
+//            get_thread_count(_caller));
 
     //search mapping
 	for(int i=0; i<Taskheader_index; i = i+1)
@@ -279,8 +279,6 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
             // TODO: now wrong, multiple pages per pe-mapping
 			pe->base_address = L4_Address(newpage);	
 		}
-
-		log_printf(loggerid, "[MEMORY] Handled page fault for threadid %p at %x", _caller.raw, address);
 	} else {
         panic("PF handler: new page is a nil page!");
     }
@@ -291,17 +289,15 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 
 void  memoryserver_startup_real(CORBA_Object  _caller, const L4_ThreadId_t * threadid, const L4_Word_t  ip, const L4_Word_t  sp, idl4_server_environment * _env)
 {
-	log_printf(loggerid, "[MEMORY] Starting thread(raw) %p taskid %d", threadid->raw, get_task_id(*threadid));
+	log_printf(loggerid, "[MEMORY] Starting thread(raw) %p (%d,%d) ip %x sp %x", threadid->raw, get_task_id(*threadid), get_thread_count(*threadid), ip, sp);
 
-    log_printf(loggerid, " threadcount %d ip %x sp %x", get_thread_count(*threadid), ip, sp);
-
-    	/* send startup IPC */
-    	L4_Msg_t msg;
-    	L4_Clear (&msg);
-    	L4_Append (&msg, ip);
-    	L4_Append (&msg, sp);
-    	L4_Load (&msg);
-    	L4_Send (*threadid);
+    /* send startup IPC */
+    L4_Msg_t msg;
+    L4_Clear (&msg);
+    L4_Append (&msg, ip);
+    L4_Append (&msg, sp);
+    L4_Load (&msg);
+    L4_Send (*threadid);
 
 	log_printf(loggerid, "[MEMORY] Thread started");
 }
