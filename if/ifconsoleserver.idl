@@ -50,7 +50,7 @@ interface IF_CONSOLESERVER {
 	void setactivethread(in int console, in L4_ThreadId_t thread);
 
 	/**
-	  Get the number of the currently active id
+	  Return the console number associated to the caller
 
 	  @return Console Id
 	*/

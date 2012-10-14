@@ -347,7 +347,9 @@ void  consoleserver_setactivethread_impl(CORBA_Object  _caller, const CORBA_long
 */
 CORBA_long consoleserver_getconsolenum_impl(CORBA_Object  _caller)
 {
-	return active_console;
+	int console = find_console_for_thread(_caller);
+
+	return console;
 }
 
 
