@@ -62,7 +62,7 @@ int main()
 	snprintf(logbuff, sizeof(logbuff), "[TEST FILESERVER get_file_id for=%s] >>%d<< (expected '0')\n", path, res);
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuff, &env);
 
-	char *path2 = "/simplethread1";
+	char *path2 = "/bannerdemo";
 	res = IF_FILESERVER_get_file_id(fileid, path2, &env);
 	snprintf(logbuff, sizeof(logbuff), "[TEST FILESERVER get_file_id for=%s] >>%d<< (expected 'gr 0')\n", path2, res);
 	IF_LOGGING_LogMessage((CORBA_Object)loggerid, logbuff, &env);

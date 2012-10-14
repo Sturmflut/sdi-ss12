@@ -35,6 +35,6 @@ top_builddir=	@top_builddir@
 
 include $(top_srcdir)/Mk/base.mk
 
-SUBDIRS=	root memoryserver nameserver fileserver consoleserver simplethread1 simplethread2 shell
+SUBDIRS=	root memoryserver nameserver fileserver consoleserver bannerdemo simplethread2 shell
 
 include $(top_srcdir)/Mk/subdir.mk

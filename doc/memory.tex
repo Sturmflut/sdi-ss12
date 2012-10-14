@@ -16,7 +16,7 @@
 	\node at (4,-4) [block] (fileserver) {fileserver};
 
 	\node at (-5,-6) [block] (shell1) {Shell 1};
-	\node at (-2.5,-6) [block] (simplethread1) {simplethread1};
+	\node at (-2.5,-6) [block] (bannerdemo) {bannerdemo};
 	\node at (0,-6) [block] (again) {...};
 
 	\draw[very thick,<->] (sigma0.south) -- (minipager.north);
@@ -28,7 +28,7 @@
 	\draw[very thick,<->] (minipager.south) -- (fileserver.north);
 
 	\draw[very thick,<->] (memoryserver.south) -- (shell1.north);
-	\draw[very thick,<->] (memoryserver.south) -- (simplethread1.north);
+	\draw[very thick,<->] (memoryserver.south) -- (bannerdemo.north);
 	\draw[very thick,<->] (memoryserver.south) -- (again.north);
 \end{tikzpicture}
 \end{center}
