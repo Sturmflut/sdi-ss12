@@ -38,6 +38,19 @@ void print_stringat(int x, int y, char* text, char attrib)
 }
 
 
+void blank_line(int y)
+{
+    print_stringat(0, y, (char*)"                                                                                ", SDI_CONSOLE_ATTRIBUTE_FGBLACK | SDI_CONSOLE_ATTRIBUTE_BGBLACK);
+}
+
+
+void clear_screen()
+{
+    for(int y = 0; y < 25; y++)
+        blank_line(y);
+}
+
+
 void thread_loop() {
     while(42) {
         sleep(5000);
@@ -55,12 +68,16 @@ void animation_loop()
     const char* banner = "Karlsruhe Institute of Technology";
     char buf[30];
 
+    sleep(300);
+
+    clear_screen();
+
     /** Print logo */
-    print_stringat(23, 3, " ____  ____ ___       ___  ____  ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
-    print_stringat(23, 4, "/ ___||  _ \\_ _|     / _ \\/ ___| ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
-    print_stringat(23, 5, "\\___ \\| | | | |_____| | | \\___ \\ ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
-    print_stringat(23, 6, " ___) | |_| | |_____| |_| |___) |", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
-    print_stringat(23, 7, "|____/|____/___|     \\___/|____/ ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
+    print_stringat(23, 3, (char*)" ____  ____ ___       ___  ____  ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
+    print_stringat(23, 4, (char*)"/ ___||  _ \\_ _|     / _ \\/ ___| ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
+    print_stringat(23, 5, (char*)"\\___ \\| | | | |_____| | | \\___ \\ ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
+    print_stringat(23, 6, (char*)" ___) | |_| | |_____| |_| |___) |", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
+    print_stringat(23, 7, (char*)"|____/|____/___|     \\___/|____/ ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
 
     void *p1, *p2, *p3;
     char key, modifier;
@@ -81,7 +98,7 @@ void animation_loop()
             x = 85;
 
         /* Blank line */
-        print_stringat(0, 23, "                                                                                ", SDI_CONSOLE_ATTRIBUTE_FGBLACK | SDI_CONSOLE_ATTRIBUTE_BGBLACK);
+        blank_line(23);
 
         /* Print banner */
         for(int i = 0; i < strlen(banner); i++)
