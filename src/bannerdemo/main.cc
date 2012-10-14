@@ -109,11 +109,6 @@ void animation_loop()
 
 int main()
 {
-    L4_Msg_t msg;
-    L4_MsgTag_t tag;
-
-    char buf[256];
-
     CORBA_Environment env(idl4_default_environment);
 
     // Resolve logger
