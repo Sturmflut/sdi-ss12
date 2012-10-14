@@ -178,8 +178,12 @@ L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  p
         }
     }
 
-    // TODO: we have to define a stack (use anon mapping) instead of using the stack in ia32-crt.S
-    IF_MEMORYSERVER_startup((CORBA_Object)memoryserverid, &threadid, (L4_Word_t)hdr->e_entry, 0, &env);
+    IF_MEMORYSERVER_map_anon_pages(
+            memoryserverid, &threadid, 0, 
+            (L4_Word_t)STACK_START - STACK_SIZE, 
+            STACK_SIZE, &env);
+
+    IF_MEMORYSERVER_startup((CORBA_Object)memoryserverid, &threadid, (L4_Word_t)hdr->e_entry, (L4_Word_t)STACK_START, &env);
     
     //make an entry in task list
     taskList[get_task_id(threadid)].has_thread[0] = true; 
