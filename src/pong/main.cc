@@ -73,12 +73,14 @@ void game_loop()
     char ret;
     char strbuf[30];
 
+    sleep(300);
+
+    clear_screen();
+
     while(1)
     {
         // Handle paddle
         ret = IF_CONSOLESERVER_getKey((CORBA_Object)consoleid, &key, &modifier, &env);
-
-        log_printf(loggerid, "Char: '%c'", key);
 
         if(ret && modifier == 0)
         {
@@ -88,11 +90,11 @@ void game_loop()
             if(key == 's')
                 paddley = paddley + 2;
 
-            if(paddley < 2)
-                paddley = 2;
+            if(paddley < 1)
+                paddley = 1;
 
-            if(paddley > (22 - PADDLE_HEIGHT))
-                paddley = 22 - PADDLE_HEIGHT;
+            if(paddley > (23 - PADDLE_HEIGHT))
+                paddley = 23 - PADDLE_HEIGHT;
         }
 
 
@@ -165,9 +167,6 @@ void game_loop()
 
 int main()
 {
-    sleep(300);
-    clear_screen();
-
     // Resolve logger
     while (L4_IsNilThread(loggerid))
         loggerid = nameserver_lookup((path_t)"/server/logger");
