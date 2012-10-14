@@ -77,6 +77,8 @@ void game_loop()
 
     clear_screen();
 
+    print_stringat(25, 0, (char*)"Paddle up/down: w/s", SDI_CONSOLE_ATTRIBUTE_FGLIGHTYELLOW);
+
     while(1)
     {
         // Handle paddle
@@ -93,8 +95,8 @@ void game_loop()
             if(paddley < 1)
                 paddley = 1;
 
-            if(paddley > (23 - PADDLE_HEIGHT))
-                paddley = 23 - PADDLE_HEIGHT;
+            if(paddley > (24 - PADDLE_HEIGHT))
+                paddley = 24 - PADDLE_HEIGHT;
         }
 
 
@@ -152,7 +154,7 @@ void game_loop()
         snprintf(strbuf, sizeof(strbuf), "Balls lost: %i", lostballs);
 	print_stringat(0, 0, strbuf, SDI_CONSOLE_ATTRIBUTE_FGLIGHTYELLOW);
    
-        sleep(150);
+        sleep(100);
 
 
         // Clear dot
