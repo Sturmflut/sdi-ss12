@@ -4,8 +4,8 @@
 #include <sdi/sdi.h>
 
 typedef struct {
-        const char* cmd;
-        void (*command)(char* cmdline);
+    const char* cmd;
+    void (*command)(char* cmdline);
 } builtin_cmd_t;
 
 
