@@ -124,9 +124,9 @@ void list_memdesc(void* kip)
 		L4_MemoryDesc_t* mdesc = L4_MemoryDesc(kip, i);
 
 		if(L4_IsVirtual(mdesc))
-			printf("Virtual Memory: low %p  high %p  type %i\n", L4_Low(mdesc), L4_High(mdesc), L4_Type(mdesc));
+			printf("Virtual Memory: low %p  high %p  type %i\n", (void*)L4_Low(mdesc), (void*)L4_High(mdesc), (int)L4_Type(mdesc));
 		else
-			printf("Physical Memory: low %p  high %p  type %i\n", L4_Low(mdesc), L4_High(mdesc), L4_Type(mdesc));
+			printf("Physical Memory: low %p  high %p  type %i\n", (void*)L4_Low(mdesc), (void*)L4_High(mdesc), (int)L4_Type(mdesc));
 	}
 }
 
@@ -269,7 +269,7 @@ int main(void) {
     printf ("Heap: start: %p end: %p\n", &__heap_start, &__heap_end);
 
     utcbsize = L4_UtcbSize (kip);
-    printf("UTCB size: %d\n", utcbsize);
+    printf("UTCB size: %d\n", (int) utcbsize);
 
     utcbarea = L4_FpageLog2 ((L4_Word_t) L4_MyLocalId ().raw,
 			      L4_UtcbAreaSizeLog2 (kip) + 1);
@@ -291,7 +291,7 @@ int main(void) {
     load_all_modules((L4_BootInfo_t*)L4_BootInfo (L4_KernelInterface ()));
 
     /* Nameserver */
-    start_task_byname("(cd)/sdios/nameserver",
+    start_task_byname((char*) "(cd)/sdios/nameserver",
 	L4_GlobalId ( SDI_NAMESERVER_DEFAULT_THREADID, 1),
 	utcbarea);
 
@@ -320,17 +320,17 @@ int main(void) {
     printf ("Started as id %lx\n", taskserverid.raw);
 
     /* FIleserver */
-    start_task_byname("(cd)/sdios/fileserver",
+    start_task_byname((char*) "(cd)/sdios/fileserver",
 	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 22, 1),
 	utcbarea);
     
  	/*Memoryserver */
-	start_task_byname("(cd)/sdios/memoryserver",
+	start_task_byname((char*) "(cd)/sdios/memoryserver",
 	L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 23, 1),
 	utcbarea);
     
     /* Console */
-    start_task_byname("(cd)/sdios/consoleserver",
+    start_task_byname((char*) "(cd)/sdios/consoleserver",
             L4_GlobalId ( L4_ThreadNo (L4_Myself ()) + 40, 1),
             utcbarea);
     
