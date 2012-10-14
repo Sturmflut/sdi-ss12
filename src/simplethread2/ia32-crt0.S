@@ -8,9 +8,6 @@
 
 	.global _start
 _start:
-	/* load the stack pointer for our small stack (see below) */
-	leal	__stack, %esp
-
 	/* clearing .bss segment, since we can not assume it is zero */
 	leal	__section_bss_start,%esi
 	mov	%esi,%edi
@@ -56,11 +53,6 @@ ___return_from_main:
 8:      jmp 6b /* Loop forever on the enter_kdebug */
 
 		
-/* allocate 16*1024 bytes for the stack */
-	.bss
-	.space	16*1024
-__stack:   /* this marks the top of the stack */
-
 /* allocate 16*1024 bytes heap space and aditional pointers */
 
 	.data
@@ -69,7 +61,7 @@ __heap_ptr:
 	.long __heap_start
 	.global __heap_start
 __heap_start:	
-	.space 16*1024
+	.space 96*1024
 	.global __heap_end
 __heap_end:
 

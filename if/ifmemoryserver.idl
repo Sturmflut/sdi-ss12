@@ -1,6 +1,10 @@
 import "sdi/types.h";
 #include <types.idl>
 
+const L4_Word_t PAGESIZE = 4096;
+const L4_Word32_t STACK_START = 0xA0000000; // 0xA0000000;
+const L4_Word_t STACK_SIZE = 8*1024*1024; // 8 mb stack
+
 [uuid(IF_MEMORYSERVER_ID)]
 interface IF_MEMORYSERVER {
 	/**

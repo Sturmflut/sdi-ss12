@@ -5,6 +5,7 @@
 
 #include <if/iflogging.h>
 #include <if/iffileserver.h>
+#include <if/ifmemoryserver.h>
 
 Taskheader_t taskList[NUM_T_ENTRY];
 unsigned char Taskheader_index;
@@ -102,7 +103,7 @@ L4_Word_t memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_Threa
 	Page_entry_t pe = {NOT_YET_MAPPED, virt_start_address, size};
 	myTaskheader->pages[(myTaskheader->pages_index)++] = pe;
 
-	log_printf(loggerid, "[MEMORY] Memory mapped for threadid %i at %x", *threadid, virt_start_address);
+	log_printf(loggerid, "[MEMORY] Anonymous memory mapped for threadid %p at %x", threadid->raw, virt_start_address);
 
 	return 0;
 }
@@ -235,7 +236,8 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 
     idl4_fpage_set_base(page, virt_address + page_nr * PAGESIZE);
     idl4_fpage_set_mode(page, IDL4_MODE_MAP);
-    idl4_fpage_set_page(page, newpage); idl4_fpage_set_permissions(page, IDL4_PERM_READ|IDL4_PERM_WRITE|IDL4_PERM_EXECUTE); 
+    idl4_fpage_set_page(page, newpage); 
+    idl4_fpage_set_permissions(page, IDL4_PERM_READ|IDL4_PERM_WRITE|IDL4_PERM_EXECUTE); 
 
 	if(!L4_IsNilFpage(newpage))
 	{	
