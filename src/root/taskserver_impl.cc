@@ -142,7 +142,7 @@ L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  p
     // TODO: proper exception handling! (file not found, file invalid)
     L4_Word_t file_id = IF_FILESERVER_get_file_id(fileserverid, path, &env);
     if (file_id == -1) {
-        panic("ELF file does not exist");
+        return L4_nilthread;
     }
     
 	buf_t buff;
