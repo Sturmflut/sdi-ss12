@@ -24,8 +24,6 @@ L4_ThreadId_t taskserverid = L4_nilthread;
 CORBA_Environment env(idl4_default_environment);
 
 
-L4_Word_t second_thread_stack[1024];
-
 void print_charat(int x, int y, char character, char attrib)
 {
     IF_CONSOLESERVER_putcharat((CORBA_Object)consoleid, x, y, character, attrib, &env); 
@@ -72,6 +70,9 @@ void animation_loop()
 
     clear_screen();
 
+    // Get console number
+    L4_Word_t console = IF_CONSOLESERVER_getconsolenum((CORBA_Object)consoleid, &env);
+
     /** Print logo */
     print_stringat(23, 3, (char*)" ____  ____ ___       ___  ____  ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
     print_stringat(23, 4, (char*)"/ ___||  _ \\_ _|     / _ \\/ ___| ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
@@ -79,19 +80,15 @@ void animation_loop()
     print_stringat(23, 6, (char*)" ___) | |_| | |_____| |_| |___) |", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
     print_stringat(23, 7, (char*)"|____/|____/___|     \\___/|____/ ", SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE | SDI_CONSOLE_ATTRIBUTE_BGBLUE);
 
-    void *p1, *p2, *p3;
-    char key, modifier;
+
+    // Print system info
+    char conbuf[15];
+    snprintf(conbuf, sizeof(conbuf), "Console %i", (int)(console+1));
+    print_stringat(33, 10, conbuf,  SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE);
+
 
     while(1)
     {
-        // Read key
-        if(IF_CONSOLESERVER_getKey((CORBA_Object)consoleid, &key, &modifier, &env))
-        {
-            snprintf(buf, sizeof(buf), "%x %x", key, modifier);
-            print_stringat(1, 1, buf, SDI_CONSOLE_ATTRIBUTE_FGLIGHTWHITE);
-        }
-        
-
         /* Scrolling step */
         x--;
         if(x < -strlen(banner))
@@ -119,26 +116,20 @@ int main()
 
     CORBA_Environment env(idl4_default_environment);
 
-
+    // Resolve logger
     while (L4_IsNilThread(loggerid))
-        loggerid = nameserver_lookup("/server/logger");
+        loggerid = nameserver_lookup((path_t)"/server/logger");
 
-
-    /* Print some stuff on the console */
+    // Resolve console
     while (L4_IsNilThread(consoleid))
-        consoleid = nameserver_lookup("/server/console");
+        consoleid = nameserver_lookup((path_t)"/server/console");
 
+    // Resolve taskserver
     while (L4_IsNilThread(taskserverid))
         taskserverid = nameserver_lookup("/task");
 
+    // Resolve myself
     L4_ThreadId_t myself = L4_Myself();
-
-    /* Starting a second thread */
-    IF_TASKSERVER_create_thread(
-            (CORBA_Object) taskserverid, 
-            (L4_Word_t)&thread_loop, 
-            (L4_Word_t)&second_thread_stack[1023], 
-            &env);
 
     /* And now.... action! */
     animation_loop();
