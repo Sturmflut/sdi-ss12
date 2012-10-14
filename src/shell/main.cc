@@ -13,6 +13,7 @@
 #include <if/iflogging.h>
 #include <if/ifnaming.h>
 #include <if/ifconsoleserver.h>
+#include <if/iftaskserver.h>
 
 #include <sdi/console_attributes.h>
 
@@ -21,6 +22,7 @@
 
 L4_ThreadId_t loggerid = L4_nilthread;
 L4_ThreadId_t consoleid = L4_nilthread;
+L4_ThreadId_t taskid = L4_nilthread;
 L4_ThreadId_t fileid = L4_nilthread;
 CORBA_Environment env(idl4_default_environment);
 
@@ -92,7 +94,25 @@ void command_loop()
         // Handle builtin commands
         if(!builtin_command(cmd, cmdline))
         {
-            console_printf(consoleid, "Unknown command, should do taskserver::create_task here\n");
+            // Get current console
+	    L4_Word_t console = IF_CONSOLESERVER_getconsolenum((CORBA_Object)consoleid, &env);
+
+            // Start new task and change console association
+	    L4_ThreadId_t newtask = IF_TASKSERVER_create_task((CORBA_Object)taskid, cmd, cmdline, &env);
+            if(!L4_IsNilThread(newtask))
+            {
+                IF_CONSOLESERVER_setactivethread((CORBA_Object)consoleid, console, &newtask, &env);
+
+                // wait for task death
+                while(42)
+                {
+                    sleep(10000);
+                }
+            }
+            else
+            {
+                console_printf(consoleid, "Command is neither a builtin nor an existing binary\n");
+            }
         }
     
     }
@@ -120,6 +140,10 @@ int main()
     // Resolve fileserver
     while (L4_IsNilThread(fileid))
         fileid = nameserver_lookup("/file");
+
+    // Resolve taskserver
+    while (L4_IsNilThread(taskid))
+        taskid = nameserver_lookup("/task");
 
     L4_ThreadId_t myself = L4_Myself();
 
