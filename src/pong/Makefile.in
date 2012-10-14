@@ -11,7 +11,7 @@ top_builddir=	@top_builddir@
 include $(top_srcdir)/Mk/base.mk
 
 
-PROGRAM=	simplethread2
+PROGRAM=	pong
 PROGRAM_DEPS=	$(top_builddir)/lib/sdi/libsdi.a \
 		$(top_srcdir)/include/$(ARCH)/sdi.ld
 

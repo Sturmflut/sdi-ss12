@@ -263,7 +263,7 @@ src/nameserver/Makefile
 src/fileserver/Makefile
 src/consoleserver/Makefile
 src/bannerdemo/Makefile
-src/simplethread2/Makefile
+src/pong/Makefile
 src/shell/Makefile
 
 ])

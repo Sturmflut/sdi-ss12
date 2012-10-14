@@ -15,6 +15,6 @@ module=(cd)/sdios/memoryserver
 module=(cd)/sdios/fileserver
 module=(cd)/sdios/consoleserver
 module=(cd)/sdios/bannerdemo
-module=(cd)/sdios/simplethread2
+module=(cd)/sdios/pong
 module=(cd)/sdios/shell
 module=(cd)/sdios/tasks.conf
