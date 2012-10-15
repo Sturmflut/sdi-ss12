@@ -13,10 +13,10 @@ include $(top_srcdir)/Mk/base.mk
 
 PROGRAM=	shell
 PROGRAM_DEPS=	$(top_builddir)/lib/sdi/libsdi.a \
+		$(top_builddir)/lib/crt0/libcrt0.a \
 		$(top_srcdir)/include/$(ARCH)/sdi.ld
 
-SRCS=		$(ARCH)-crt0.S \
-		main.cc \
+SRCS=		main.cc \
 		builtin_cat.cc \
 		builtin_lookup.cc \
 		builtin_ls.cc \
@@ -25,7 +25,7 @@ SRCS=		$(ARCH)-crt0.S \
 IDLS=           
 
 LIBS+=		-ll4 -lsdi -lio
-LDFLAGS+=	-Ttext=00780000 -T $(top_builddir)/include/$(ARCH)/sdi.ld
+LDFLAGS+=	-Ttext=00780000 -T $(top_builddir)/include/$(ARCH)/sdi.ld $(top_builddir)/lib/crt0/libcrt0.a
 
 
 include $(top_srcdir)/Mk/prog.mk

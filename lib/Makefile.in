@@ -36,7 +36,7 @@ top_builddir=	@top_builddir@
 include $(top_srcdir)/Mk/base.mk
 
 
-SUBDIRS=	sdi
+SUBDIRS=	sdi crt0
 
 post-clean:
 	rm -f *.a

@@ -256,6 +256,7 @@ Makefile
 if/Makefile
 lib/Makefile
 lib/sdi/Makefile
+lib/crt0/Makefile
 src/Makefile
 src/root/Makefile
 src/memoryserver/Makefile
