@@ -3,95 +3,97 @@ import "sdi/types.h";
 
 [uuid(IF_FILE_ID)]
 interface IF_FILE {
-	const L4_Word_t TYPE_FILE = 1;
-	const L4_Word_t TYPE_DIRECTORY = 2;
+    const L4_Word_t TYPE_FILE = 1;
+    const L4_Word_t TYPE_DIRECTORY = 2;
 
-	/**
-	  Resolve the file id for a given path
+    /**
+      Resolve the file id for a given path
 
-	  @param path Path
-	  @return File ID
-	*/
-	L4_Word_t get_file_id(in path_t path);
+      @param path Path
+      @return File ID
+    */
+    L4_Word_t get_file_id(in path_t path);
 
-	/**
-	  Read from the given file
+    /**
+      Read from the given file
 
-	  @paran file_id File Id
-	  @param offset Start offset
-	  @param count Number of bytes to read
-	  @param buf Buffer
-	  @return -1 on error, number of actually read bytes on success
-	*/
-	L4_Word_t read(in L4_Word_t file_id, in L4_Word_t offset, in L4_Word_t count,
-		[prealloc] out buf_t buf);
+      @paran file_id File Id
+      @param offset Start offset
+      @param count Number of bytes to read
+      @param buf Buffer
+      @return -1 on error, number of actually read bytes on success
+    */
+    L4_Word_t read(in L4_Word_t file_id, in L4_Word_t offset, in L4_Word_t count,
+        [prealloc] out buf_t buf);
 
-	/**
-	  Write to the given file
+    /**
+      Write to the given file
 
-	  @paran file_id File Id
-	  @param offset Start offset
-	  @param count Number of bytes to write
-	  @param buf Buffer
-	  @return -1 on error, number of actually written bytes on success
-	*/
-	L4_Word_t write(in L4_Word_t file_id, in L4_Word_t offset, in L4_Word_t count,
-		in buf_t buf);
+      @paran file_id File Id
+      @param offset Start offset
+      @param count Number of bytes to write
+      @param buf Buffer
+      @return -1 on error, number of actually written bytes on success
+    */
+    L4_Word_t write(in L4_Word_t file_id, in L4_Word_t offset, in L4_Word_t count,
+        in buf_t buf);
 
-	/**
-	  Get the size of the given file
-	
-	  @param path Path
-	  @return -1 on error, file size on success
-	*/
-	L4_Word_t get_file_size(in path_t path);
+    /**
+      Get the size of the given file
+    
+      @param path Path
+      @return -1 on error, file size on success
+    */
+    L4_Word_t get_file_size(in path_t path);
 
-	/**
-	  Get the type of the given file
-	
-	  @param path Path
-	  @return -1 on error, type constant on success
-	*/
-	L4_Word_t get_file_type(in path_t path);
+    /**
+      Get the type of the given file
+    
+      @param path Path
+      @return -1 on error, type constant on success
+    */
+    L4_Word_t get_file_type(in path_t path);
 
-	/**
-	  Remove the given file
+    /**
+      Remove the given file
 
-	  @param file_id File id
-	  @return true on success, false on error
-	*/
-	boolean remove(in L4_Word_t file_id);
+      @param file_id File id
+      @return true on success, false on error
+    */
+    boolean remove(in L4_Word_t file_id);
 
-	/**
-	  Create the given directory
+    /**
+      Create the given directory
 
-	  @param path Directory path
-	  @return true on success, false on error
-	*/
-	boolean mkdir(in path_t path);
+      @param path Directory path
+      @return true on success, false on error
+    */
+    boolean mkdir(in path_t path);
 
-	/**
-	  Remove the given directory
+    /**
+      Remove the given directory
 
-	  @param path Path
-	  @return true on success, false on error
-	*/
-	boolean rmdir(in path_t path);
+      @param path Path
+      @return true on success, false on error
+    */
+    boolean rmdir(in path_t path);
 
-	/**
-	  Get the total number of files and directories present in the given path
+    /**
+      Get the total number of files and directories present in the given path
 
-	  @param path Path
-	  @return -1 on error, total number of files and directories on success
-	*/
-	L4_Word_t get_dir_size(in path_t path);
+      @param path Path
+      @return -1 on error, total number of files and directories on success
+    */
+    L4_Word_t get_dir_size(in path_t path);
 
-	/**
-	  Get the given directory entry
+    /**
+      Get the given directory entry
 
-	  @param path Path
-	  @param entry Entry id (< get_dir_size)
-	  @param buf Entry name buffer
-	*/
-	boolean get_dir_entry(in path_t path, in L4_Word_t entry, [prealloc] out buf_t buf);
+      @param path Path
+      @param entry Entry id (< get_dir_size)
+      @param buf Entry name buffer
+          @return True on success, false on error
+    */
+    boolean get_dir_entry(in path_t path, in L4_Word_t entry, [prealloc] out buf_t buf);
 };
+

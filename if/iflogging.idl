@@ -4,10 +4,10 @@ import "sdi/types.h";
 [uuid(IF_LOGGING_ID)]
 interface IF_LOGGING {
 
-	/**
-	  Send the given message to the logger
+    /**
+      Send the given message to the logger
 
-	  @param message Log message
-	*/
-	void LogMessage( in logmessage_t message);
+      @param message Log message
+    */
+    void LogMessage( in logmessage_t message);
 };
