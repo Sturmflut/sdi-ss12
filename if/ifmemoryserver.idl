@@ -49,7 +49,8 @@ interface IF_MEMORYSERVER {
          in L4_Word_t size, in L4_Word_t realsize);
 
     /**
-      Unmap the mapping at the given virtual address
+      Unmap the mapping at the given virtual address (in the address
+      space of the caller)
 
       @param virt_start_address Virtual start address inside the given address space
     */
