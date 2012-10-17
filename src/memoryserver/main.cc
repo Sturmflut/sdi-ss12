@@ -24,25 +24,6 @@ char logbuf[80];
 
 int main(void)
 {
-    while (L4_IsNilThread(loggerid)){
-        loggerid = nameserver_lookup("/server/logger");
-    }
-
-    log_printf(loggerid, "[MEMORY] Registering");
-
-    nameserver_register("/server/memory");
-
-    log_printf(loggerid, "[MEMORY] Registered...");
-
-    //initialize data
-    Taskheader_index = 0;
-    sigma0id = L4_GlobalId(48, 1); // TODO: hard coded for now
-
-    log_printf(loggerid, "[MEMORY] sigma0id = %x", sigma0id);
-
-    while (L4_IsNilThread(fileserverid)){
-        fileserverid = nameserver_lookup("/file");
-    }
-
+    memoryserver_init();
     memoryserver_server();	
 }

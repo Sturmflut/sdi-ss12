@@ -42,6 +42,8 @@ extern L4_ThreadId_t fileserverid;
 extern CORBA_Environment env;
 extern char logbuf[80];
 
+extern void memoryserver_init();
+
 extern L4_Word_t memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_ThreadId_t * threadid, const L4_Word_t  type, const L4_Word_t  virt_start_address, const L4_Word_t  size, idl4_server_environment * _env);
 
 extern void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  address, const L4_Word_t  ip, const L4_Word_t  privileges, idl4_fpage_t * page, idl4_server_environment * _env);

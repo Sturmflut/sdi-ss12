@@ -10,6 +10,29 @@
 Taskheader_t taskList[NUM_T_ENTRY];
 unsigned char Taskheader_index;
 
+void memoryserver_init() {
+    while (L4_IsNilThread(loggerid)){
+        loggerid = nameserver_lookup("/server/logger");
+    }
+
+    log_printf(loggerid, "[MEMORY] Registering");
+
+    nameserver_register("/server/memory");
+
+    log_printf(loggerid, "[MEMORY] Registered...");
+
+    //initialize data
+    Taskheader_index = 0;
+    sigma0id = L4_GlobalId(48, 1); // TODO: hard coded for now
+
+    log_printf(loggerid, "[MEMORY] sigma0id = %x", sigma0id);
+
+    while (L4_IsNilThread(fileserverid)){
+        fileserverid = nameserver_lookup("/file");
+    }
+
+}
+
 unsigned char findOrCreateTaskEntry(L4_Word_t taskid)
 {
 	char taskheader_entry = -1;
