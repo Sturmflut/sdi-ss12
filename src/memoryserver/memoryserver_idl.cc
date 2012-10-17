@@ -70,9 +70,7 @@ IDL4_PUBLISH_MEMORYSERVER_STARTUP(memoryserver_startup_implementation);
 IDL4_INLINE void  memoryserver_destroyed_implementation(CORBA_Object  _caller, const L4_ThreadId_t * threadid, idl4_server_environment * _env)
 
 {
-  /* implementation of IF_MEMORYSERVER::destroyed */
-  
-  return;
+  return memoryserver_destroyed_implementation_real(_caller, threadid, _env);
 }
 
 IDL4_PUBLISH_MEMORYSERVER_DESTROYED(memoryserver_destroyed_implementation);

@@ -6,6 +6,7 @@
 #define NOT_YET_MAPPED -1
 #define MAX_FILE_MAPPINGS 10
 #define MAX_ANON_MAPPINGS 20
+#define MAX_FPAGES_PER_TASK 4096
 
 /*Data structures for memory server */
 
@@ -22,11 +23,17 @@ typedef struct {
       L4_Word_t realsize; // size of file
 } File_mapping_t;
 
+
+// NOTE: storing mapped_fpages like this is very wasteful. Maybe use a
+// multilevel pagetable like x86
+//
 typedef struct {
     bool task_exists;
     L4_Word_t taskid;
     Anon_mapping_t anon_mappings[MAX_ANON_MAPPINGS];
     File_mapping_t file_mappings[MAX_FILE_MAPPINGS];
+    L4_Fpage_t mapped_fpages[MAX_FPAGES_PER_TASK];
+    unsigned int mapped_fpages_index;
     unsigned int anon_mapping_index;
     unsigned int file_mapping_index;	
 } Taskheader_t;
@@ -44,6 +51,8 @@ extern char logbuf[80];
 
 extern void memoryserver_init();
 
+extern void clear_tasklist_entry(char taskheader_entry);
+
 extern L4_Word_t memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_ThreadId_t * threadid, const L4_Word_t  type, const L4_Word_t  virt_start_address, const L4_Word_t  size, idl4_server_environment * _env);
 
 extern void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  address, const L4_Word_t  ip, const L4_Word_t  privileges, idl4_fpage_t * page, idl4_server_environment * _env);
@@ -52,6 +61,7 @@ extern void memoryserver_startup_real(CORBA_Object  _caller, const L4_ThreadId_t
 
 extern L4_Word_t memoryserver_map_file_pages_real(CORBA_Object  _caller, const L4_ThreadId_t * threadid, const L4_Word_t  type, const path_t  path, const L4_Word_t  offset, const L4_Word_t  virt_start_address, const L4_Word_t  size, const L4_Word_t  realsize, idl4_server_environment * _env);
 
+extern void  memoryserver_destroyed_implementation_real(CORBA_Object  _caller, const L4_ThreadId_t * threadid, idl4_server_environment * _env);
 
 void  memoryserver_server(void);
 

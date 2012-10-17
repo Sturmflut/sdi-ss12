@@ -38,8 +38,7 @@ IDL4_INLINE void  taskserver_kill_task_implementation(CORBA_Object  _caller, con
 
 {
   /* implementation of IF_TASKSERVER::kill_task */
-  
-  return;
+  return taskserver_kill_task_implementation_real(_caller, task_id, _env);
 }
 
 IDL4_PUBLISH_TASKSERVER_KILL_TASK(taskserver_kill_task_implementation);

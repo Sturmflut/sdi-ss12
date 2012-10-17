@@ -32,14 +32,20 @@ void memoryserver_init() {
     }
 
     for (int i = 0; i < NUM_T_ENTRY; i++) {
-        taskList[i].task_exists = false;
-        taskList[i].anon_mapping_index = 0;
-        taskList[i].file_mapping_index = 0;
+        clear_tasklist_entry(i);
     }
+}
+
+void clear_tasklist_entry(char taskheader_entry) {
+    taskList[taskheader_entry].task_exists = false;
+    taskList[taskheader_entry].anon_mapping_index = 0;
+    taskList[taskheader_entry].file_mapping_index = 0;
+    taskList[taskheader_entry].mapped_fpages_index = 0;
 }
 
 unsigned char findOrCreateTaskEntry(L4_Word_t taskid)
 {
+    // TODO: reuse "old" entries in taskList
 	char taskheader_entry = -1;
 
 	for(int i = 0; i < NUM_T_ENTRY; i = i+1)
@@ -316,8 +322,11 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
             // region where we have to fill with zeros
             memset((void *)L4_Address(newpage), 0, PAGESIZE); 
         }
-    } 	
-     
+    }
+    
+    unsigned int mapped_fpages_index = taskList[taskListIndex].mapped_fpages_index;
+    taskList[taskListIndex].mapped_fpages[mapped_fpages_index] = newpage;
+    taskList[taskListIndex].mapped_fpages_index++;
 
 	return;
 }
@@ -337,4 +346,20 @@ void  memoryserver_startup_real(CORBA_Object  _caller, const L4_ThreadId_t * thr
 	log_printf(loggerid, "[MEMORY] Thread started");
 }
 
+extern void  memoryserver_destroyed_implementation_real(CORBA_Object  _caller, const L4_ThreadId_t * threadid, idl4_server_environment * _env)
+{
+    L4_Word_t task_id = get_task_id(*threadid);
+    char taskheader_entry = findOrCreateTaskEntry(task_id);
 
+    if (taskheader_entry == -1) {
+        panic("Task entry of to-be-killed task does not exist!");
+    }
+
+    log_printf(loggerid, "[MEMORY] Destroying task %p...", threadid->raw);
+    
+    unsigned int mapped_fpages_index = taskList[taskheader_entry].mapped_fpages_index;
+    log_printf(loggerid, "[MEMORY] Releasing %d pages", mapped_fpages_index);
+    L4_FlushFpages(mapped_fpages_index, taskList[taskheader_entry].mapped_fpages);
+    
+    clear_tasklist_entry(taskheader_entry); 
+}

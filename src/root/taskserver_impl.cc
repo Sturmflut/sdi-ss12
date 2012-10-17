@@ -120,6 +120,8 @@ L4_ThreadId_t get_next_thread_id() {
 
 L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  path, const path_t  cmdline, idl4_server_environment * _env) {
     L4_ThreadId_t threadid = get_next_thread_id();
+
+    // TODO: reuse old entries
     last_task_id++;
     
     /* First ThreadControl to setup initial thread */
@@ -225,3 +227,21 @@ L4_ThreadId_t  taskserver_create_thread_real(CORBA_Object  _caller, const L4_Wor
 
 }
 
+void taskserver_kill_task_implementation_real(CORBA_Object  _caller, const L4_ThreadId_t * threadid, idl4_server_environment * _env)
+{
+    L4_Word_t task_id = get_task_id(*threadid);
+
+    log_printf(loggerid, "[TASK] killing task_id: %d", task_id);
+    
+    // iterate over all threads in the given task
+    for (int i = 0; i < MAX_THREADS; i++) {
+        if (taskList[task_id].has_thread[i]) {
+            L4_ThreadId_t kill_thread_id = create_thread_id(task_id, i);
+            if (!L4_ThreadControl(kill_thread_id, L4_nilthread, L4_nilthread, L4_nilthread, (void *)-1)) {
+                panic("Could not kill thread");
+            }
+        }
+    }
+    
+    IF_MEMORYSERVER_destroyed(memoryserverid, threadid, &env);
+}

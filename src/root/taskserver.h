@@ -24,4 +24,6 @@ L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  p
 
 L4_ThreadId_t  taskserver_create_thread_real(CORBA_Object  _caller, const L4_Word_t  ip, const L4_Word_t  sp, idl4_server_environment * _env);
 
+void taskserver_kill_task_implementation_real(CORBA_Object  _caller, const L4_ThreadId_t * task_id, idl4_server_environment * _env);
+
 #endif
