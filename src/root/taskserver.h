@@ -4,7 +4,6 @@
 #include <sdi/sdi.h>
 #include <if/iflogging.h>
 
-#define NUM_T_ENTRY 30
 #define MAX_THREADS 10
 
 // TODO: Datenstruktur um Threads zu speichern

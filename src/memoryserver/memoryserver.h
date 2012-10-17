@@ -3,7 +3,6 @@
 
 #include <sdi/sdi.h>
 
-#define NUM_T_ENTRY 30
 #define NOT_YET_MAPPED -1
 #define MAX_FILE_MAPPINGS 10
 #define MAX_ANON_MAPPINGS 20

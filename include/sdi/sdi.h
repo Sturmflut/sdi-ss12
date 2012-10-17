@@ -45,6 +45,9 @@ void console_setcolor(char color);
 
 #define ELEM_COUNT(x) (sizeof((x)) / sizeof((x[0])))
 
+// number of threads
+#define NUM_T_ENTRY 30
+
 // Taskserver
 L4_Word_t get_task_id(L4_ThreadId_t threadid);
 L4_Word_t get_thread_count(L4_ThreadId_t threadid);
