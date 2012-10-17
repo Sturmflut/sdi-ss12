@@ -31,15 +31,20 @@ void memoryserver_init() {
         fileserverid = nameserver_lookup("/file");
     }
 
+    for (int i = 0; i < NUM_T_ENTRY; i++) {
+        taskList[i].task_exists = false;
+        taskList[i].anon_mapping_index = 0;
+        taskList[i].file_mapping_index = 0;
+    }
 }
 
 unsigned char findOrCreateTaskEntry(L4_Word_t taskid)
 {
 	char taskheader_entry = -1;
 
-	for(int i = 0; i < Taskheader_index; i = i+1)
+	for(int i = 0; i < NUM_T_ENTRY; i = i+1)
 	{
-		if(taskList[i].taskid == taskid)
+		if (taskList[i].task_exists && taskList[i].taskid == taskid)
 			taskheader_entry = i;
 	}
 	
@@ -47,9 +52,10 @@ unsigned char findOrCreateTaskEntry(L4_Word_t taskid)
 	{
         if(Taskheader_index < NUM_T_ENTRY) {
             taskheader_entry = Taskheader_index++;
-            taskList[taskheader_entry].pages_index = 0;
-            taskList[taskheader_entry].filemaps_index = 0;
+            taskList[taskheader_entry].anon_mapping_index = 0;
+            taskList[taskheader_entry].file_mapping_index = 0;
             taskList[taskheader_entry].taskid = taskid;
+            taskList[taskheader_entry].task_exists = true;
         }
 	}
 	
@@ -75,20 +81,20 @@ char checkAddressOverlapping(L4_Word_t virt_start_address, L4_Word_t virt_end_ad
 
 char isAddressConflict(Taskheader_t * myTaskheader, L4_Word_t virt_start_address, L4_Word_t virt_end_address) 
 {	
-	for(int i=0; i<myTaskheader->pages_index; i = i+1)
+	for(int i=0; i<myTaskheader->anon_mapping_index; i = i+1)
 	{
-		L4_Word_t mapped_virt_start_address = myTaskheader->pages[i].virt_address;
-		L4_Word_t mapped_virt_end_address = mapped_virt_start_address + myTaskheader->pages[i].size;
+		L4_Word_t mapped_virt_start_address = myTaskheader->anon_mappings[i].virt_address;
+		L4_Word_t mapped_virt_end_address = mapped_virt_start_address + myTaskheader->anon_mappings[i].size;
 		
 		if( checkAddressOverlapping(virt_start_address, virt_end_address, mapped_virt_start_address, mapped_virt_end_address) == 0 )
 			return 1;
 		
 	}	
 
-	for(int i=0; i<myTaskheader->filemaps_index; i = i+1)
+	for(int i=0; i<myTaskheader->file_mapping_index; i = i+1)
 	{
-		L4_Word_t mapped_virt_start_address = myTaskheader->filemaps[i].virt_address;
-		L4_Word_t mapped_virt_end_address = mapped_virt_start_address + myTaskheader->filemaps[i].size;
+		L4_Word_t mapped_virt_start_address = myTaskheader->file_mappings[i].virt_address;
+		L4_Word_t mapped_virt_end_address = mapped_virt_start_address + myTaskheader->file_mappings[i].size;
 
 		if( checkAddressOverlapping(virt_start_address, virt_end_address, mapped_virt_start_address, mapped_virt_end_address) == 0 )
 			return 1;
@@ -122,9 +128,16 @@ L4_Word_t memoryserver_map_anon_pages_real(CORBA_Object  _caller, const L4_Threa
 		return -1; // TODO define proper return values
     }
 
+    if (myTaskheader->anon_mapping_index >= MAX_ANON_MAPPINGS) {
+        panic("Max. anonymous mappings reached");
+    }
+
 	//create new page entry for thread
-	Page_entry_t pe = {NOT_YET_MAPPED, virt_start_address, size};
-	myTaskheader->pages[(myTaskheader->pages_index)++] = pe;
+	Anon_mapping_t pe;
+    pe.virt_address = virt_start_address;
+    pe.size = size;
+	
+    myTaskheader->anon_mappings[(myTaskheader->anon_mapping_index)++] = pe;
 
 	log_printf(loggerid, "[MEMORY] Anonymous memory mapped for threadid %p at %x", threadid->raw, virt_start_address);
 
@@ -157,17 +170,20 @@ L4_Word_t  memoryserver_map_file_pages_real(CORBA_Object  _caller, const L4_Thre
         return -1; // TODO define proper return values
     }
 
-	//create new file entry for thread
-	File_entry_t fe; 
-
+    if (myTaskheader->file_mapping_index >= MAX_FILE_MAPPINGS) {
+        panic("Max. file mappings reached");
+    }
+	
+    //create new file entry for thread
+	File_mapping_t fe; 
     fe.virt_address = virt_start_address;
     fe.offset = offset;
     fe.size = size;
     fe.realsize = realsize;
-    fe.page = L4_Nilpage;
     strncpy(fe.path, path, ELEM_COUNT(fe.path));
+
     
-	myTaskheader->filemaps[(myTaskheader->filemaps_index)++] = fe;
+	myTaskheader->file_mappings[(myTaskheader->file_mapping_index)++] = fe;
 
 	log_printf(loggerid, "[MEMORY] Memory mapped for threadid %p at %x", threadid->raw, virt_start_address);
 
@@ -177,10 +193,10 @@ L4_Word_t  memoryserver_map_file_pages_real(CORBA_Object  _caller, const L4_Thre
 
 void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  address, const L4_Word_t  ip, const L4_Word_t  privileges, idl4_fpage_t * page, idl4_server_environment * _env)
 {
-	Page_entry_t *pe = NULL;
-	Page_entry_t *tmp_pe = NULL;
-	File_entry_t *fe = NULL;
-	File_entry_t *tmp_fe = NULL;
+	Anon_mapping_t *pe = NULL;
+	Anon_mapping_t *tmp_pe = NULL;
+	File_mapping_t *fe = NULL;
+	File_mapping_t *tmp_fe = NULL;
 	int taskListIndex = -1;
 
 
@@ -189,10 +205,10 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 //            get_task_id(_caller),
 //            get_thread_count(_caller));
 
-    //search mapping
-	for(int i=0; i<Taskheader_index; i = i+1)
+    // search mapping
+	for(int i=0; i < NUM_T_ENTRY; i++)
 	{
-		if(taskList[i].taskid == get_task_id(_caller))
+		if(taskList[i].task_exists && taskList[i].taskid == get_task_id(_caller))
 		{
 			taskListIndex = i;
 			break;
@@ -204,9 +220,9 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 		return;
     }
 
-	for(int i=0; i<taskList[taskListIndex].pages_index; i = i+1)
+	for(int i=0; i<taskList[taskListIndex].anon_mapping_index; i = i+1)
 	{
-		tmp_pe = &(taskList[taskListIndex].pages[i]);
+		tmp_pe = &(taskList[taskListIndex].anon_mappings[i]);
 
 		if(address >= tmp_pe->virt_address &&
 			address <= (tmp_pe->virt_address + tmp_pe->size))
@@ -218,9 +234,9 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
 	
 	if(pe == NULL)
 	{
-		for(int i=0; i<taskList[taskListIndex].filemaps_index; i = i+1)
+		for(int i=0; i<taskList[taskListIndex].file_mapping_index; i = i+1)
 		{
-			tmp_fe = &(taskList[taskListIndex].filemaps[i]);
+			tmp_fe = &(taskList[taskListIndex].file_mappings[i]);
 
 			if(address >= tmp_fe->virt_address &&
 				address <= (tmp_fe->virt_address + tmp_fe->size))
@@ -262,52 +278,46 @@ void  memoryserver_pagefault_real(CORBA_Object  _caller, const L4_Word_t  addres
     idl4_fpage_set_page(page, newpage); 
     idl4_fpage_set_permissions(page, IDL4_PERM_READ|IDL4_PERM_WRITE|IDL4_PERM_EXECUTE); 
 
-	if(!L4_IsNilFpage(newpage))
-	{	
-		if(fe != NULL)
-		{
-            // TODO: no longer correct, now multiple fpages per file mapping 
-			fe->page = newpage;
-
-            if (address < virt_address + fe->realsize) {
-                // region where we have to load file from file server
-                buf_t buff;
-                char tbuff[PAGESIZE];
-                memset(tbuff, 0, PAGESIZE);
-
-                buff._buffer = (CORBA_char*)tbuff;
-                buff._maximum = PAGESIZE;
-
-
-                L4_Word_t fileid = IF_FILESERVER_get_file_id(fileserverid, fe->path, &env);
-
-                L4_Word_t in_max = PAGESIZE;
-
-                if ((virt_address + page_nr * PAGESIZE) + PAGESIZE >= virt_address + fe->realsize) {
-                    // we are in the last block, so in_max has to be adjusted
-                    in_max = (virt_address + fe->realsize) - (virt_address + page_nr * PAGESIZE);
-                }
-
-                L4_Word_t res_read = IF_FILESERVER_read(
-                        fileserverid, 
-                        fileid, 
-                        fe->offset + page_nr * PAGESIZE,
-                        in_max, &buff, &env);
-
-                memcpy((void *)L4_Address(newpage), buff._buffer, in_max);
-
-            } else if (address >= virt_address + fe->realsize && address < virt_address + fe->size) {
-                // region where we have to fill with zeros
-                memset((void *)L4_Address(newpage), 0, PAGESIZE); 
-            }
-		} else {
-            // TODO: now wrong, multiple pages per pe-mapping
-			pe->base_address = L4_Address(newpage);	
-		}
-	} else {
+    if (L4_IsNilFpage(newpage)) {
         panic("PF handler: new page is a nil page!");
     }
 
+    if(fe != NULL)
+    {
+        if (address < virt_address + fe->realsize) {
+            // region where we have to load file from file server
+            buf_t buff;
+            char tbuff[PAGESIZE];
+            memset(tbuff, 0, PAGESIZE);
+
+            buff._buffer = (CORBA_char*)tbuff;
+            buff._maximum = PAGESIZE;
+
+
+            L4_Word_t fileid = IF_FILESERVER_get_file_id(fileserverid, fe->path, &env);
+
+            L4_Word_t in_max = PAGESIZE;
+
+            if ((virt_address + page_nr * PAGESIZE) + PAGESIZE >= virt_address + fe->realsize) {
+                // we are in the last block, so in_max has to be adjusted
+                in_max = (virt_address + fe->realsize) - (virt_address + page_nr * PAGESIZE);
+            }
+
+            L4_Word_t res_read = IF_FILESERVER_read(
+                    fileserverid, 
+                    fileid, 
+                    fe->offset + page_nr * PAGESIZE,
+                    in_max, &buff, &env);
+
+            memcpy((void *)L4_Address(newpage), buff._buffer, in_max);
+
+        } else if (address >= virt_address + fe->realsize && address < virt_address + fe->size) 
+        {
+            // region where we have to fill with zeros
+            memset((void *)L4_Address(newpage), 0, PAGESIZE); 
+        }
+    } 	
+     
 
 	return;
 }

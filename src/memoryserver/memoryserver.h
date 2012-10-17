@@ -5,30 +5,31 @@
 
 #define NUM_T_ENTRY 30
 #define NOT_YET_MAPPED -1
+#define MAX_FILE_MAPPINGS 10
+#define MAX_ANON_MAPPINGS 20
 
 /*Data structures for memory server */
 
-typedef struct{
-      L4_Word_t base_address; //Address of page in own space
+typedef struct {
       L4_Word_t virt_address; //Address of page in clients space
       L4_Word_t size;
-} Page_entry_t;
+} Anon_mapping_t;
 
-typedef struct{
+typedef struct {
       L4_Word_t virt_address;
       char path[64]; // path_t has length 64 (see types.idl)
       L4_Word_t offset;
-      L4_Word_t size; //size >= realsize
-      L4_Word_t realsize;
-      L4_Fpage_t page;
-} File_entry_t;
+      L4_Word_t size; // size of mapping; size >= realsize
+      L4_Word_t realsize; // size of file
+} File_mapping_t;
 
-typedef struct{
-      L4_Word_t taskid;
-      Page_entry_t pages[1000];
-      File_entry_t filemaps[10];
-	unsigned int pages_index;
-	unsigned int filemaps_index;	
+typedef struct {
+    bool task_exists;
+    L4_Word_t taskid;
+    Anon_mapping_t anon_mappings[MAX_ANON_MAPPINGS];
+    File_mapping_t file_mappings[MAX_FILE_MAPPINGS];
+    unsigned int anon_mapping_index;
+    unsigned int file_mapping_index;	
 } Taskheader_t;
 
 extern Taskheader_t taskList[NUM_T_ENTRY];
