@@ -25,7 +25,7 @@ SRCS=		main.cc \
 IDLS=           
 
 LIBS+=		-ll4 -lsdi -lio
-LDFLAGS+=	-Ttext=00780000 -T $(top_builddir)/include/$(ARCH)/sdi.ld $(top_builddir)/lib/crt0/libcrt0.a
+LDFLAGS+=	-Ttext=00100000 -T $(top_builddir)/include/$(ARCH)/sdi.ld $(top_builddir)/lib/crt0/libcrt0.a
 
 
 include $(top_srcdir)/Mk/prog.mk
