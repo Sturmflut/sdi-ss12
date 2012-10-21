@@ -1,37 +1,34 @@
 \section{Bootvorgang}
 
 \begin{itemize}
-	\item GRUB lädt Kickstart, L4, die Module und einen MULTIBOOT-Block hintereinander in den Speicher.
+	\item GRUB lädt Kickstart, den L4-Kernel, die Module und einen MULTIBOOT-Block hintereinander in den Speicher.
 	
 	\item GRUB startet Kickstart.
 	
-	\item Kickstart initialisiert die Hardware, startet L4 und übergibt den MULTIBOOT-Block.
+	\item Kickstart initialisiert die Hardware, startet L4 und übergibt den BootInfo-Block.
 	
 	\item L4 initialisiert sich und startet die Root-Task.
 	
-	\item Die Root-Task startet einen minimalen Pager (Minipager genannt) und den Logger im eigenen Adressraum.
+	\item Die Root-Task startet einen minimalen Pager (\textit{Minipager}) und den Logger im eigenen Adressraum.
 	
 	\item Der Minipager reicht alle Pagefaults 1:1 an Sigma0 durch. Alle Threads, welche den Minipager als Pager verwenden, laufen daher direkt aus dem physikalischen Speicher.
 
-	\item Die Root-Task startet den Nameserver, den Memory Server und den File Server jeweils wie folgt und mit festen ThreadIds:
+	\item Die Root-Task startet den Nameserver, den Memory Server, den File Server  und den Consoleserver jeweils wie folgt und mit festen ThreadIds:
 	\begin{enumerate}
 		\item Dekodieren des ELF-Headers.
 		\item Kopieren der relevanten Teile des ELF-Images an die beim Linken definierte Adresse. Bei diesem Vorgang werden automatisch passende Seiten von Sigma0 geholt.
 		\item ThreadControl aufrufen und den Namespace erzeugen.
 		\item Den Minipager als Pager eintragen.
+		\item ThreadControl aufrufen und den Thread starten.
 	\end{enumerate}
-	
-	\item Der Memory Server wird später der Pager für alle neu erstellten Tasks sein.
-	
-	\item File Server, Memory Server und Task Server registrieren sich beim Name Server.
-	
-	\item Der File Server holt sich über den Minipager die BootInfo und exportiert diese als virtuelles Dateisystem.
 	
 	\item Die Root-Task wird zum Task Server. Alle weiteren Tasks und Threads werden über den Task Server erzeugt.
 	
-	\item Der Task Server lädt die Konfigurationsdatei tasks.conf vom File Server. Sie enthält den Pfad aller noch zu startenden Tasks.
+	\item Der Memory Server wird später der Pager für alle neu erstellten Tasks sein.
 	
-	\item Der Task Server startet alle weiteren Tasks.
+	\item File Server, Memory Server, Task Server und Consoleserver registrieren sich beim Name Server.
+	
+	\item Der File Server holt sich über den Minipager die BootInfo und exportiert diese als virtuelles Dateisystem.
 	
 	\item Das attachen von Interrupts läuft über den Task Server, da nur dieser ThreadControl aufrufen kann.
 	
@@ -40,6 +37,10 @@
 	\item Der Consoleserver benötigt Zugriff auf die Ports 0x62 und 0x64 (per default erlaubt), sowie auf den Interrupt 1 (Keyboard).
 
 	\item Der Console Server startet emulierte Konsolen. Der Wechsel erfolgt mit einer Tastenkombination (z.B. Strg+Fn).
+	
+	\item Der Task Server lädt die Konfigurationsdatei tasks.conf vom File Server. Sie enthält den Pfad aller noch zu startenden Tasks sowie die Konsole, an welche die Tasks gebunden werden sollen.
+	
+	\item Der Task Server startet alle weiteren Tasks.
 	
 	\item Auf allen Konsolen wird je eine Shell gestartet.
 \end{itemize}

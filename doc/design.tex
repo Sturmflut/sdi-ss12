@@ -3,6 +3,10 @@
 \begin{center}
 \begin{tikzpicture}[block/.style={rectangle,very thick,draw=kit-blue100,top color=white,bottom color=kit-blue30,minimum size=10mm,align=center}]
 
+	\node at (-5,0) (schicht1) {Schicht 1};
+	\node at (-5,1.5) (schicht2) {Schicht 2};
+	\node at (-5,3) (schicht3) {Schicht 3};
+
 	\node at (-2,0) [block] (logger) {Logger};
 	\node at (0,0) [block] (minipager) {Minipager};
 	\node at (2,0) [block] (task) {Task};
@@ -23,4 +27,14 @@
 \end{tikzpicture}
 \end{center}
 
-Angestrebt wird ein Design, bei dem nur die elementarsten Server privilegierte Calls ausführen können/müssen.
+\subsection{Schicht 1 (Roottask)}
+
+Im Adressraum der Roottask laufen der Logger und der Minipager. Der Minipager wird später zum Pager für die notwendigsten System-Server und reicht physikalische Speicherseiten idempotent durch. Nach erfolgter Initialisierung der Startumgebung wird die Roottask selbst zum Taskserver.
+
+\subsection{Schicht 2}
+
+In dieser Schicht befinden sich die notwendigsten System-Server und Treiber.
+
+\subsection{Schicht 3}
+
+In dieser Schicht befinden sich die User-Tasks, welche über den Taskserver gestartet werden und Ein-/Ausgaben über den Consoleserver tätigen.
