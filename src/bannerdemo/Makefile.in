@@ -20,7 +20,7 @@ SRCS=		main.cc
 
 IDLS=           
 
-LIBS+=		-ll4 -lsdi -lio
+LIBS+=		-ll4 -lsdi -lio -lmalloc_memoryserver
 LDFLAGS+=	-Ttext=00100000 -T $(top_builddir)/include/$(ARCH)/sdi.ld $(top_builddir)/lib/crt0/libcrt0.a
 
 
