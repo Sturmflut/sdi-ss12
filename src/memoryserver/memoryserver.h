@@ -38,6 +38,8 @@ typedef struct {
     unsigned int file_mapping_index;	
 } Taskheader_t;
 
+// XXX: might be confusing - data structure has same name as in
+// taskserver.h
 extern Taskheader_t taskList[NUM_T_ENTRY];
 
 // points to the first free entry in taskList

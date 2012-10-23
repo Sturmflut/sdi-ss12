@@ -338,6 +338,14 @@ void  consoleserver_setactivethread_impl(CORBA_Object  _caller, const CORBA_long
 {
         if(console <0 || console >= SDI_CONSOLESERVER_NUM_CONSOLES)
                 return;
+        
+        // the thread_id might be already used at a different console 
+        // => clear
+        for (unsigned int i = 0; i < SDI_CONSOLESERVER_NUM_CONSOLES; i++) {
+            if (active_threads[i].raw == thread->raw) {
+                active_threads[i] = L4_nilthread;
+            }
+        }
 
         active_threads[console] = *thread;
 }

@@ -45,25 +45,31 @@ void clear_tasklist_entry(char taskheader_entry) {
 
 unsigned char findOrCreateTaskEntry(L4_Word_t taskid)
 {
-    // TODO: reuse "old" entries in taskList
 	char taskheader_entry = -1;
 
 	for(int i = 0; i < NUM_T_ENTRY; i = i+1)
 	{
-		if (taskList[i].task_exists && taskList[i].taskid == taskid)
+		if (taskList[i].task_exists && taskList[i].taskid == taskid) {
 			taskheader_entry = i;
-	}
-	
-	if(taskheader_entry == -1)
-	{
-        if(Taskheader_index < NUM_T_ENTRY) {
-            taskheader_entry = Taskheader_index++;
-            taskList[taskheader_entry].anon_mapping_index = 0;
-            taskList[taskheader_entry].file_mapping_index = 0;
-            taskList[taskheader_entry].taskid = taskid;
-            taskList[taskheader_entry].task_exists = true;
+            break;
         }
 	}
+    
+
+    // no existing taskList entry, try tro create new one
+	if(taskheader_entry == -1) {
+        // find unused taskList entry
+        for (int i = 0; i < NUM_T_ENTRY; i++) {
+            if (!taskList[i].task_exists) {
+                taskheader_entry = i;
+                taskList[taskheader_entry].anon_mapping_index = 0;
+                taskList[taskheader_entry].file_mapping_index = 0;
+                taskList[taskheader_entry].taskid = taskid;
+                taskList[taskheader_entry].task_exists = true;
+                break;
+            }
+        }
+    }
 	
 	return taskheader_entry;
 }

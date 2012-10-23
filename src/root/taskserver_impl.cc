@@ -10,8 +10,6 @@
 #include "root.h"
 
 
-L4_Word_t last_task_id;
-
 L4_ThreadId_t memoryserverid = L4_nilthread;
 L4_ThreadId_t fileserverid = L4_nilthread;
 L4_ThreadId_t consoleserverid = L4_nilthread;
@@ -24,9 +22,6 @@ void taskserver_init() {
     nameserver_register("/task");
     log_printf(loggerid, "[TASK] Registered...");
     
-    // arbitrary first task_id (should be high enough to not collide)
-    last_task_id = 0;
-    
     while (L4_IsNilThread(memoryserverid)) {
         memoryserverid = nameserver_lookup("/server/memory");
     }
@@ -36,10 +31,19 @@ void taskserver_init() {
     while (L4_IsNilThread(consoleserverid)) {
         consoleserverid = nameserver_lookup("/server/console");
     }
-
-    log_printf(loggerid, "==============> Found consoleserverid: %p", consoleserverid.raw);
+    
+    for (L4_Word_t i = 0; i < NUM_T_ENTRY; i++) {
+        clear_tasklist_entry(i);
+    }
 
     start_init_tasks();
+}
+
+void clear_tasklist_entry(L4_Word_t task_id) {
+    taskList[task_id].task_exists = false;
+    for (int j = 0; j < MAX_THREADS; j++) {
+        taskList[task_id].has_thread[j] = false;
+    }
 }
 
 void start_init_tasks() {
@@ -115,14 +119,20 @@ void start_init_tasks() {
 
 // get thread id for the next task
 L4_ThreadId_t get_next_thread_id() {
-    return create_thread_id(last_task_id + 1, 0);
+    // task_id 0 is never used, so start search at 1
+    for (L4_Word_t i = 1; i < NUM_T_ENTRY; i++) {
+        if (!taskList[i].task_exists) {
+            return create_thread_id(i, 0);
+        }
+    }
+
+    panic("could not find free task_id!");
 }
 
-L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  path, const path_t  cmdline, idl4_server_environment * _env) {
+L4_ThreadId_t taskserver_create_task_real(CORBA_Object  _caller, const path_t  path, const path_t  cmdline, idl4_server_environment * _env) 
+{
     L4_ThreadId_t threadid = get_next_thread_id();
-
-    // TODO: reuse old entries
-    last_task_id++;
+    taskList[get_task_id(threadid)].task_exists = true;
     
     /* First ThreadControl to setup initial thread */
     if (!L4_ThreadControl (threadid, threadid, L4_Myself (), L4_nilthread, (void*)-1UL)) {
@@ -242,6 +252,8 @@ void taskserver_kill_task_implementation_real(CORBA_Object  _caller, const L4_Th
             }
         }
     }
+    
+    clear_tasklist_entry(task_id);
     
     IF_MEMORYSERVER_destroyed(memoryserverid, threadid, &env);
 }

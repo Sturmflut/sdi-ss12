@@ -8,13 +8,19 @@
 
 // TODO: Datenstruktur um Threads zu speichern
 typedef struct{
+    bool task_exists;
     bool has_thread[MAX_THREADS]; //index is thread cnt
 } Task_entry_t;
 
 extern CORBA_Environment env;
+
+// XXX: might be confusing - data structure has same name as in
+// memoryserver.h
 extern Task_entry_t taskList[NUM_T_ENTRY]; //index is task number
 
 void taskserver_init();
+
+void clear_tasklist_entry(L4_Word_t task_id);
 
 void start_init_tasks();
 
