@@ -42,7 +42,7 @@ ___return_from_main:
         je 6f
 	call *(%ebx)
 	add $4,%ebx
-	jump _Z4killv
+	jmp _Z4killv
 	jmp 5b
 6:
 
