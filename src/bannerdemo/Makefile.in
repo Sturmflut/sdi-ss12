@@ -14,13 +14,14 @@ include $(top_srcdir)/Mk/base.mk
 PROGRAM=	bannerdemo
 PROGRAM_DEPS=	$(top_builddir)/lib/crt0/libcrt0.a \
 		$(top_builddir)/lib/sdi/libsdi.a \
+		$(top_builddir)/lib/malloc_memoryserver/libmalloc_memoryserver.a \
 		$(top_srcdir)/include/$(ARCH)/sdi.ld
 
 SRCS=		main.cc
 
 IDLS=           
 
-LIBS+=		-ll4 -lsdi -lio -lmalloc_memoryserver
+LIBS+=		-lsdi -lmalloc_memoryserver -ll4 -lsdi -lio
 LDFLAGS+=	-Ttext=00100000 -T $(top_builddir)/include/$(ARCH)/sdi.ld $(top_builddir)/lib/crt0/libcrt0.a
 
 
