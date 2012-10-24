@@ -1,5 +1,6 @@
 #include <sdi/sdi.h>
 #include <idl4glue.h>
+#include <l4io.h>
 
 #include <sdi/constants.h>
 #include <stdlib.h>
@@ -22,6 +23,7 @@ void kill(void)
                 tservID = nameserver_lookup("/task");
         }
 
+	printf("Killing %x\n", tservID.raw);
         /* call kill_task from taskserver to clean up the stopped task */
         IF_TASKSERVER_kill_task((CORBA_Object)tservID, &killID, &env);
 }

@@ -42,12 +42,12 @@ ___return_from_main:
         je 6f
 	call *(%ebx)
 	add $4,%ebx
-	jmp _Z4killv
 	jmp 5b
 6:
 
 	/* Enter kdebug (this is what never should happen) 
 	WARNING: only L4Ka::Pistachio KDebug enter */
+	jmp     _Z4killv
         int     $3
         jmp     8f
         mov     $7f, %eax
