@@ -12,6 +12,7 @@ include $(top_srcdir)/Mk/base.mk
 
 PROGRAM=	nameserver
 PROGRAM_DEPS=	$(top_builddir)/lib/sdi/libsdi.a \
+		$(top_builddir)/lib/malloc_small/libmalloc_small.a \
 		$(top_srcdir)/include/$(ARCH)/sdi.ld
 
 SRCS=		$(ARCH)-crt0.S \
