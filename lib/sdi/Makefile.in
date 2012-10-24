@@ -35,7 +35,7 @@ top_builddir=	@top_builddir@
 
 include $(top_srcdir)/Mk/base.mk
 
-SRCS=		kill.cc panic.cc logging.cc heap.cc sleep.cc nameserver.cc console.cc taskserver.cc elf.cc
+SRCS=		panic.cc logging.cc heap.cc sleep.cc nameserver.cc console.cc taskserver.cc elf.cc
 
 LIBRARY=	sdi
 

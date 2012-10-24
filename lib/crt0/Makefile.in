@@ -35,7 +35,8 @@ top_builddir=	@top_builddir@
 
 include $(top_srcdir)/Mk/base.mk
 
-SRCS=		$(ARCH)-crt0.S
+SRCS=		$(ARCH)-crt0.S \
+		kill.cc
 
 LIBRARY=	crt0
 
