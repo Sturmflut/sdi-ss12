@@ -25,7 +25,7 @@ SRCS=		$(ARCH)-crt0.S \
 
 IDLS=		logger.idl pager.idl taskserver.idl
 
-LIBS+=		-ll4 -lsdi -lio -lsdi
+LIBS+=		-ll4 -lsdi -lio -lmalloc_small
 LDFLAGS+=	-O 3 -Ttext=$(ROOTTASK_LINKBASE) -T $(top_builddir)/include/$(ARCH)/sdi.ld
 
 

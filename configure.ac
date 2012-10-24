@@ -257,6 +257,8 @@ if/Makefile
 lib/Makefile
 lib/sdi/Makefile
 lib/crt0/Makefile
+lib/malloc_small/Makefile
+lib/malloc_memoryserver/Makefile
 src/Makefile
 src/root/Makefile
 src/memoryserver/Makefile

@@ -71,13 +71,13 @@ void game_loop()
     char key;
     char modifier;
     char ret;
-    char strbuf[30];
+    char strbuf[40];
 
     sleep(300);
 
     clear_screen();
 
-    print_stringat(25, 0, (char*)"Paddle up/down: w/s", SDI_CONSOLE_ATTRIBUTE_FGLIGHTYELLOW);
+    print_stringat(24, 0, (char*)"Paddle up/down: w/s   ESC: Exit", SDI_CONSOLE_ATTRIBUTE_FGLIGHTYELLOW);
 
     while(1)
     {
@@ -86,12 +86,19 @@ void game_loop()
 
         if(ret && modifier == 0)
         {
+            // Exit
+	    if(key == 0x1b)
+                return;
+
+            // Paddle up
             if(key == 'w')
                 paddley = paddley - 2;
 
+            // Paddle down
             if(key == 's')
                 paddley = paddley + 2;
 
+            // Handle paddle
             if(paddley < 1)
                 paddley = 1;
 

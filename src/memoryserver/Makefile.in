@@ -21,7 +21,7 @@ SRCS=		$(ARCH)-crt0.S \
 
 IDLS=		memoryserver.idl
 
-LIBS+=		-ll4 -lsdi -lio
+LIBS+=		-ll4 -lsdi -lio -lmalloc_small
 LDFLAGS+=	-Ttext=01540000 -T $(top_builddir)/include/$(ARCH)/sdi.ld
 
 include $(top_srcdir)/Mk/prog.mk
