@@ -62,6 +62,7 @@ void command_loop()
 {
     char* cmd;
     char* cmdline;
+    L4_ThreadId_t mythreadid = L4_GlobalId(L4_Myself());
 
     while(1)
     {
@@ -104,10 +105,10 @@ void command_loop()
                 IF_CONSOLESERVER_setactivethread((CORBA_Object)consoleid, console, &newtask, &env);
 
                 // wait for task death
-                while(42)
-                {
-                    sleep(10000);
-                }
+		task_wait(newtask);
+
+		// Switch console back to myself
+                IF_CONSOLESERVER_setactivethread((CORBA_Object)consoleid, console, &mythreadid, &env);
             }
             else
             {
