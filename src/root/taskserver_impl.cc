@@ -258,7 +258,7 @@ void taskserver_kill_task_implementation_real(CORBA_Object  _caller, const L4_Th
     IF_MEMORYSERVER_destroyed(memoryserverid, threadid, &env);
 }
 
-CORBA_boolean  taskserver_is_running_implementation(CORBA_Object  _caller, const L4_ThreadId_t * task_id, idl4_server_environment * _env)
+CORBA_boolean  taskserver_is_running_impl(CORBA_Object  _caller, const L4_ThreadId_t * task_id, idl4_server_environment * _env)
 {
     return taskList[get_task_id(*task_id)].task_exists;
 }
