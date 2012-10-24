@@ -10,6 +10,27 @@
 	\item API: Datenübergabe über Puffer (sequence<char>)
 \end{itemize}
 
+\subsubsection{Namensauflösung der Pfade}
+
+Nähere Beschreibung zur Funktionsweise des lookup siehe Kapitel "Naming".
+
+\subsubsection{FileID holen}
+
+Die Funktion get\_file\_id wertet den übergebenen Pfad aus und liefert bei Übereinstimmung
+die entsprechende ID, die über einen zero-based Index repräsentiert wird.
+
+Auszug des virtullen Dateisystems:
+\begin{lstlisting}
+Module: start afb000 size 1ff4a type: 1 cmdline: (cd)/sdios/nameserver
+Module: start b1b000 size 216e2 type: 1 cmdline: (cd)/sdios/memoryserver
+Module: start b3d000 size 27c22 type: 1 cmdline: (cd)/sdios/fileserver
+Module: start baf000 size d1f1 type: 1 cmdline: (cd)/sdios/keyboarddriver
+\end{lstlisting}
+
+Anwendungsbeispiel:
+
+Der Aufruf von get\_file\_id mit dem Parameter "memoryserver" liefert einen Rückgabewert von 1 zurück.
+
 \subsubsection{Directory listings}
 
 Code für die Auflistung des Inhalts von "/":
