@@ -61,5 +61,14 @@ interface IF_TASKSERVER : IF_NAMING, IF_FILE {
       @param int_num Interrupt number   
     */
     void attach_interrupt(in L4_Word_t int_num);
+	
+	/**
+      Checks, if a taks with given number is available and therefore running
+
+      @param task_id ID of Task that is checked for his state
+      @return Returns true, if task is created and running
+    */
+    boolean is_running(in L4_ThreadId_t task_id);
+
 };
 

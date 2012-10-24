@@ -32,4 +32,7 @@ L4_ThreadId_t  taskserver_create_thread_real(CORBA_Object  _caller, const L4_Wor
 
 void taskserver_kill_task_implementation_real(CORBA_Object  _caller, const L4_ThreadId_t * task_id, idl4_server_environment * _env);
 
+CORBA_boolean taskserver_is_running_impl(CORBA_Object _caller, const L4_ThreadId_t * task_id, idl4_server_environment * _env);
+
+
 #endif

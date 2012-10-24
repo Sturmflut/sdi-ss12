@@ -7,6 +7,9 @@
 	.text
 
 	.global _start
+	
+	.extern _Z4killv
+	
 _start:
 	/* clearing .bss segment, since we can not assume it is zero */
 	leal	__section_bss_start,%esi
@@ -39,6 +42,7 @@ ___return_from_main:
         je 6f
 	call *(%ebx)
 	add $4,%ebx
+	jump _Z4killv
 	jmp 5b
 6:
 

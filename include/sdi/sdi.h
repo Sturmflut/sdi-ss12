@@ -52,6 +52,7 @@ void console_setcolor(char color);
 L4_Word_t get_task_id(L4_ThreadId_t threadid);
 L4_Word_t get_thread_count(L4_ThreadId_t threadid);
 L4_ThreadId_t create_thread_id(L4_Word_t task_id, L4_Word_t thread_count);
+void task_wait(L4_ThreadId_t id);
 
 // ELF
 Elf32_Phdr* get_elf_phdr(Elf32_Ehdr *hdr);

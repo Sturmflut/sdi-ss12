@@ -53,6 +53,16 @@ IDL4_INLINE void  taskserver_kill_thread_implementation(CORBA_Object  _caller, c
 
 IDL4_PUBLISH_TASKSERVER_KILL_THREAD(taskserver_kill_thread_implementation);
 
+IDL4_INLINE CORBA_boolean  taskserver_is_running_implementation(CORBA_Object  _caller, const L4_ThreadId_t * task_id, idl4_server_environment * _env)
+
+{
+	/* implementation of IF_TASKSERVER::is_running */
+	
+	return taskserver_is_running_impl(_caller, task_id, _env);
+}
+
+IDL4_PUBLISH_TASKSERVER_IS_RUNNING(taskserver_is_running_implementation);
+
 IDL4_INLINE void  taskserver_set_priority_implementation(CORBA_Object  _caller, const L4_ThreadId_t * thread_id, const L4_Word_t  prio, idl4_server_environment * _env)
 
 {
